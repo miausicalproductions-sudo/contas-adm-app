@@ -1,0 +1,21 @@
+<!doctype html><html lang=pt-BR><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Contas ADM</title></head>
+<body style="margin:0;background:#1d1b2c;color:#fff;font-family:system-ui,sans-serif;display:grid;place-items:center;height:100vh">Abrindo…
+<script>
+/* App de celular: abre o painel guardado no aparelho. Se o Apps Script tiver uma versão mais nova do painel,
+   baixa em segundo plano e usa na próxima abertura (atualiza sozinho, sem reinstalar). */
+(async () => {
+  const V = h => { const m = String(h).match(/PANELV:(\d+)/); return m ? +m[1] : 0; };
+  let h = await (await fetch('painel.html')).text();
+  try { const c = localStorage.getItem('painelHtml'); if (c && V(c) > V(h)) h = c; } catch (e) {}
+  const upd = async () => {
+    try {
+      const u = (JSON.parse(localStorage.getItem('adm2') || '{}').cfg || {}).url || '';
+      if (!/^https:\/\/script\.google\.com\/.+\/exec$/.test(u)) return;
+      const t = await (await fetch(u + '?src=1')).text();
+      if (V(t) > V(h) && t.includes('</html>')) { localStorage.setItem('painelHtml', t); localStorage.setItem('painelNew', '1'); }
+    } catch (e) {}
+  };
+  document.open(); document.write(h); document.close();
+  setTimeout(upd, 8000);
+})();
+</script></body></html>

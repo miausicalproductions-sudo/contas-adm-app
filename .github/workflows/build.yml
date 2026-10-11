@@ -1,0 +1,79 @@
+name: Montar programas
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      mac:
+        description: 'Montar também o programa do Mac (Catalina 10.15 ou mais novo, Intel)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm install
+      - run: npm run dist:win
+      - uses: actions/upload-artifact@v4
+        with: { name: windows, path: dist/*.exe }
+
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 17 }
+      - run: npm install --no-save @capacitor/core@6.2.0 @capacitor/cli@6.2.0 @capacitor/android@6.2.0
+      - run: node tools/prep-www.js
+      - run: npx cap add android
+      - run: pip install pillow && python3 tools/android-icons.py
+      - run: npx cap sync android
+      - run: cd android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon
+      - run: cp android/app/build/outputs/apk/debug/app-debug.apk Contas-ADM-android.apk
+      - uses: actions/upload-artifact@v4
+        with: { name: android, path: Contas-ADM-android.apk }
+
+  mac:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.mac }}
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm install
+      - run: npm install --no-save electron@32.3.3   # última série que ainda roda no macOS 10.15 Catalina
+      - run: npm run dist:mac
+        env: { CSC_IDENTITY_AUTO_DISCOVERY: 'false' }
+      - uses: actions/upload-artifact@v4
+        with: { name: mac, path: dist/*.dmg }
+
+  publicar:
+    needs: [windows, android]
+    if: ${{ always() && (needs.windows.result == 'success' || needs.android.result == 'success') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { path: out }
+      - run: ls -R out
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: programas
+          name: Contas ADM — programas para instalar
+          body: |
+            Baixe o arquivo do seu aparelho:
+            • Windows 11: Contas-ADM-win-….exe
+            • Android: Contas-ADM-android.apk
+            • Mac: Contas-ADM-mac-….dmg (quando montado)
+            O painel dentro do programa se atualiza sozinho pelo Apps Script; só reinstale quando sair um programa novo aqui.
+          files: out/**/*
+          make_latest: true

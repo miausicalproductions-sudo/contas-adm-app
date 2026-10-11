@@ -1,0 +1,7 @@
+{
+  "appId": "com.studiosmiau.contasadm",
+  "appName": "Contas ADM",
+  "webDir": "www",
+  "android": { "allowMixedContent": false, "backgroundColor": "#1d1b2c" },
+  "server": { "androidScheme": "https" }
+}

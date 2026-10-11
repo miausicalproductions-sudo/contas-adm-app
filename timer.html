@@ -1,0 +1,26 @@
+<!doctype html><html lang=pt-BR><head><meta charset=utf-8><title>Cronômetro</title>
+<style>
+html,body{margin:0;height:100%;background:transparent;overflow:hidden;font-family:'Segoe UI',system-ui,-apple-system,sans-serif}
+#w{position:absolute;inset:0;background:rgba(29,27,44,.86);color:#fff;border-radius:16px;display:grid;grid-template-rows:auto 1fr auto;container-type:size;-webkit-app-region:drag;opacity:.92;transition:opacity .15s}
+#w:hover{opacity:1}
+.h{display:flex;align-items:center;gap:7px;padding:8px 10px 0;font-size:13px;min-width:0}.h b{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.h i{width:10px;height:10px;border-radius:50%;background:var(--c,#7c6cf0);flex:none}
+.t{display:grid;place-items:center;font-weight:700;font-variant-numeric:tabular-nums;font-size:min(16.5cqw,46cqh);line-height:1}
+#w.pa .t{opacity:.55}
+.b{display:flex;gap:6px;padding:0 10px 10px}
+button{-webkit-app-region:no-drag;font:inherit;color:#fff;border:0;cursor:pointer;border-radius:10px;padding:6px 4px;font-size:12.5px;font-weight:700;background:rgba(255,255,255,.12);flex:1}
+button:hover{background:rgba(255,255,255,.22)}.fin{background:#2F9E44}.fin:hover{background:#37b24d}.x{flex:0 0 26px;background:none;font-size:15px;padding:2px}
+</style></head><body><div id=w><div class=h><i></i><b id=n>Cronômetro</b><button class=x id=cl title="Fechar esta janela">×</button></div><div class=t id=t>00:00</div>
+<div class=b><button id=pa>Pausar</button><button class=fin id=fi>Finalizar</button></div></div>
+<script>
+const $=id=>document.getElementById(id),pad=n=>String(n).padStart(2,'0');
+const hms=ms=>{const t=Math.floor(ms/1000);return(t>=3600?pad(t/3600|0)+':':'')+pad((t/60|0)%60)+':'+pad(t%60)};
+const cmd=k=>{localStorage.setItem('tmcmd',JSON.stringify({k,t:Date.now()}))};
+function tick(){let T=null,S={};try{T=JSON.parse(localStorage.tm||'null');S=JSON.parse(localStorage.adm2||'{}')}catch(e){}
+ if(!T){$('n').textContent='Sem cronômetro';$('t').textContent='—';$('pa').textContent='Começar';$('w').classList.remove('pa');return}
+ const c=(S.cos||[]).find(x=>x.id==T.co)||{};$('n').textContent=c.name||'Cronômetro';document.documentElement.style.setProperty('--c',c.color||'#7c6cf0');
+ $('t').textContent=hms((+T.acc||0)+(T.paused?0:Date.now()-T.t0));$('pa').textContent=T.paused?'Continuar':'Pausar';$('w').classList.toggle('pa',!!T.paused)}
+$('pa').onclick=()=>{let T=null;try{T=JSON.parse(localStorage.tm||'null')}catch(e){}cmd(T?'pause':'start')};
+$('fi').onclick=()=>{cmd('fin');window.desktop&&desktop.focus()};
+$('cl').onclick=()=>window.close();
+tick();setInterval(tick,500);
+</script></body></html>
