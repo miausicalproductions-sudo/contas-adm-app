@@ -57,6 +57,8 @@ ipcMain.on('timer', (e, on) => {
   timerWin.loadFile(path.join(__dirname, 'timer.html'));
   timerWin.on('closed', () => { timerWin = null; });
 });
+ipcMain.handle('tm-state', async () => { try { return win ? JSON.parse(await win.webContents.executeJavaScript('window.__tmInfo?__tmInfo():"{}"')) : {}; } catch (e) { return {}; } });
+ipcMain.on('tm-cmd', (e, k) => { if (win && /^(pause|fin|start)$/.test(k)) win.webContents.executeJavaScript('window.__tmCmd&&__tmCmd(' + JSON.stringify(k) + ')').catch(() => {}); });
 ipcMain.on('focus-main', () => { if (win) { if (win.isMinimized()) win.restore(); win.show(); win.focus(); } });
 
 app.whenReady().then(() => {

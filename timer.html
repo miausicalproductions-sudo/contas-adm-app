@@ -14,12 +14,13 @@ button:hover{background:rgba(255,255,255,.22)}.fin{background:#2F9E44}.fin:hover
 <script>
 const $=id=>document.getElementById(id),pad=n=>String(n).padStart(2,'0');
 const hms=ms=>{const t=Math.floor(ms/1000);return(t>=3600?pad(t/3600|0)+':':'')+pad((t/60|0)%60)+':'+pad(t%60)};
-const cmd=k=>{localStorage.setItem('tmcmd',JSON.stringify({k,t:Date.now()}))};
-function tick(){let T=null,S={};try{T=JSON.parse(localStorage.tm||'null');S=JSON.parse(localStorage.adm2||'{}')}catch(e){}
- if(!T){$('n').textContent='Sem cronômetro';$('t').textContent='—';$('pa').textContent='Começar';$('w').classList.remove('pa');return}
- const c=(S.cos||[]).find(x=>x.id==T.co)||{};$('n').textContent=c.name||'Cronômetro';document.documentElement.style.setProperty('--c',c.color||'#7c6cf0');
- $('t').textContent=hms((+T.acc||0)+(T.paused?0:Date.now()-T.t0));$('pa').textContent=T.paused?'Continuar':'Pausar';$('w').classList.toggle('pa',!!T.paused)}
-$('pa').onclick=()=>{let T=null;try{T=JSON.parse(localStorage.tm||'null')}catch(e){}cmd(T?'pause':'start')};
+const cmd=k=>{if(window.desktop)desktop.tmCmd(k)};
+async function tick(){const T=window.desktop?await desktop.tmState():{};
+ if(!T||!T.on){$('n').textContent='Sem cronômetro';$('t').textContent='—';$('pa').textContent='Começar';$('w').classList.remove('pa');return}
+ $('n').textContent=T.n||'Cronômetro';document.documentElement.style.setProperty('--c',T.c||'#7c6cf0');
+ $('t').textContent=hms(T.ms);$('pa').textContent=T.paused?'Continuar':'Pausar';$('w').classList.toggle('pa',!!T.paused);ON=T.on}
+let ON=false;
+$('pa').onclick=()=>cmd(ON?'pause':'start');
 $('fi').onclick=()=>{cmd('fin');window.desktop&&desktop.focus()};
 $('cl').onclick=()=>window.close();
 tick();setInterval(tick,500);

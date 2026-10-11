@@ -750,7 +750,9 @@ setInterval(()=>{if(!TM||!TMEL)return;const t=TMEL.querySelector('.tmt');if(t)t.
 setTimeout(()=>{if(TM){if(TM.acc==null)TM.acc=0;tmShow()}},0);
 
 function tmPause(){if(!TM)return;if(TM.paused){TM.t0=Date.now();TM.paused=false}else{TM.acc=tmEl();TM.paused=true}tmSave();tmShow()}
-window.addEventListener('storage',e=>{if(e.key!='tmcmd'||!e.newValue)return;let c={};try{c=JSON.parse(e.newValue)}catch(x){}if(c.k=='pause')tmPause();if(c.k=='fin'&&TM){if(window.desktop)desktop.focus();tmShow();tmFinOpen()}if(c.k=='start'&&!TM){if(window.desktop)desktop.focus();tmToggle()}});
+window.__tmCmd=k=>{if(k=='pause')tmPause();if(k=='fin'&&TM){if(window.desktop)desktop.focus();tmShow();tmFinOpen()}if(k=='start'&&!TM){if(window.desktop)desktop.focus();tmToggle()}};
+window.__tmInfo=()=>{const c=TM?co(TM.co):{};return JSON.stringify({on:!!TM,ms:tmEl(),paused:!!(TM&&TM.paused),n:c.name||'',c:c.color||''})};
+window.addEventListener('storage',e=>{if(e.key=='tmcmd'&&e.newValue){try{window.__tmCmd(JSON.parse(e.newValue).k)}catch(x){}}});
 /* primeira vez no programa de PC / app de celular: endereço do Apps Script e chave */
 const IS_APP=!!(window.desktop||window.Capacitor);
 function appGate2(){if(!IS_APP||GAS||(S.cfg.url&&S.cfg.key))return;const d=document.createElement('div');d.id='lock';d.innerHTML=`<div class=lkb style="width:min(420px,92vw)"><span class=lki>${IK.lock}</span><b>${esc(BR().ag||'Contas ADM')}</b><p class=mu style="text-align:center">Primeira vez neste aparelho. No PC que já usa o painel, abra Config e copie os dois campos.</p><label style="width:100%;font-size:12.5px;font-weight:600">Endereço do Apps Script (/exec)<input id=g2u autocomplete=off spellcheck=false value="${esc(S.cfg.url||'')}" style="font-size:14px;letter-spacing:0;text-align:left"></label><label style="width:100%;font-size:12.5px;font-weight:600">Chave de acesso<input id=g2k autocomplete=off spellcheck=false style="font-size:14px;letter-spacing:0;text-align:left"></label><button class=btn data-act=g2ok style="width:100%">Entrar</button><small id=lkmsg></small></div>`;document.body.appendChild(d)}
