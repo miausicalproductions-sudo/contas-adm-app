@@ -5,5 +5,6 @@ contextBridge.exposeInMainWorld('desktop', {
   focus: () => ipcRenderer.send('focus-main'),
   tmState: () => ipcRenderer.invoke('tm-state'),
   tmCmd: k => ipcRenderer.send('tm-cmd', k),
+  checkUpdate: () => ipcRenderer.invoke('check-update'),
   platform: process.platform
 });

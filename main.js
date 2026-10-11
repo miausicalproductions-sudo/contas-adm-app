@@ -18,7 +18,7 @@ const savePrefs = o => { try { fs.writeFileSync(PREFS(), JSON.stringify(Object.a
 app.setAppUserModelId('com.studiosmiau.contasadm');          // avisos do Windows com o nome e o ícone do programa
 if (!app.requestSingleInstanceLock()) app.quit();
 app.on('second-instance', () => showMain());
-function showMain() { if (!win) return createWindow(true); if (win.isMinimized()) win.restore(); win.show(); win.focus(); }
+function showMain() { if (!win) return createWindow(true); if (win.isMinimized()) win.restore(); win.show(); win.focus(); if (Date.now() - lastCheck > 10 * 60 * 1000) setTimeout(() => checkUpdate(), 1500); }
 
 function createWindow(forceShow) {
   win = new BrowserWindow({
@@ -31,7 +31,8 @@ function createWindow(forceShow) {
   // links de fora (chat da IA, Instagram, Drive, WhatsApp) abrem no navegador do computador
   win.webContents.setWindowOpenHandler(({ url }) => { if (/^(https?:|mailto:)/.test(url)) shell.openExternal(url); return { action: 'deny' }; });
   win.webContents.on('will-navigate', (e, url) => { if (/^https?:/.test(url)) { e.preventDefault(); shell.openExternal(url); } });
-  win.webContents.once('did-finish-load', () => setTimeout(checkUpdate, 6000));
+  win.webContents.once('did-finish-load', () => setTimeout(() => checkUpdate(), 6000));
+  win.on('focus', () => { if (Date.now() - lastCheck > 10 * 60 * 1000) checkUpdate(); });
   // fechar = continuar perto do relógio para avisar a hora de postar (Sair de verdade: menu do ícone perto do relógio)
   win.on('close', e => {
     if (quitting || process.platform === 'darwin') return;
@@ -41,20 +42,28 @@ function createWindow(forceShow) {
   win.on('closed', () => { win = null; if (timerWin) timerWin.close(); });
 }
 
-async function checkUpdate() {
-  if (!win) return;
+// Atualização do painel: procura ao abrir, a cada 30 min, ao voltar para a janela e no botão "Procurar atualização" do painel
+let lastCheck = 0, checking = false;
+async function checkUpdate(manual) {
+  if (!win || checking) return { msg: 'procurando…' };
+  checking = true; lastCheck = Date.now();
   try {
     const url = await win.webContents.executeJavaScript("(()=>{try{return (JSON.parse(localStorage.adm2||'{}').cfg||{}).url||''}catch(e){return ''}})()");
-    if (!/^https:\/\/script\.google\.com\/.+\/exec$/.test(url)) return;
+    if (!/^https:\/\/script\.google\.com\/.+\/exec$/.test(url)) return { err: 'O endereço do Apps Script em Config não termina em /exec.' };
     const r = await fetch(url + '?src=1', { redirect: 'follow' }), t = await r.text();
-    const cur = ver(read(pick()));
-    if (ver(t) > cur && t.includes('</html>')) {
-      fs.writeFileSync(CACHE(), t, 'utf8');
-      const { response } = await dialog.showMessageBox(win, { type: 'info', buttons: ['Atualizar agora', 'Depois'], defaultId: 0, title: 'Contas ADM', message: 'Chegou uma versão nova do painel.', detail: 'Atualizar agora recarrega a tela (nada se perde). Se escolher "Depois", ela entra na próxima vez que abrir o programa.' });
-      if (response === 0 && win) win.loadFile(CACHE());
-    }
-  } catch (e) { /* sem internet ou Apps Script antigo: segue com a versão que já tem */ }
+    const cur = ver(read(pick())), novo = ver(t);
+    if (!novo || !t.includes('</html>')) return { err: 'O Apps Script não entregou o painel (confira se o arquivo "painel" existe e se a Nova versão foi implantada). Resposta: ' + r.status };
+    if (novo <= cur) return { ok: 1, cur, novo, msg: 'Já está na versão mais nova (painel v' + cur + ').' };
+    fs.writeFileSync(CACHE(), t, 'utf8');
+    if (!win.isVisible()) { win.loadFile(CACHE()); return { ok: 1, cur, novo, up: 1 }; }      // programa perto do relógio: atualiza sem perguntar
+    const { response } = await dialog.showMessageBox(win, { type: 'info', buttons: ['Atualizar agora', 'Depois'], defaultId: 0, title: 'Contas ADM', message: 'Chegou uma versão nova do painel (v' + novo + ').', detail: 'Atualizar agora recarrega a tela (nada se perde). Se escolher "Depois", ela entra na próxima vez que abrir o programa.' });
+    if (response === 0 && win) win.loadFile(CACHE());
+    return { ok: 1, cur, novo, up: response === 0 ? 1 : 0 };
+  } catch (e) { return { err: 'Sem conexão com o Apps Script agora (' + (e && e.message || e) + ').' }; }
+  finally { checking = false; }
 }
+ipcMain.handle('check-update', () => checkUpdate(true));
+setInterval(() => checkUpdate(), 30 * 60 * 1000);
 
 // cronômetro por cima de todos os programas
 ipcMain.on('timer', (e, on) => {
@@ -92,6 +101,7 @@ function setStart(on) {
 function trayMenu() {
   return Menu.buildFromTemplate([
     { label: 'Abrir o Contas ADM', click: showMain },
+    { label: 'Procurar atualização', click: async () => { showMain(); const r = await checkUpdate(true); if (r && (r.err || r.msg) && win) dialog.showMessageBox(win, { type: r.err ? 'warning' : 'info', message: r.err || r.msg, title: 'Contas ADM' }); } },
     { label: 'Cronômetro', click: () => { showMain(); if (win) win.webContents.executeJavaScript('window.__tmCmd&&__tmCmd("start")').catch(() => {}); } },
     { type: 'separator' },
     { label: 'Abrir junto com o Windows', type: 'checkbox', checked: prefs().iniciar !== 0, click: m => setStart(m.checked) },
