@@ -8,8 +8,12 @@
 //   VERIFY_TOKEN = o "token de verificação" mostrado no painel (Config → WhatsApp dos clientes)
 //   APP_SECRET   = a chave secreta do app da Meta (Configurações do app → Básico → Chave secreta do app)
 
+// O painel já preenche estes valores no botão "Copiar o código pronto" (aí não precisa criar as variáveis na Cloudflare)
+const CFG = { GAS_URL: '', GAS_KEY: '', VERIFY_TOKEN: '', APP_SECRET: '' };
+
 export default {
-  async fetch(req, env, ctx) {
+  async fetch(req, env0, ctx) {
+    const env = { GAS_URL: (env0 && env0.GAS_URL) || CFG.GAS_URL, GAS_KEY: (env0 && env0.GAS_KEY) || CFG.GAS_KEY, VERIFY_TOKEN: (env0 && env0.VERIFY_TOKEN) || CFG.VERIFY_TOKEN, APP_SECRET: (env0 && env0.APP_SECRET) || CFG.APP_SECRET };
     const url = new URL(req.url);
 
     // 1) A Meta confere o endereço uma vez, quando o webhook é cadastrado
