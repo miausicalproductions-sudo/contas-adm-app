@@ -10,17 +10,18 @@ html,body{margin:0;height:100%;background:transparent;overflow:hidden;font-famil
 button{-webkit-app-region:no-drag;font:inherit;color:#fff;border:0;cursor:pointer;border-radius:10px;padding:6px 4px;font-size:12.5px;font-weight:700;background:rgba(255,255,255,.12);flex:1}
 button:hover{background:rgba(255,255,255,.22)}.fin{background:#2F9E44}.fin:hover{background:#37b24d}.x{flex:0 0 26px;background:none;font-size:15px;padding:2px}
 </style></head><body><div id=w><div class=h><i></i><b id=n>Cronômetro</b><button class=x id=cl title="Fechar esta janela">×</button></div><div class=t id=t>00:00</div>
-<div class=b><button id=pa>Pausar</button><button class=fin id=fi>Finalizar</button></div></div>
+<div class=b><button id=pa>Pausar</button><button id=ad title="Esqueceu de ligar antes? Soma 15 minutos (clique de novo para somar mais)" style="flex:0 0 46px">+15</button><button class=fin id=fi>Finalizar</button></div></div>
 <script>
 const $=id=>document.getElementById(id),pad=n=>String(n).padStart(2,'0');
 const hms=ms=>{const t=Math.floor(ms/1000);return(t>=3600?pad(t/3600|0)+':':'')+pad((t/60|0)%60)+':'+pad(t%60)};
 const cmd=k=>{if(window.desktop)desktop.tmCmd(k)};
 async function tick(){const T=window.desktop?await desktop.tmState():{};
- if(!T||!T.on){$('n').textContent='Sem cronômetro';$('t').textContent='—';$('pa').textContent='Começar';$('w').classList.remove('pa');return}
+ if(!T||!T.on){$('n').textContent='Sem cronômetro';$('t').textContent='—';$('pa').textContent='Começar';$('ad').hidden=true;$('w').classList.remove('pa');ON=false;return}$('ad').hidden=false;
  $('n').textContent=T.n||'Cronômetro';document.documentElement.style.setProperty('--c',T.c||'#7c6cf0');
  $('t').textContent=hms(T.ms);$('pa').textContent=T.paused?'Continuar':'Pausar';$('w').classList.toggle('pa',!!T.paused);ON=T.on}
 let ON=false;
 $('pa').onclick=()=>cmd(ON?'pause':'start');
+$('ad').onclick=()=>cmd('add15');
 $('fi').onclick=()=>{cmd('fin');window.desktop&&desktop.focus()};
 $('cl').onclick=()=>window.close();
 tick();setInterval(tick,500);

@@ -2,6 +2,17 @@
   "appId": "com.studiosmiau.contasadm",
   "appName": "Contas ADM",
   "webDir": "www",
-  "android": { "allowMixedContent": false, "backgroundColor": "#1d1b2c" },
-  "server": { "androidScheme": "https" }
+  "android": {
+    "allowMixedContent": false,
+    "backgroundColor": "#1d1b2c"
+  },
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_notify",
+      "iconColor": "#5B4BDB"
+    }
+  }
 }

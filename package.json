@@ -18,7 +18,7 @@
   "build": {
     "appId": "com.studiosmiau.contasadm",
     "productName": "Contas ADM",
-    "files": ["main.js", "preload.js", "timer.html", "app/**"],
+    "files": ["main.js", "preload.js", "timer.html", "app/**", "build/icon.png"],
     "directories": { "output": "dist", "buildResources": "build" },
     "artifactName": "Contas-ADM-${os}-${version}.${ext}",
     "win": { "target": "nsis", "icon": "build/icon.png" },
