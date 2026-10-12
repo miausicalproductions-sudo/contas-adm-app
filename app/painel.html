@@ -503,7 +503,7 @@ button.fk{text-align:left;cursor:pointer;transition:transform .15s,box-shadow .1
 @media (max-width:760px){.ccn{grid-template-columns:1fr 1fr}}
 </style></head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:42*/const PV=42;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:43*/const PV=43;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -1283,7 +1283,10 @@ async function osDrop(files,day,band){if(!sel)return pickCo(null,()=>osDrop(file
  const sg=sugType(L),n=blank({type:sg.t},day);if(band!=null&&band!=='')n.time=slot(day,sel,BT(day,sel,n.type,band),1);if(files.length==1)n.txt=cleanName(files[0].name);openMd(n,true,{sug:sg.t,why:sg.why});upFiles(files)}
 /* campos que dependem do formato: Stories têm telas e figurinha; os outros têm legenda e texto alternativo */
 function mdType(){const st=$('#my')&&$('#my').value=='stories';{const gu=$('#mguia'),v=($('#my')||{}).value;if(gu){gu.hidden=!['stories','carrossel','reels'].includes(v);const b3=gu.querySelector('[data-act=stopen]');if(b3)b3.hidden=v=='reels'}}document.querySelectorAll('#md .tpx').forEach(e=>e.hidden=(e.dataset.for=='st')!=st);const cv=$('#mcov');if(cv)cv.hidden=($('#my')||{}).value!='reels'}
-function capCount(){const t=$('#mcap'),n=$('#mcapn');if(!t||!n)return;const v=t.value,h=(v.match(/#[\wÀ-ÿ]+/g)||[]).length;n.textContent=v?v.length+' de 2.200 caracteres · '+h+(h==1?' hashtag':' hashtags'):'';n.style.color=v.length>2200?'#C62F4A':''}
+function capCount(){const t=$('#mcap'),n=$('#mcapn');if(!t||!n)return;const v=t.value,ty=($('#my')||{}).value;
+ if(ty=='stories'){const k=v?artParse(v).S.length:0;n.textContent=v?k+(k==1?' tela':' telas')+' (Stories não têm limite de legenda)':'';n.style.color='';return}
+ const T=/^\s*\**tela\s*\d/im.test(v)?(v.match(/^\s*\**legenda\**\s*:\s*([\s\S]*)$/im)||[,''])[1].split(/^\s*\**para o chat\s*gpt\**\s*:/im)[0].trim():v,h=(T.match(/#[\wÀ-ÿ]+/g)||[]).length;
+ n.textContent=v?(T!==v?'legenda (depois de LEGENDA:): ':'')+T.length+' de 2.200 caracteres · '+h+(h==1?' hashtag':' hashtags')+(T!==v?' · as telas saem daqui ao montar':''):'';n.style.color=T.length>2200?'#C62F4A':''}
 /* colaboradores e marcações: "@ana, instagram.com/joao" → ['ana','joao'] */
 const igU=(v,n)=>String(v||'').split(/[\s,;]+/).map(x=>x.replace(/^(https?:\/\/)?(www\.)?instagram\.com\//i,'').replace(/^@/,'').replace(/[/?#].*$/,'').trim().toLowerCase()).filter(x=>/^[a-z0-9._]{1,30}$/.test(x)).filter((x,i,a)=>a.indexOf(x)==i).slice(0,n||20);
 const igAt=L=>L.map(x=>'@'+x).join(', ');
