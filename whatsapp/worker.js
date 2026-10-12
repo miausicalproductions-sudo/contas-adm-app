@@ -21,6 +21,7 @@ export default {
     if (req.method === 'GET' && path === '/s') return storyPage(url, env);
     if (req.method === 'GET' && path === '/f') return storyFile(url, env);
     if (req.method === 'POST' && path === '/done') return storyDone(url, env);
+    if (req.method === 'POST' && path === '/n') return ntfyRelay(req, env);       // avisos do iPhone: o Apps Script manda por aqui
 
     // Telegram (modo instantâneo): o segredo vem no cabeçalho e o Apps Script confere
     if (req.method === 'POST' && path === '/tg') {
@@ -84,6 +85,17 @@ async function assinaturaOk(raw, header, secret) {
 
 const esc = t => String(t == null ? '' : t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const TN = { reels: 'Reels', stories: 'Stories', feed: 'Feed', carrossel: 'Carrossel' };
+
+async function ntfyRelay(req, env) {                // repassa o aviso ao ntfy.sh (só aceita se vier assinado com a chave do painel)
+  let j; try { j = await req.json(); } catch (e) { return new Response('pedido inválido', { status: 400 }); }
+  const b = String(j.b || ''), s = String(j.s || '');
+  if (!b || !env.GAS_KEY || !igual(s, await hmacHex(env.GAS_KEY, 'n:' + b))) return new Response('assinatura inválida', { status: 401 });
+  let m; try { m = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(b), c => c.charCodeAt(0)))); } catch (e) { return new Response('pedido inválido', { status: 400 }); }
+  if (!m.t || Math.abs(Date.now() - m.t) > 10 * 60 * 1000) return new Response('aviso velho', { status: 401 });
+  delete m.t;
+  const r = await fetch('https://ntfy.sh/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(m) });
+  return new Response(r.ok ? 'ok' : 'ntfy: ' + r.status, { status: r.ok ? 200 : 502 });
+}
 
 async function storyFile(url, env) {
   const ok = await linkOk(url, env); if (!ok) return new Response('link inválido', { status: 403 });
