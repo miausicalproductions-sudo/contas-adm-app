@@ -9,9 +9,11 @@
   try { const c = localStorage.getItem('painelHtml'); if (c && V(c) > V(h)) h = c; } catch (e) {}
   const upd = async () => {
     try {
-      const u = (JSON.parse(localStorage.getItem('adm2') || '{}').cfg || {}).url || '';
+      const cfg = (JSON.parse(localStorage.getItem('adm2') || '{}').cfg || {}), u = cfg.url || '';
       if (!/^https:\/\/script\.google\.com\/.+\/exec$/.test(u)) return;
-      const t = await (await fetch(u + '?src=1')).text();
+      let t = '';
+      try { const j = JSON.parse(await (await fetch(u, { method: 'POST', body: JSON.stringify({ action: 'painel', key: cfg.key || '' }) })).text()); t = j.html || ''; } catch (e) {}   // mesmo caminho da sincronização
+      if (!t) t = await (await fetch(u + '?src=1')).text();
       if (V(t) > V(h) && t.includes('</html>')) { localStorage.setItem('painelHtml', t); localStorage.setItem('painelNew', '1'); }
     } catch (e) {}
   };

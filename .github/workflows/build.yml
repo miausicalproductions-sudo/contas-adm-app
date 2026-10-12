@@ -40,6 +40,7 @@ jobs:
       - run: node tools/prep-www.js
       - run: npx cap add android
       - run: pip install pillow && python3 tools/android-icons.py
+      - run: python3 tools/android-native.py
       - run: npx cap sync android
       - name: Mesma assinatura em todas as versões (assim o app novo instala por cima do antigo, sem desinstalar)
         run: mkdir -p ~/.android && cp build/android-debug.keystore ~/.android/debug.keystore
