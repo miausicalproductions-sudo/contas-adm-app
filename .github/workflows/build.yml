@@ -74,7 +74,7 @@ jobs:
       - uses: softprops/action-gh-release@v2
         with:
           tag_name: programas
-          name: Contas ADM — programas para instalar
+          name: Studios Miau — programas para instalar
           body: |
             Baixe o arquivo do seu aparelho:
             • Windows 11: Contas-ADM-win-….exe

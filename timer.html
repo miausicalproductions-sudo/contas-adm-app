@@ -8,19 +8,27 @@ html,body{margin:0;height:100%;background:transparent;overflow:hidden;font-famil
 #w.pa .t{opacity:.55}
 .b{display:flex;gap:6px;padding:0 10px 10px}
 button{-webkit-app-region:no-drag;font:inherit;color:#fff;border:0;cursor:pointer;border-radius:10px;padding:6px 4px;font-size:12.5px;font-weight:700;background:rgba(255,255,255,.12);flex:1}
-button:hover{background:rgba(255,255,255,.22)}.fin{background:#2F9E44}.fin:hover{background:#37b24d}.x{flex:0 0 26px;background:none;font-size:15px;padding:2px}
-</style></head><body><div id=w><div class=h><i></i><b id=n>Cronômetro</b><button class=x id=cl title="Fechar esta janela">×</button></div><div class=t id=t>00:00</div>
+button:hover{background:rgba(255,255,255,.22)}
+#pk{display:none;overflow:auto;padding:4px 8px 8px;gap:4px;align-content:start;scrollbar-width:none}#pk::-webkit-scrollbar{display:none}#w.pick #pk{display:grid}#w.pick .t,#w.pick .b{display:none}#w.pick{grid-template-rows:auto 1fr}
+#pk button{display:flex;align-items:center;gap:8px;text-align:left;padding:7px 10px;font-weight:600;flex:none}#pk button i{width:10px;height:10px;border-radius:50%;flex:none}#pk small{opacity:.6;padding:0 4px}.fin{background:#2F9E44}.fin:hover{background:#37b24d}.x{flex:0 0 26px;background:none;font-size:15px;padding:2px}
+</style></head><body><div id=w><div class=h><i></i><b id=n>Cronômetro</b><button class=x id=cl title="Fechar esta janela">×</button></div><div class=t id=t>00:00</div><div id=pk></div>
 <div class=b><button id=pa>Pausar</button><button id=ad title="Esqueceu de ligar antes? Soma 15 minutos (clique de novo para somar mais)" style="flex:0 0 46px">+15</button><button class=fin id=fi>Finalizar</button></div></div>
 <script>
 const $=id=>document.getElementById(id),pad=n=>String(n).padStart(2,'0');
 const hms=ms=>{const t=Math.floor(ms/1000);return(t>=3600?pad(t/3600|0)+':':'')+pad((t/60|0)%60)+':'+pad(t%60)};
 const cmd=k=>{if(window.desktop)desktop.tmCmd(k)};
+let PK=false,GR=0;
+async function pick(){const L=window.desktop&&desktop.tmCos?await desktop.tmCos():[];PK=true;$('w').classList.add('pick');$('n').textContent='Cronômetro de qual empresa?';
+ $('pk').innerHTML=L.length?L.map(c=>`<button data-id="${c.id}"><i style="background:${c.c||'#7c6cf0'}"></i>${(c.n||'').replace(/[<>&"]/g,'')}</button>`).join(''):'<small>Abra o programa uma vez para carregar as empresas.</small>';
+ if(window.desktop&&desktop.tmFit)desktop.tmFit(Math.min(440,44+Math.max(1,L.length)*36))}
+$('pk').onclick=e=>{const b=e.target.closest('button[data-id]');if(!b)return;cmd('start:'+b.dataset.id);GR=Date.now();PK=false;$('n').textContent=b.textContent;$('t').textContent='00:00';$('w').classList.remove('pick');if(window.desktop&&desktop.tmFit)desktop.tmFit(132);setTimeout(tick,300)};
 async function tick(){const T=window.desktop?await desktop.tmState():{};
- if(!T||!T.on){$('n').textContent='Sem cronômetro';$('t').textContent='—';$('pa').textContent='Começar';$('ad').hidden=true;$('w').classList.remove('pa');ON=false;return}$('ad').hidden=false;
+ if(!T||!T.on){if(Date.now()-GR<3000)return;if(!PK)pick();ON=false;return}
+ if(PK){PK=false;$('w').classList.remove('pick');if(desktop.tmFit)desktop.tmFit(132)}$('ad').hidden=false;
  $('n').textContent=T.n||'Cronômetro';document.documentElement.style.setProperty('--c',T.c||'#7c6cf0');
  $('t').textContent=hms(T.ms);$('pa').textContent=T.paused?'Continuar':'Pausar';$('w').classList.toggle('pa',!!T.paused);ON=T.on}
 let ON=false;
-$('pa').onclick=()=>cmd(ON?'pause':'start');
+$('pa').onclick=()=>ON?cmd('pause'):pick();
 $('ad').onclick=()=>cmd('add15');
 $('fi').onclick=()=>{cmd('fin');window.desktop&&desktop.focus()};
 $('cl').onclick=()=>window.close();

@@ -1,4 +1,4 @@
-// Contas ADM — Worker da Cloudflare (grátis)
+// Studios Miau — Worker da Cloudflare (grátis)
 // 1) Recebe os avisos da Meta (WhatsApp dos clientes) e do Telegram e repassa ao Apps Script na hora.
 //    O Apps Script não consegue responder direto (o Google redireciona o endereço), por isso este intermediário.
 // 2) Página do Story (/s): a arte pronta para mandar aos Stories do Instagram, as telas para copiar e o botão "Postei".
@@ -38,7 +38,7 @@ export default {
           : new Response('token de verificação diferente do painel', { status: 403 });
       }
       if (env.GAS_URL && env.GAS_KEY) ctx.waitUntil(gas(env, { action: 'wkHello', origin: url.origin }).catch(() => {}));   // o Apps Script aprende o endereço deste Worker
-      return new Response('Contas ADM: Worker do WhatsApp no ar.' + (env.GAS_URL && env.GAS_KEY && env.VERIFY_TOKEN && env.APP_SECRET ? '' : ' Falta preencher as variáveis.'), { status: 200, headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
+      return new Response('Studios Miau: Worker do WhatsApp no ar.' + (env.GAS_URL && env.GAS_KEY && env.VERIFY_TOKEN && env.APP_SECRET ? '' : ' Falta preencher as variáveis.'), { status: 200, headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
     }
     if (req.method !== 'POST') return new Response('método não aceito', { status: 405 });
 
@@ -117,6 +117,7 @@ async function storyPage(url, env) {
 <div class=media>${media.length ? media.map((m, i) => `<div class=m>${/^video/.test(m.mime) ? `<video src="${m.src}" controls playsinline preload=metadata></video>` : `<img src="${m.src}" alt="">`}<button data-i=${i}>${media.length > 1 ? (i + 1) + '/' + media.length + ' · ' : ''}${p.type === 'stories' ? 'Mandar para os Stories' : 'Mandar para o Instagram'}</button></div>`).join('') : '<div class=card><p>A arte ainda não está no Drive.</p></div>'}</div>
 <div id=msg class=mu>${p.type === 'stories' ? 'Toque no botão e escolha <b>Instagram → Stories</b>. Lá você coloca a música e a figurinha.' : 'Toque no botão e escolha <b>Instagram</b> (Feed ou Reels). A legenda está logo abaixo para copiar.'}</div>
 ${p.fig ? `<div class="card fig"><h3>Figurinha: ${esc(p.figName)}</h3><p>${esc(p.figtx || '')}</p>${p.figtx ? `<div class=row><button class=b2 data-copy="${esc(p.figtx)}">Copiar o texto da figurinha</button></div>` : ''}</div>` : ''}
+${p.utags || p.collab ? `<div class=card><h3>${p.type === 'stories' ? 'Marcar no Story' : 'Marcar e colaboradores'}<\/h3><p>${p.utags ? 'Marcar: ' + esc(p.utags.split(' ').map(u => '@' + u).join(' ')) : ''}${p.utags && p.collab ? '\n' : ''}${p.collab ? 'Colaboradores: ' + esc(p.collab.split(' ').map(u => '@' + u).join(' ')) : ''}<\/p><div class=row>${p.utags ? `<button class=b2 data-copy="${esc(p.utags.split(' ').map(u => '@' + u).join(' '))}">Copiar os @<\/button>` : ''}<\/div><\/div>` : ''}
 ${p.cap ? `<div class=card><h3>${p.type === 'stories' ? 'Telas' : 'Legenda'}</h3><p>${esc(p.cap)}</p><div class=row><button class=b2 data-copy="${esc(p.cap)}">Copiar</button></div></div>` : ''}
 <div class=row style="justify-content:center;margin-top:16px"><button class="b2 ok" id=done>${p.st === 'postado' ? '✓ Já está como postado' : '✅ Postei'}</button></div>
 <script>

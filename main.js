@@ -1,8 +1,11 @@
-// Contas ADM — programa de PC (Windows / Mac)
+// Studios Miau — programa de PC (Windows / Mac) (antes chamado Contas ADM)
 // Abre o painel numa janela própria. O painel conversa com o Apps Script como sempre.
 // Atualização: o programa baixa do Apps Script a versão nova do painel (arquivo "painel") e usa na próxima abertura.
 const { app, BrowserWindow, ipcMain, dialog, shell, Menu, Tray, nativeImage } = require('electron');
 const path = require('path'), fs = require('fs');
+// o nome mudou para Studios Miau, mas a pasta de dados continua a mesma: não perde a configuração, a chave nem o cronômetro
+try { app.setPath('userData', path.join(app.getPath('appData'), 'Contas ADM')); } catch (e) { }
+const NOME = 'Studios Miau';
 
 const BUNDLED = path.join(__dirname, 'app', 'painel.html');
 const CACHE = () => path.join(app.getPath('userData'), 'painel-atual.html');
@@ -22,7 +25,7 @@ function showMain() { if (!win) return createWindow(true); if (win.isMinimized()
 
 function createWindow(forceShow) {
   win = new BrowserWindow({
-    width: 1440, height: 920, minWidth: 380, minHeight: 500, title: 'Contas ADM',
+    width: 1440, height: 920, minWidth: 380, minHeight: 500, title: NOME,
     icon: path.join(__dirname, 'build', 'icon.png'), backgroundColor: '#f6f5fa', autoHideMenuBar: true, show: false,
     webPreferences: { preload: path.join(__dirname, 'preload.js'), contextIsolation: true, nodeIntegration: false, spellcheck: true, backgroundThrottling: false }
   });
@@ -37,7 +40,7 @@ function createWindow(forceShow) {
   win.on('close', e => {
     if (quitting || process.platform === 'darwin') return;
     e.preventDefault(); win.hide();
-    if (!prefs().avisouBandeja && tray) { tray.displayBalloon && tray.displayBalloon({ title: 'Contas ADM continua aberto', content: 'Fico aqui perto do relógio para avisar a hora de postar. Para sair de vez: clique com o botão direito no ícone → Sair.' }); savePrefs({ avisouBandeja: 1 }); }
+    if (!prefs().avisouBandeja && tray) { tray.displayBalloon && tray.displayBalloon({ title: NOME + ' continua aberto', content: 'Fico aqui perto do relógio para avisar a hora de postar. Para sair de vez: clique com o botão direito no ícone → Sair.' }); savePrefs({ avisouBandeja: 1 }); }
   });
   win.on('closed', () => { win = null; if (timerWin) timerWin.close(); });
 }
@@ -64,7 +67,7 @@ async function checkUpdate(manual) {
     if (novo <= cur) return { ok: 1, cur, novo, msg: 'Já está na versão mais nova (painel v' + cur + ').' };
     fs.writeFileSync(CACHE(), t, 'utf8');
     if (!win.isVisible()) { win.loadFile(CACHE()); return { ok: 1, cur, novo, up: 1 }; }      // programa perto do relógio: atualiza sem perguntar
-    const { response } = await dialog.showMessageBox(win, { type: 'info', buttons: ['Atualizar agora', 'Depois'], defaultId: 0, title: 'Contas ADM', message: 'Chegou uma versão nova do painel (v' + novo + ').', detail: 'Atualizar agora recarrega a tela (nada se perde). Se escolher "Depois", ela entra na próxima vez que abrir o programa.' });
+    const { response } = await dialog.showMessageBox(win, { type: 'info', buttons: ['Atualizar agora', 'Depois'], defaultId: 0, title: NOME, message: 'Chegou uma versão nova do painel (v' + novo + ').', detail: 'Atualizar agora recarrega a tela (nada se perde). Se escolher "Depois", ela entra na próxima vez que abrir o programa.' });
     if (response === 0 && win) win.loadFile(CACHE());
     return { ok: 1, cur, novo, up: response === 0 ? 1 : 0 };
   } catch (e) { return { err: 'Sem conexão com o Apps Script agora (' + (e && e.message || e) + ').' }; }
@@ -73,28 +76,53 @@ async function checkUpdate(manual) {
 ipcMain.handle('check-update', () => checkUpdate(true));
 setInterval(() => checkUpdate(), 30 * 60 * 1000);
 
-// cronômetro por cima de todos os programas
-ipcMain.on('timer', (e, on) => {
-  if (!on) { if (timerWin) timerWin.close(); return; }
-  if (timerWin) { timerWin.show(); timerWin.focus(); return; }
+// cronômetro por cima de todos os programas (abre sem mostrar o programa inteiro)
+function openTimer(pick) {
+  const h = pick ? Math.min(440, 74 + Math.max(1, (lastCos || []).length) * 34) : 132;
+  if (timerWin) { if (pick) timerWin.setSize(Math.max(260, timerWin.getSize()[0]), h); timerWin.show(); timerWin.focus(); return; }
+  const wa = require('electron').screen.getPrimaryDisplay().workArea;
   timerWin = new BrowserWindow({
-    width: 260, height: 132, minWidth: 190, minHeight: 90, frame: false, transparent: true, resizable: true, alwaysOnTop: true,
+    width: 260, height: h, minWidth: 190, minHeight: 90, frame: false, transparent: true, resizable: true, alwaysOnTop: true,
+    x: wa.x + wa.width - 280, y: wa.y + wa.height - h - 20,
     skipTaskbar: false, title: 'Cronômetro', icon: path.join(__dirname, 'build', 'icon.png'), hasShadow: true,
     webPreferences: { preload: path.join(__dirname, 'preload.js'), contextIsolation: true, nodeIntegration: false }
   });
   timerWin.setAlwaysOnTop(true, 'screen-saver'); timerWin.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
   timerWin.loadFile(path.join(__dirname, 'timer.html'));
   timerWin.on('closed', () => { timerWin = null; });
-});
+}
+ipcMain.on('timer', (e, on) => { if (!on) { if (timerWin) timerWin.close(); return; } openTimer(false); });
+ipcMain.on('tm-fit', (e, h) => { if (timerWin && h > 80 && h < 600) { const [w] = timerWin.getSize(); timerWin.setSize(Math.max(190, w), Math.round(h)); } });
+// lista de empresas para o cronômetro (lida do painel, que fica aberto escondido perto do relógio)
+let lastCos = [];
+async function loadCos() {
+  if (!win) return lastCos;
+  try { const L = JSON.parse(await win.webContents.executeJavaScript('window.__tmCos?__tmCos():"[]"')); if (Array.isArray(L)) lastCos = L; } catch (e) { }
+  return lastCos;
+}
+async function tmRunning() { try { return win ? JSON.parse(await win.webContents.executeJavaScript('window.__tmInfo?__tmInfo():"{}"')) : {}; } catch (e) { return {}; } }
+async function refreshTray() { await loadCos(); const t = await tmRunning(); if (tray && process.platform === 'linux') tray.setContextMenu(trayMenu(t)); return t; }
+function tmStartCo(id) {                                   // escolhe a empresa no menu → o cronômetro começa e aparece por cima
+  if (!win) { createWindow(false); win.webContents.once('did-finish-load', () => setTimeout(() => tmStartCo(id), 1500)); return; }
+  win.webContents.executeJavaScript('window.__tmCmd&&__tmCmd(' + JSON.stringify('start:' + id) + ')').catch(() => {});
+  openTimer(false); setTimeout(refreshTray, 800);
+}
+ipcMain.handle('tm-cos', () => loadCos());
 ipcMain.handle('tm-state', async () => { try { return win ? JSON.parse(await win.webContents.executeJavaScript('window.__tmInfo?__tmInfo():"{}"')) : {}; } catch (e) { return {}; } });
-ipcMain.on('tm-cmd', (e, k) => { if (win && /^(pause|fin|start|add\d{1,3})$/.test(k)) win.webContents.executeJavaScript('window.__tmCmd&&__tmCmd(' + JSON.stringify(k) + ')').catch(() => {}); });
+ipcMain.on('tm-cmd', (e, k) => {
+  if (!win || !/^(pause|fin|start|add\d{1,3}|start:[\w-]{1,64})$/.test(k)) return;
+  win.webContents.executeJavaScript('window.__tmCmd&&__tmCmd(' + JSON.stringify(k) + ')').catch(() => {});
+  setTimeout(refreshTray, 800);
+});
 ipcMain.on('focus-main', () => showMain());
 
 app.whenReady().then(() => {
   Menu.setApplicationMenu(process.platform === 'darwin' ? Menu.buildFromTemplate([{ role: 'appMenu' }, { role: 'editMenu' }, { role: 'viewMenu' }, { role: 'windowMenu' }]) : null);
   createWindow();
   makeTray();
-  if (prefs().iniciar === undefined) setStart(true);         // primeira vez: já abre junto com o Windows (dá para desligar no ícone)
+  setStart(prefs().iniciar !== 0);                          // abre junto com o Windows (padrão); regrava o caminho caso o programa tenha mudado de pasta
+  if (win) win.webContents.on('did-finish-load', () => setTimeout(refreshTray, 3000));
+  setInterval(refreshTray, 2 * 60 * 1000);
   app.on('activate', () => { if (!BrowserWindow.getAllWindows().length) createWindow(true); else showMain(); });
 });
 app.on('before-quit', () => { quitting = true; });
@@ -104,14 +132,19 @@ app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(
 function setStart(on) {
   savePrefs({ iniciar: on ? 1 : 0 });
   try { app.setLoginItemSettings({ openAtLogin: !!on, args: ['--oculto'] }); } catch (e) {}
-  if (tray) tray.setContextMenu(trayMenu());
+  if (tray) refreshTray();
 }
-function trayMenu() {
+function trayMenu(t) {
+  t = t || {};
+  const fmt = ms => { const m = Math.floor((ms || 0) / 60000); return (m >= 60 ? Math.floor(m / 60) + 'h' : '') + String(m % 60).padStart(m >= 60 ? 2 : 1, '0') + 'min'; };
+  const cron = t.on
+    ? { label: 'Cronômetro: ' + (t.n || '') + ' · ' + fmt(t.ms) + (t.paused ? ' (pausado)' : ''), click: () => openTimer(false) }
+    : { label: 'Cronômetro', submenu: lastCos.length ? [{ label: 'De qual empresa?', enabled: false }, ...lastCos.slice(0, 25).map(c => ({ label: c.n, click: () => tmStartCo(c.id) }))] : [{ label: 'Escolher a empresa…', click: () => openTimer(true) }] };
   return Menu.buildFromTemplate([
-    { label: 'Abrir o Contas ADM', click: showMain },
-    { label: 'Procurar atualização', click: async () => { showMain(); const r = await checkUpdate(true); if (r && (r.err || r.msg) && win) dialog.showMessageBox(win, { type: r.err ? 'warning' : 'info', message: r.err || r.msg, title: 'Contas ADM' }); } },
-    { label: 'Cronômetro', click: () => { showMain(); if (win) win.webContents.executeJavaScript('window.__tmCmd&&__tmCmd("start")').catch(() => {}); } },
+    { label: 'Abrir o ' + NOME, click: showMain },
+    cron,
     { type: 'separator' },
+    { label: 'Procurar atualização', click: async () => { showMain(); const r = await checkUpdate(true); if (r && (r.err || r.msg) && win) dialog.showMessageBox(win, { type: r.err ? 'warning' : 'info', message: r.err || r.msg, title: NOME }); } },
     { label: 'Abrir junto com o Windows', type: 'checkbox', checked: prefs().iniciar !== 0, click: m => setStart(m.checked) },
     { type: 'separator' },
     { label: 'Sair', click: () => { quitting = true; app.quit(); } }
@@ -121,7 +154,10 @@ function makeTray() {
   if (process.platform === 'darwin') return;
   try {
     const img = nativeImage.createFromPath(path.join(__dirname, 'build', 'icon.png')).resize({ width: 32, height: 32 });
-    tray = new Tray(img); tray.setToolTip('Contas ADM — avisos na hora de postar');
-    tray.setContextMenu(trayMenu()); tray.on('click', showMain);
+    tray = new Tray(img); tray.setToolTip(NOME + ' — avisos na hora de postar');
+    tray.on('click', showMain);
+    // botão direito: o menu é montado na hora, com as empresas e o cronômetro atualizados
+    if (process.platform === 'linux') tray.setContextMenu(trayMenu());
+    else tray.on('right-click', async () => { let t = {}; try { t = await Promise.race([refreshTray(), new Promise(ok => setTimeout(() => ok({}), 700))]); } catch (e) { } tray.popUpContextMenu(trayMenu(t)); });
   } catch (e) { tray = null; }
 }
