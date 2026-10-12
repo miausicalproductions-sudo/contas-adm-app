@@ -13,6 +13,7 @@ const ver = h => { const m = String(h).match(/PANELV:(\d+)/) || String(h).match(
 const inteiro = h => ver(h) > 0 && String(h).length > 100000 && /<\/html>\s*$/i.test(String(h));   // painel completo (não cortado no meio)
 // de onde vem o painel novo: direto do GitHub (sem colar nada no Apps Script); se falhar, do Apps Script
 const GH_PAINEL = 'https://raw.githubusercontent.com/miausicalproductions-sudo/contas-adm-app/main/app/painel.html';
+const GH_API = 'https://api.github.com/repos/miausicalproductions-sudo/contas-adm-app/contents/app/painel.html?ref=main';
 const read = f => { try { return fs.readFileSync(f, 'utf8'); } catch (e) { return ''; } };
 const pick = () => (ver(read(CACHE())) > ver(read(BUNDLED)) ? CACHE() : BUNDLED);
 
@@ -56,7 +57,9 @@ async function checkUpdate(manual) {
   try {
     let t = ''; const notas = [];
     const pega = (h, de) => { if (!h) return; if (!inteiro(h)) { notas.push(de + ': veio incompleto (' + Math.round(String(h).length / 1024) + ' KB)'); return; } if (ver(h) > ver(t)) t = h; };
-    try { const r = await fetch(GH_PAINEL + '?t=' + Date.now(), { cache: 'no-store' }); if (r.ok) pega(await r.text(), 'GitHub'); else notas.push('GitHub: ' + r.status); }   // 1º: GitHub
+    try { const r = await fetch(GH_API, { cache: 'no-store', headers: { Accept: 'application/vnd.github.raw', 'User-Agent': 'StudiosMiau' } }); if (r.ok) pega(await r.text(), 'GitHub'); else notas.push('GitHub API: ' + r.status); }   // 1º: GitHub (sem atraso de cache)
+    catch (e) { notas.push('GitHub API: sem conexão'); }
+    try { const r = await fetch(GH_PAINEL + '?t=' + Date.now(), { cache: 'no-store' }); if (r.ok) pega(await r.text(), 'GitHub'); else notas.push('GitHub: ' + r.status); }   // 2º: GitHub (cópia rápida, pode atrasar 5 min)
     catch (e) { notas.push('GitHub: sem conexão'); }
     if (!t) {                                            // 2º: o Apps Script (mesmo caminho da sincronização)
       try {

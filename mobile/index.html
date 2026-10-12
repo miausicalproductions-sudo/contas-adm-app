@@ -12,7 +12,7 @@
   const upd = async () => {
     try {
       let t = '';
-      try { const r = await fetch(GH + '?t=' + Date.now(), { cache: 'no-store' }); if (r.ok) { const x = await r.text(); if (OK(x)) t = x; } } catch (e) {}   // 1º: GitHub
+      for (const [u, o] of [['https://api.github.com/repos/miausicalproductions-sudo/contas-adm-app/contents/app/painel.html?ref=main', { headers: { Accept: 'application/vnd.github.raw' } }], [GH + '?t=' + Date.now(), {}]]) { try { const r = await fetch(u, Object.assign({ cache: 'no-store' }, o)); if (r.ok) { const x = await r.text(); if (OK(x) && V(x) > V(t)) t = x; } } catch (e) {} }   // 1º: GitHub (API sem atraso; depois a cópia rápida)
       if (!t) {                                                                                                         // 2º: Apps Script
         const cfg = (JSON.parse(localStorage.getItem('adm2') || '{}').cfg || {}), u = cfg.url || '';
         if (/^https:\/\/script\.google\.com\/.+\/exec$/.test(u)) try { const j = JSON.parse(await (await fetch(u, { method: 'POST', body: JSON.stringify({ action: 'painel', key: cfg.key || '' }) })).text()); if (OK(j.html || '')) t = j.html; } catch (e) {}
