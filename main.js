@@ -9,7 +9,10 @@ const NOME = 'Studios Miau';
 
 const BUNDLED = path.join(__dirname, 'app', 'painel.html');
 const CACHE = () => path.join(app.getPath('userData'), 'painel-atual.html');
-const ver = h => { const m = String(h).match(/PANELV:(\d+)/); return m ? +m[1] : 0; };
+const ver = h => { const m = String(h).match(/PANELV:(\d+)/) || String(h).match(/const PV=(\d+)/); return m ? +m[1] : 0; };
+const inteiro = h => ver(h) > 0 && String(h).length > 100000 && /<\/html>\s*$/i.test(String(h));   // painel completo (não cortado no meio)
+// de onde vem o painel novo: direto do GitHub (sem colar nada no Apps Script); se falhar, do Apps Script
+const GH_PAINEL = 'https://raw.githubusercontent.com/miausicalproductions-sudo/contas-adm-app/main/app/painel.html';
 const read = f => { try { return fs.readFileSync(f, 'utf8'); } catch (e) { return ''; } };
 const pick = () => (ver(read(CACHE())) > ver(read(BUNDLED)) ? CACHE() : BUNDLED);
 
@@ -51,26 +54,25 @@ async function checkUpdate(manual) {
   if (!win || checking) return { msg: 'procurando…' };
   checking = true; lastCheck = Date.now();
   try {
-    let t = '', how = '';
-    try {                                                // 1º: pelo mesmo caminho da sincronização do painel (com a chave)
-      const j = await win.webContents.executeJavaScript('window.__painelSrc?__painelSrc().catch(e=>({err:String(e)})):null');
-      if (j && j.html) { t = j.html; how = 'sync'; } else if (j && j.err) how = j.err;
-    } catch (e) { }
-    if (!t) {                                            // 2º: o link antigo ?src=1
-      const url = await win.webContents.executeJavaScript("(()=>{try{return (JSON.parse(localStorage.adm2||'{}').cfg||{}).url||''}catch(e){return ''}})()");
-      if (!/^https:\/\/script\.google\.com\/.+\/exec$/.test(url)) return { err: 'O endereço do Apps Script em Config não termina em /exec.' };
-      const r = await fetch(url + '?src=1', { redirect: 'follow' }); t = await r.text(); how = (how ? how + ' · ' : '') + 'src ' + r.status;
+    let t = ''; const notas = [];
+    const pega = (h, de) => { if (!h) return; if (!inteiro(h)) { notas.push(de + ': veio incompleto (' + Math.round(String(h).length / 1024) + ' KB)'); return; } if (ver(h) > ver(t)) t = h; };
+    try { const r = await fetch(GH_PAINEL + '?t=' + Date.now(), { cache: 'no-store' }); if (r.ok) pega(await r.text(), 'GitHub'); else notas.push('GitHub: ' + r.status); }   // 1º: GitHub
+    catch (e) { notas.push('GitHub: sem conexão'); }
+    if (!t) {                                            // 2º: o Apps Script (mesmo caminho da sincronização)
+      try {
+        const j = await win.webContents.executeJavaScript('window.__painelSrc?__painelSrc().catch(e=>({err:String(e)})):null');
+        if (j && j.html) pega(j.html, 'Apps Script'); else if (j && j.err) notas.push('Apps Script: ' + j.err);
+      } catch (e) { }
     }
-    const r = { status: how };
     const cur = ver(read(pick())), novo = ver(t);
-    if (!novo || !t.includes('</html>')) return { err: 'O Apps Script não entregou o painel (confira se o arquivo "painel" existe e se a Nova versão foi implantada). Detalhe: ' + r.status + ' · começo da resposta: ' + t.slice(0, 90).replace(/\s+/g, ' ') };
+    if (!t) return { err: 'Não consegui baixar o painel novo agora (' + notas.join(' · ') + '). Tento de novo sozinho em 30 min.' };
     if (novo <= cur) return { ok: 1, cur, novo, msg: 'Já está na versão mais nova (painel v' + cur + ').' };
     fs.writeFileSync(CACHE(), t, 'utf8');
     if (!win.isVisible()) { win.loadFile(CACHE()); return { ok: 1, cur, novo, up: 1 }; }      // programa perto do relógio: atualiza sem perguntar
     const { response } = await dialog.showMessageBox(win, { type: 'info', buttons: ['Atualizar agora', 'Depois'], defaultId: 0, title: NOME, message: 'Chegou uma versão nova do painel (v' + novo + ').', detail: 'Atualizar agora recarrega a tela (nada se perde). Se escolher "Depois", ela entra na próxima vez que abrir o programa.' });
     if (response === 0 && win) win.loadFile(CACHE());
     return { ok: 1, cur, novo, up: response === 0 ? 1 : 0 };
-  } catch (e) { return { err: 'Sem conexão com o Apps Script agora (' + (e && e.message || e) + ').' }; }
+  } catch (e) { return { err: 'Não consegui procurar a atualização (' + (e && e.message || e) + ').' }; }
   finally { checking = false; }
 }
 ipcMain.handle('check-update', () => checkUpdate(true));

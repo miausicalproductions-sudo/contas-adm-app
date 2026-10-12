@@ -494,7 +494,7 @@ button.fk{text-align:left;cursor:pointer;transition:transform .15s,box-shadow .1
 @media (max-width:760px){.ccn{grid-template-columns:1fr 1fr}}
 </style></head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:31*/const PV=31;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:32*/const PV=32;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -890,8 +890,10 @@ async function upCheck(manual){UPL=Date.now();
  if(window.desktop){if(!manual)return;if(!desktop.checkUpdate)return alert('Este programa é de uma versão antiga: instale o programa novo uma vez (o link do instalador está no chat). Depois disso ele se atualiza sozinho.');const r=await desktop.checkUpdate();return stat(r.err?'⚠ '+r.err:r.msg?'● '+r.msg:r.up?'● atualizando…':'● versão nova baixada: entra na próxima vez que abrir')}
  if(!window.Capacitor){if(manual)location.reload();return}
  if(!S.cfg.url)return manual&&alert('Coloque o endereço do Apps Script em Config.');
- try{let t='';try{t=(await api({action:'painel'})).html||''}catch(e){t=await(await fetch(S.cfg.url+'?src=1')).text()}const m=t.match(/PANELV:(\d+)/),n=m?+m[1]:0;
-  if(!n||!t.includes('</html>'))return manual&&alert('O Apps Script não entregou o painel. Confira se o arquivo "painel" existe e se a Nova versão foi implantada.');
+ try{const V=h=>{const m=String(h).match(/PANELV:(\d+)/)||String(h).match(/const PV=(\d+)/);return m?+m[1]:0},OK=h=>V(h)>0&&String(h).length>100000&&/<\/html>\s*$/i.test(String(h));let t='';
+  try{const r=await fetch(GH_PAINEL+'?t='+Date.now(),{cache:'no-store'});if(r.ok){const x=await r.text();if(OK(x))t=x}}catch(e){}   /* 1º direto do GitHub: não precisa colar nada no Apps Script */
+  if(!t)try{const x=(await api({action:'painel'})).html||'';if(OK(x))t=x}catch(e){}const n=V(t);
+  if(!t)return manual&&alert('Não consegui baixar o painel novo agora (sem conexão com o GitHub nem com o Apps Script). Tento de novo sozinho em 30 min.');
   if(n<=PV)return manual&&stat('● já está na versão mais nova (painel v'+PV+')');
   try{localStorage.setItem('painelHtml',t)}catch(x){return manual&&alert('Sem espaço no aparelho para a versão nova.')}
   document.getElementById('upbar')?.remove();const d=document.createElement('div');d.id='upbar';d.innerHTML=`<span>Versão nova do painel (v${n}) pronta</span><button data-act=upgo>Atualizar</button>`;document.body.appendChild(d)}
@@ -937,6 +939,7 @@ const AVA={
  avsave:async(q)=>{try{AVS=await api({action:'avCfg',wk:$('#avwk').value.trim(),ntfy:$('#avnt').value.trim(),min:$('#avmin').value});Object.keys(AVD).forEach(k=>delete AVD[k]);avsSave();render();if(q!==1)stat('● avisos salvos');return true}catch(x){alert('Não deu: '+x);return false}},
  avtest:async()=>{if(!$('#avnt').value.trim())return alert('Primeiro gere o tópico (botão Gerar) e inscreva o iPhone nele.');if(!await AVA.avsave(1))return;stat('mandando o aviso de teste…');try{await api({action:'avTest'});stat('● aviso de teste mandado: confira o iPhone')}catch(x){alert('O aviso não saiu:\n'+x+'\n\nSe falar do Worker: WhatsApp → passo 3 → Copiar o código pronto → cole na Cloudflare → Deploy. Depois teste de novo.')}},
  avtg:async()=>{try{await api({action:'tgHook',wk:$('#avwk').value.trim()});await avLoad();stat('● Telegram instantâneo ligado')}catch(x){alert('Não deu: '+x)}}};
+const GH_PAINEL='https://raw.githubusercontent.com/miausicalproductions-sudo/contas-adm-app/main/app/painel.html';
 window.__painelSrc=async()=>{const r=await api({action:'painel'});return{v:r.v,html:r.html}};   /* o programa do PC busca o painel novo por aqui */
 /* primeira vez no programa de PC / app de celular: endereço do Apps Script e chave */
 const IS_APP=!!(window.desktop||window.Capacitor);

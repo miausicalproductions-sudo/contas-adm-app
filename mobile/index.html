@@ -4,17 +4,20 @@
 /* App de celular: abre o painel guardado no aparelho. Se o Apps Script tiver uma versão mais nova do painel,
    baixa em segundo plano e usa na próxima abertura (atualiza sozinho, sem reinstalar). */
 (async () => {
-  const V = h => { const m = String(h).match(/PANELV:(\d+)/); return m ? +m[1] : 0; };
+  const V = h => { const m = String(h).match(/PANELV:(\d+)/) || String(h).match(/const PV=(\d+)/); return m ? +m[1] : 0; };
+  const OK = h => V(h) > 0 && String(h).length > 100000 && /<\/html>\s*$/i.test(String(h));
+  const GH = 'https://raw.githubusercontent.com/miausicalproductions-sudo/contas-adm-app/main/app/painel.html';
   let h = await (await fetch('painel.html')).text();
-  try { const c = localStorage.getItem('painelHtml'); if (c && V(c) > V(h)) h = c; } catch (e) {}
+  try { const c = localStorage.getItem('painelHtml'); if (c && OK(c) && V(c) > V(h)) h = c; } catch (e) {}
   const upd = async () => {
     try {
-      const cfg = (JSON.parse(localStorage.getItem('adm2') || '{}').cfg || {}), u = cfg.url || '';
-      if (!/^https:\/\/script\.google\.com\/.+\/exec$/.test(u)) return;
       let t = '';
-      try { const j = JSON.parse(await (await fetch(u, { method: 'POST', body: JSON.stringify({ action: 'painel', key: cfg.key || '' }) })).text()); t = j.html || ''; } catch (e) {}   // mesmo caminho da sincronização
-      if (!t) t = await (await fetch(u + '?src=1')).text();
-      if (V(t) > V(h) && t.includes('</html>')) { localStorage.setItem('painelHtml', t); localStorage.setItem('painelNew', '1'); }
+      try { const r = await fetch(GH + '?t=' + Date.now(), { cache: 'no-store' }); if (r.ok) { const x = await r.text(); if (OK(x)) t = x; } } catch (e) {}   // 1º: GitHub
+      if (!t) {                                                                                                         // 2º: Apps Script
+        const cfg = (JSON.parse(localStorage.getItem('adm2') || '{}').cfg || {}), u = cfg.url || '';
+        if (/^https:\/\/script\.google\.com\/.+\/exec$/.test(u)) try { const j = JSON.parse(await (await fetch(u, { method: 'POST', body: JSON.stringify({ action: 'painel', key: cfg.key || '' }) })).text()); if (OK(j.html || '')) t = j.html; } catch (e) {}
+      }
+      if (t && V(t) > V(h)) { localStorage.setItem('painelHtml', t); localStorage.setItem('painelNew', '1'); }
     } catch (e) {}
   };
   document.open(); document.write(h); document.close();
