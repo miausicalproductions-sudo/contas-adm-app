@@ -14,6 +14,18 @@ Programa que roda no PC 1 (e, se quiser, no PC 2) e faz para o painel:
 4. No painel: **Config → IA local e Claude API**: endereço `http://127.0.0.1:8765` e o código. Clique em **Salvar e testar**.
 5. **Só no PC 1**: abra o `config.toml` no Bloco de Notas, cole a chave da API em `chave = "..."` (console.anthropic.com → API Keys) e confira o `teto_mensal_usd`. Rode o `iniciar.bat` ou reinicie o PC.
 
+## Já instalou antes? Só complete
+- **Gerador de figurinhas** (SDXL Lightning + recorte, ~7 GB): `instalar_gerador_imagens.bat`. Usa o Python e o PyTorch que já estão aqui, baixa só o que falta e gera `dados\teste_figurinha.png` para conferir.
+- **Código novo do GitHub + transcrição de áudio**: `atualizar.bat`. Baixa o código, mantém `config.toml`, `venv` e `dados`, instala só o que faltar (faster-whisper) e abre o miau-ia de novo.
+
+## O que cada IA faz
+| IA | Modelo | Quando o painel chama |
+|---|---|---|
+| Recorte de fundo | BiRefNet (rembg) | ✂️ recortar o fundo, figurinhas |
+| Figurinhas, elementos e texturas | SDXL Lightning 4 passos, fp16 | figurinha "a criar" do Claude, ⚡ Criar figurinha, ↻ Outras opções |
+| Transcrição | faster-whisper medium | 🎙 Ideias por voz, áudios do Telegram |
+| Claude (API) | Sonnet / Haiku | ⚡ Gerar dia, layouts, modelo, classificar ideias, traduzir figurinhas |
+
 ## PC 2 (opcional)
 1. Instale do mesmo jeito.
 2. No `config.toml` do PC 2: `escutar = "0.0.0.0"`. Não coloque a chave do Claude.

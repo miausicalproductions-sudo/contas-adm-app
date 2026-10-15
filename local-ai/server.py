@@ -7,7 +7,9 @@ são carregadas só quando usadas.
 Rotas:
   GET  /health            status: placa, modelos na memória, PC 2, Claude e gasto
   POST /recorte           {imagem}                 -> {imagem} PNG sem fundo
-  POST /figurinha         {prompt, n}              -> {imagens:[PNG sem fundo], onde}
+  POST /figurinha         {prompt, n, estilo}      -> {imagens:[PNG], onde}  estilo: figurinha | elemento | textura
+  POST /transcrever       {audio, nome}            -> {texto, segmentos, duracao}
+  POST /claude/classificar {empresa, texto}        -> {dados:{entrada, prio, tipo, dia, resumo}, uso}
   POST /claude/dia        {empresa, sistema, empresa_md, pedido, schema}        -> {dados, uso}
   POST /claude/layouts    idem (schema dos modelos)                              -> {dados, uso}
   POST /claude/modelo     idem + imagens (arte de referência)                    -> {dados, uso}
@@ -33,8 +35,20 @@ from config import carregar  # noqa: E402
 from jobs import aparar, de_dataurl, para_dataurl  # noqa: E402
 from jobs import figurinha as J_FIG  # noqa: E402
 from jobs import recorte as J_REC  # noqa: E402
+from jobs import transcrever as J_VOZ  # noqa: E402
+import base64  # noqa: E402
+import re  # noqa: E402
+import tempfile  # noqa: E402
 
-VERSAO = "1.0"
+VERSAO = "1.1"
+SCHEMA_CLASSE = {"type": "object", "properties": {
+    "entrada": {"type": "string", "enum": ["ideia", "diretriz", "contexto", "pedido"],
+                "description": "ideia = ideia solta para o banco; diretriz = algo obrigatório num dia ou campanha; contexto = bastidor/informação; pedido = pedem um Story/post agora"},
+    "prio": {"type": "string", "enum": ["alta", "banco"], "description": "alta = a equipe quer usar logo"},
+    "tipo": {"type": "string", "enum": ["stories", "reels", "carrossel", "feed"]},
+    "dia": {"type": "string", "description": "data AAAA-MM-DD se a fala citar um dia; senão vazio"},
+    "resumo": {"type": "string", "description": "a ideia reescrita em até 2 frases, sem perder detalhes concretos"},
+    "empresa": {"type": "string", "description": "nome da empresa citada, se houver"}}, "required": ["entrada", "prio", "tipo", "resumo"]}
 MAX_CORPO = 30 * 2**20
 
 
@@ -85,13 +99,39 @@ class Servico:
                 return J_REC.rodar(s, img)
         return self._gpu(f)
 
-    def figurinhas(self, prompt, n, semente=None):
+    def figurinhas(self, prompt, n, semente=None, estilo="figurinha"):
+        estilo = estilo if estilo in J_FIG.ESTILOS else "figurinha"
+
         def f():
             with self.gpu.uso("figurinha", J_FIG.PESO_GB, lambda: J_FIG.carregar(self.cfg)) as p:
-                brutas = J_FIG.rodar(p, prompt, n, semente)
+                brutas = J_FIG.rodar(p, prompt, n, semente, estilo=estilo)
+            if not J_FIG.RECORTA[estilo]:
+                return brutas
             with self.gpu.uso("recorte", J_REC.PESO_GB, lambda: J_REC.carregar(self.cfg)) as s:
                 return [aparar(J_REC.rodar(s, b)) for b in brutas]
         return self._gpu(f)
+
+    def transcrever(self, dataurl, nome=""):
+        m = re.match(r"^data:([\w/+.-]+)(?:;[^,]*)?;base64,", str(dataurl or ""))
+        b64 = str(dataurl)[m.end():] if m else str(dataurl or "")
+        dados = base64.b64decode(b64)
+        if not dados:
+            raise ValueError("áudio vazio")
+        ext = (re.search(r"\.(\w{2,5})$", nome or "") or re.search(r"/(\w+)", m.group(1) if m else "") or [None, "webm"])[1]
+        with tempfile.NamedTemporaryFile(suffix="." + ext.replace("mpeg", "mp3"), delete=False) as t:
+            t.write(dados)
+            caminho = t.name
+
+        def f():
+            with self.gpu.uso("transcrever", J_VOZ.PESO_GB, lambda: J_VOZ.carregar(self.cfg)) as w:
+                return J_VOZ.rodar(w, caminho)
+        try:
+            return self._gpu(f)
+        finally:
+            try:
+                os.remove(caminho)
+            except OSError:
+                pass
 
     def health(self, completo):
         d = {"ok": True, "servico": "miau-ia", "versao": VERSAO, "papel": self.cfg.papel}
@@ -176,13 +216,22 @@ def criar_handler(sv):
                         prompt = sv.claude.prompt_figurinha(prompt)
                     if cfg.pc2 and not b.get("_local") and sv.pc2_online():
                         try:
-                            r = sv.no_pc2("/figurinha", {"prompt": prompt, "n": n, "traduzir": False, "_local": True})
+                            r = sv.no_pc2("/figurinha", {"prompt": prompt, "n": n, "traduzir": False, "_local": True, "estilo": b.get("estilo") or "figurinha"})
                             r["onde"] = "pc2"
                             return self._json(200, r)
                         except Exception as e:
                             sys.stderr.write("PC 2 falhou, fazendo no PC 1: %s\n" % e)
-                    imgs = sv.figurinhas(prompt, n, b.get("semente"))
+                    imgs = sv.figurinhas(prompt, n, b.get("semente"), b.get("estilo") or "figurinha")
                     return self._json(200, {"imagens": [para_dataurl(i) for i in imgs], "prompt": prompt, "onde": cfg.papel})
+                if rota == "/transcrever":
+                    if not b.get("audio"):
+                        return self._json(400, {"erro": "falta o áudio"})
+                    return self._json(200, sv.transcrever(b.get("audio"), b.get("nome") or ""))
+                if rota == "/claude/classificar":
+                    dados, uso = sv.claude.ferramenta("classificar", b.get("empresa"), b.get("sistema") or "", b.get("empresa_md") or "",
+                                                      "Classifique esta ideia da equipe (transcrição de áudio ou texto do celular):\n\n" + str(b.get("texto") or "")[:6000],
+                                                      "classificar", "Classifica a ideia para o banco de ideias da agência.", b.get("schema") or SCHEMA_CLASSE, max_tokens=800)
+                    return self._json(200, {"dados": dados, "uso": uso})
                 if rota in ("/claude/dia", "/claude/layouts", "/claude/modelo"):
                     tarefa = rota.rsplit("/", 1)[1]
                     nome, desc = {

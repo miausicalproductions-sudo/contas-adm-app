@@ -31,6 +31,8 @@ class ClaudeFalso:
         u = NS(input_tokens=120, output_tokens=900, cache_read_input_tokens=6000, cache_creation_input_tokens=0)
         if kw.get("tools"):
             nome = kw["tools"][0]["name"]
+            if nome == "classificar":
+                return NS(content=[NS(type="tool_use", input={"entrada": "pedido", "prio": "alta", "tipo": "stories", "resumo": "Stories avisando do desconto na ração", "dia": ""})], usage=u, stop_reason="tool_use")
             dado = {"telas": [{"titulo": "Bom *dia*", "frases": ["Toddy veio dar oi"]}], "modelo": "Saudação"} if nome == "montar_telas" \
                 else {"modelos": [{"nome": "Teste", "telas": [{"fundo": "fundo", "camadas": [{"tipo": "titulo", "x": 8, "y": 15, "w": 84, "h": 12}]}]}], "faltou": []}
             return NS(content=[NS(type="tool_use", input=dado)], usage=u, stop_reason="tool_use")
@@ -125,6 +127,22 @@ class Testes(unittest.TestCase):
         c, d = chamar(self.u1 + "/claude/dia", {"empresa": {"id": "c2"}, "pedido": "telas", "schema": schema})
         self.sv1.cfg.teto_mensal_usd = 5
         self.assertEqual((c, d.get("teto")), (402, True))
+
+    def test_transcrever(self):
+        audio = "data:audio/ogg;codecs=opus;base64," + base64.b64encode(b"OggS" + b"0" * 2000).decode()
+        c, d = chamar(self.u1 + "/transcrever", {"audio": audio, "nome": "ideia.ogg"})
+        self.assertEqual(c, 200, d)
+        self.assertIn("2004 bytes", d["texto"])
+
+    def test_classificar(self):
+        c, d = chamar(self.u1 + "/claude/classificar", {"empresa": {"id": "c1"}, "texto": "chegou ração nova, faz 2 stories com desconto"})
+        self.assertEqual((c, d["dados"]["entrada"]), (200, "pedido"))
+        self.assertEqual(self.falso.pedidos[-1]["model"], "claude-haiku-5-5")
+
+    def test_figurinha_textura_sem_recorte(self):
+        c, d = chamar(self.u1 + "/figurinha", {"prompt": "patinhas", "n": 1, "estilo": "textura", "_local": True})
+        img = Image.open(io.BytesIO(base64.b64decode(d["imagens"][0].split(",", 1)[1])))
+        self.assertEqual((c, img.size, img.getpixel((2, 2))[3]), (200, (512, 512), 255))
 
     def test_schema_invalido(self):
         c, d = chamar(self.u1 + "/claude/dia", {"pedido": "x", "schema": "nada"})

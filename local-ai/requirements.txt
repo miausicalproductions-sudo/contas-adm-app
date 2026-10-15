@@ -7,3 +7,4 @@ transformers>=4.44
 accelerate>=0.33
 safetensors>=0.4
 huggingface_hub>=0.24
+faster-whisper>=1.0

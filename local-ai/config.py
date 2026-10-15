@@ -31,6 +31,7 @@ class Config:
     descarregar_apos_s: int = 90
     recorte_modelo: str = "birefnet-general"
     figurinha_modelo: str = "sdxl-lightning"
+    whisper_modelo: str = "medium"      # "small" (mais leve) ou "large-v3" (mais preciso)
     pasta_dados: str = os.path.join(PASTA, "dados")
 
     @property
