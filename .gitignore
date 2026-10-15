@@ -3,3 +3,9 @@ dist/
 www/
 android/
 ios/
+
+# IA local: segredos e arquivos grandes ficam só no PC
+local-ai/config.toml
+local-ai/venv/
+local-ai/dados/
+__pycache__/

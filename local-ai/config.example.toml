@@ -1,0 +1,32 @@
+# Configuração do miau-ia. O instalar.bat copia este arquivo para config.toml (que NÃO vai para o GitHub).
+# Depois de mudar algo aqui, feche e abra o miau-ia de novo (ou reinicie o computador).
+
+[servico]
+# PC 1: "127.0.0.1" (só o próprio computador). PC 2: "0.0.0.0" (aceita o PC 1 pela rede local).
+escutar = "127.0.0.1"
+porta = 8765
+# Código deste PC. Cole em Config → "IA local e Claude API" no painel. O instalar.bat gera um novo.
+token = ""
+# Só no PC 1: endereço e código do PC 2 (deixe vazio se não tiver PC 2).
+pc2 = ""            # exemplo: "http://192.168.0.20:8765"
+pc2_token = ""
+
+[claude]
+# Chave da API da Anthropic (console.anthropic.com → API Keys). SÓ no PC 1. Nunca no painel nem no GitHub.
+chave = ""
+modelo = "claude-sonnet-5-5"        # roteiro, layouts e leitura de referência
+modelo_rapido = "claude-haiku-5-5"  # tradução das figurinhas, classificação e chat leve
+teto_mensal_usd = 20                # acima disso o painel volta ao copiar e colar
+cache_ttl = "5m"                    # "5m" (padrão) ou "1h"
+
+# Preço em US$ por milhão de tokens [entrada, saída], só para a conta de gasto do painel.
+# Confira os valores atuais em https://www.anthropic.com/pricing e ajuste aqui.
+[claude.precos]
+"claude-sonnet-5-5" = [3.0, 15.0]
+"claude-haiku-5-5" = [1.0, 5.0]
+
+[gpu]
+simular = false            # true = sem placa de vídeo (só para testar o painel)
+vram_gb = 7.0              # quanto a IA local pode ocupar da placa de 8 GB
+descarregar_apos_s = 90    # tira os modelos da placa depois de 90 s parados
+recorte_modelo = "birefnet-general"   # ou "isnet-general-use" (mais leve)

@@ -1,0 +1,9 @@
+# O PyTorch é instalado antes pelo instalar.bat (CUDA 12.8: serve para a RTX 4060 Ti e para a RTX 5060).
+anthropic>=0.40
+pillow>=10
+rembg[gpu]>=2.0.57
+diffusers>=0.30
+transformers>=4.44
+accelerate>=0.33
+safetensors>=0.4
+huggingface_hub>=0.24
