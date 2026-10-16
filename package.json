@@ -1,7 +1,7 @@
 {
   "name": "contas-adm",
   "productName": "Studios Miau",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Painel de planejamento e publicação de Instagram da Studios Miau",
   "author": "Studios Miau",
   "main": "main.js",

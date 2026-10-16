@@ -47,7 +47,7 @@ import io  # noqa: E402
 import re  # noqa: E402
 import tempfile  # noqa: E402
 
-VERSAO = "1.13"
+VERSAO = "1.14"
 SCHEMA_CLASSE = {"type": "object", "properties": {
     "entrada": {"type": "string", "enum": ["ideia", "diretriz", "contexto", "pedido"],
                 "description": "ideia = ideia solta para o banco; diretriz = algo obrigatório num dia ou campanha; contexto = bastidor/informação; pedido = pedem um Story/post agora"},

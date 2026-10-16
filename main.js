@@ -25,7 +25,11 @@ const savePrefs = o => { try { fs.writeFileSync(PREFS(), JSON.stringify(Object.a
 app.setAppUserModelId('com.studiosmiau.contasadm');          // avisos do Windows com o nome e o ícone do programa
 if (!app.requestSingleInstanceLock()) app.quit();
 app.on('second-instance', () => showMain());
-function showMain() { if (!win) return createWindow(true); if (win.isMinimized()) win.restore(); win.show(); win.focus(); if (Date.now() - lastCheck > 10 * 60 * 1000) setTimeout(() => checkUpdate(), 1500); }
+function showMain() {
+  if (!win) return createWindow(true);
+  // 1ª vez no dia que a pessoa abre a janela (o programa já estava ligado junto com o Windows): passa o vídeo antes
+  if (!win.isVisible() && querVideo()) { splash(true); if (splashWin) { splashWin.once('closed', () => { if (win) { win.maximize(); win.show(); win.focus(); } }); return; } }
+  if (win.isMinimized()) win.restore(); win.show(); win.focus(); if (Date.now() - lastCheck > 10 * 60 * 1000) setTimeout(() => checkUpdate(), 1500); }
 
 function createWindow(forceShow) {
   win = new BrowserWindow({
@@ -162,8 +166,11 @@ async function iaPrimeiraVez() {
 
 /* vídeo de abertura (logo animado, fundo verde já retirado): só ao abrir pela pessoa, não quando liga junto com o Windows */
 let splashWin = null;
-function splash() {
-  if (HIDDEN || prefs().abertura === 0) return;
+const hoje = () => new Date().toLocaleDateString('pt-BR');
+const querVideo = () => prefs().abertura !== 0 && prefs().videoDia !== hoje();
+function splash(forcar) {
+  if ((HIDDEN && !forcar) || prefs().abertura === 0 || splashWin) return;
+  savePrefs({ videoDia: hoje() });
   try {
     splashWin = new BrowserWindow({ width: 720, height: 540, frame: false, resizable: false, center: true, backgroundColor: '#1d1b2c', show: false, skipTaskbar: false, title: NOME, icon: path.join(__dirname, 'build', 'icon.png') });
     splashWin.loadFile(path.join(__dirname, 'splash.html'));

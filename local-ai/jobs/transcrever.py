@@ -22,6 +22,38 @@ def carregar(cfg):
         return {"m": WhisperModel(nome, device="cpu", compute_type="int8"), "nome": nome, "dev": "cpu"}
 
 
+def _decodificar(caminho):
+    """Lê o áudio com o PyAV direto (16 kHz, mono, float32). Não usa o decode_audio do faster-whisper, que quebra com
+    o PyAV 14+ ("open() got an unexpected keyword argument 'metadata_errors'"). Pula pedaços estragados do arquivo."""
+    import av
+    import numpy as np
+    partes = []
+    with av.open(caminho) as c:
+        st = c.streams.audio[0]
+        rs = av.AudioResampler(format="s16", layout="mono", rate=16000)
+
+        def junta(saida):
+            if saida is None:
+                return
+            for q in (saida if isinstance(saida, (list, tuple)) else [saida]):
+                partes.append(q.to_ndarray().reshape(-1))
+        for pacote in c.demux(st):
+            try:
+                quadros = pacote.decode()
+            except Exception:
+                continue
+            for q in quadros:
+                q.pts = None
+                junta(rs.resample(q))
+        try:
+            junta(rs.resample(None))
+        except Exception:
+            pass
+    if not partes:
+        return np.zeros(0, dtype=np.float32)
+    return np.concatenate(partes).astype(np.float32) / 32768.0
+
+
 def audio(caminho):
     """Só o áudio (16 kHz, mono, numpy) de um vídeo ou áudio. Devolve (amostras, segundos) ou (None, motivo)."""
     try:
@@ -31,11 +63,14 @@ def audio(caminho):
                 return None, "o vídeo não tem faixa de áudio"
     except Exception as e:
         return None, "não abriu o arquivo (%s)" % e
-    from faster_whisper import decode_audio
     try:
-        a = decode_audio(caminho, sampling_rate=16000)
-    except Exception as e:
-        return None, "não consegui ler o áudio (%s)" % e
+        a = _decodificar(caminho)
+    except Exception as e1:
+        try:   # plano B: o leitor do próprio faster-whisper
+            from faster_whisper import decode_audio
+            a = decode_audio(caminho, sampling_rate=16000)
+        except Exception as e2:
+            return None, "não consegui ler o áudio (%s / %s)" % (e1, e2)
     if a is None or len(a) < 1600:
         return None, "faixa de áudio vazia"
     return a, len(a) / 16000.0
