@@ -3,6 +3,7 @@
     python baixar_modelos.py            tudo (recorte, figurinhas, transcrição)
     python baixar_modelos.py imagens    só o gerador de figurinhas + o recorte de fundo
     python baixar_modelos.py voz        só a transcrição de áudio
+    python baixar_modelos.py leitura    só a leitura de imagem (Florence-2, Stories do celular)
     python baixar_modelos.py imagens --testar   baixa e gera uma figurinha de teste em dados/
 """
 import os
@@ -12,7 +13,7 @@ import time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from config import carregar  # noqa: E402
 from jobs import aparar  # noqa: E402
-from jobs import figurinha, recorte, transcrever  # noqa: E402
+from jobs import descrever, figurinha, recorte, transcrever  # noqa: E402
 
 cfg = carregar()
 arg = [a for a in sys.argv[1:] if not a.startswith("-")]
@@ -56,4 +57,11 @@ if quais in ("tudo", "voz"):
     print("\n[4] Transcrição de áudio (faster-whisper %s)..." % cfg.whisper_modelo)
     transcrever.carregar(cfg)
     print("    ok")
+if quais in ("tudo", "leitura") and cfg.descrever != "claude":
+    print("\n[5] Leitura de imagem (Florence-2-large, ~1,6 GB)...")
+    try:
+        descrever.carregar(cfg)
+        print("    ok")
+    except Exception as e:
+        print("    não carregou (%s). Os Stories do celular serão lidos pelo Claude rápido (centavos)." % e)
 print("\nPronto: modelos baixados.")

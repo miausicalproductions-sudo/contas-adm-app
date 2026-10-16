@@ -144,6 +144,15 @@ class Testes(unittest.TestCase):
         img = Image.open(io.BytesIO(base64.b64decode(d["imagens"][0].split(",", 1)[1])))
         self.assertEqual((c, img.size, img.getpixel((2, 2))[3]), (200, (512, 512), 255))
 
+    def test_descrever_foto_e_video(self):
+        c, d = chamar(self.u1 + "/descrever", {"midia": foto(), "tipo": "foto", "empresa": {"id": "c1"}})
+        self.assertEqual((c, d["via"], d["texto_tela"]), (200, "local", "PROMO HOJE"))
+        self.assertTrue(d["resumo"])
+        video = "data:video/mp4;base64," + base64.b64encode(b"0" * 5000).decode()
+        c, d = chamar(self.u1 + "/descrever", {"midia": video, "tipo": "video", "nome": "s.mp4"})
+        self.assertEqual((c, len(d["cenas"])), (200, 3))
+        self.assertIn("5000 bytes", d["fala"])
+
     def test_schema_invalido(self):
         c, d = chamar(self.u1 + "/claude/dia", {"pedido": "x", "schema": "nada"})
         self.assertEqual(c, 400)

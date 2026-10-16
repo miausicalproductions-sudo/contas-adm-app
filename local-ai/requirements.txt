@@ -8,3 +8,5 @@ accelerate>=0.33
 safetensors>=0.4
 huggingface_hub>=0.24
 faster-whisper>=1.0
+einops>=0.7
+timm>=0.9

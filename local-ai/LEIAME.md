@@ -23,7 +23,8 @@ Programa que roda no PC 1 (e, se quiser, no PC 2) e faz para o painel:
 |---|---|---|
 | Recorte de fundo | BiRefNet (rembg) | ✂️ recortar o fundo, figurinhas |
 | Figurinhas, elementos e texturas | SDXL Lightning 4 passos, fp16 | figurinha "a criar" do Claude, ⚡ Criar figurinha, ↻ Outras opções |
-| Transcrição | faster-whisper medium | 🎙 Ideias por voz, áudios do Telegram |
+| Transcrição | faster-whisper medium | 🎙 Ideias por voz, áudios do Telegram, fala dos Stories do celular |
+| Leitura de imagem | Florence-2-large (se não carregar: Claude rápido) | Stories postados pelo celular (o que aparece e o texto na tela) |
 | Claude (API) | Sonnet / Haiku | ⚡ Gerar dia, layouts, modelo, classificar ideias, traduzir figurinhas |
 
 ## PC 2 (opcional)
@@ -36,6 +37,10 @@ Programa que roda no PC 1 (e, se quiser, no PC 2) e faz para o painel:
 - `config.toml` (chave e códigos) nunca vai para o GitHub: está no `.gitignore`.
 - O PC 1 só aceita pedidos do próprio computador. O PC 2 só aceita quem tiver o código dele.
 - Se a chave vazar: apague-a no console da Anthropic e crie outra.
+
+## Ligar e desligar
+- `parar.bat` desliga o miau-ia e libera a RAM e a placa. `ligar.bat` liga de novo (ele também liga sozinho com o Windows).
+- Parado, ele não ocupa a placa; os modelos saem da placa 90 s depois do último uso.
 
 ## Problemas
 - Para ver erros: feche o miau-ia escondido (Gerenciador de Tarefas → pythonw) e rode `iniciar.bat`. O registro fica em `dados/miau-ia.log`.

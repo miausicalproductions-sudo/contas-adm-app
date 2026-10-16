@@ -25,7 +25,7 @@ class ErroClaude(Exception):
     pass
 
 
-TAREFAS_RAPIDAS = {"classificar", "traduzir", "chat", "resumir"}
+TAREFAS_RAPIDAS = {"classificar", "traduzir", "chat", "resumir", "descrever"}
 
 
 class ClaudeAPIManager:
@@ -142,13 +142,14 @@ class ClaudeAPIManager:
             raise ErroClaude("O Claude não devolveu o formato pedido.")
         return bloco.input, uso
 
-    def texto(self, tarefa, empresa, fixo, empresa_md, pedido, max_tokens=1500):
+    def texto(self, tarefa, empresa, fixo, empresa_md, pedido, max_tokens=1500, imagens=None):
         if not self.configurada:
             raise ErroClaude("A chave da API não está no config.toml deste PC.")
         self._checar_teto()
         modelo = self.modelo_de(tarefa)
+        conteudo = self._imagens(imagens) + [{"type": "text", "text": str(pedido or "")}] if imagens else str(pedido or "")
         r = self.cli.messages.create(model=modelo, max_tokens=max_tokens, system=self._sistema(fixo, empresa_md),
-                                     messages=[{"role": "user", "content": str(pedido or "")}])
+                                     messages=[{"role": "user", "content": conteudo}])
         uso = self._registrar(empresa, tarefa, modelo, r.usage)
         return "".join(getattr(b, "text", "") for b in r.content).strip(), uso
 

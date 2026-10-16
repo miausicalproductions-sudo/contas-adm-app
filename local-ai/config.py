@@ -32,6 +32,7 @@ class Config:
     recorte_modelo: str = "birefnet-general"
     figurinha_modelo: str = "sdxl-lightning"
     whisper_modelo: str = "medium"      # "small" (mais leve) ou "large-v3" (mais preciso)
+    descrever: str = "local"            # leitura dos Stories: "local" (Florence-2 na placa) ou "claude" (Haiku, centavos)
     pasta_dados: str = os.path.join(PASTA, "dados")
 
     @property

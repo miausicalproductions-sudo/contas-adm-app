@@ -9,6 +9,7 @@ Rotas:
   POST /recorte           {imagem}                 -> {imagem} PNG sem fundo
   POST /figurinha         {prompt, n, estilo}      -> {imagens:[PNG], onde}  estilo: figurinha | elemento | textura
   POST /transcrever       {audio, nome}            -> {texto, segmentos, duracao}
+  POST /descrever         {midia, tipo, nome}      -> {resumo, cenas, texto_tela, fala, via}  (Story do celular)
   POST /claude/classificar {empresa, texto}        -> {dados:{entrada, prio, tipo, dia, resumo}, uso}
   POST /claude/dia        {empresa, sistema, empresa_md, pedido, schema}        -> {dados, uso}
   POST /claude/layouts    idem (schema dos modelos)                              -> {dados, uso}
@@ -36,11 +37,13 @@ from jobs import aparar, de_dataurl, para_dataurl  # noqa: E402
 from jobs import figurinha as J_FIG  # noqa: E402
 from jobs import recorte as J_REC  # noqa: E402
 from jobs import transcrever as J_VOZ  # noqa: E402
+from jobs import descrever as J_VER  # noqa: E402
+from jobs import midia as J_MID  # noqa: E402
 import base64  # noqa: E402
 import re  # noqa: E402
 import tempfile  # noqa: E402
 
-VERSAO = "1.1"
+VERSAO = "1.2"
 SCHEMA_CLASSE = {"type": "object", "properties": {
     "entrada": {"type": "string", "enum": ["ideia", "diretriz", "contexto", "pedido"],
                 "description": "ideia = ideia solta para o banco; diretriz = algo obrigatório num dia ou campanha; contexto = bastidor/informação; pedido = pedem um Story/post agora"},
@@ -109,6 +112,71 @@ class Servico:
                 return brutas
             with self.gpu.uso("recorte", J_REC.PESO_GB, lambda: J_REC.carregar(self.cfg)) as s:
                 return [aparar(J_REC.rodar(s, b)) for b in brutas]
+        return self._gpu(f)
+
+    def _arquivo(self, dataurl, nome, padrao="bin"):
+        m = re.match(r"^data:([\w/+.-]+)(?:;[^,]*)?;base64,", str(dataurl or ""))
+        dados = base64.b64decode(str(dataurl)[m.end():] if m else str(dataurl or ""))
+        if not dados:
+            raise ValueError("arquivo vazio")
+        ext = (re.search(r"\.(\w{2,5})$", nome or "") or re.search(r"/(\w+)", m.group(1) if m else "") or [None, padrao])[1]
+        with tempfile.NamedTemporaryFile(suffix="." + ext.replace("mpeg", "mp3").replace("quicktime", "mov"), delete=False) as t:
+            t.write(dados)
+            return t.name
+
+    def descrever(self, dataurl, tipo="foto", nome="", empresa=None):
+        """Story (foto ou vídeo) -> o que aparece, o texto escrito e a fala, resumidos em português."""
+        from PIL import Image
+        caminho = self._arquivo(dataurl, nome, "mp4" if tipo == "video" else "jpg")
+        try:
+            imgs = J_MID.quadros(caminho, 3, self.cfg.simular) if tipo == "video" else [Image.open(caminho).convert("RGB")]
+            fala = ""
+            if tipo == "video":
+                try:
+                    fala = self.transcrever_arquivo(caminho).get("texto", "")
+                except Exception as e:
+                    sys.stderr.write("vídeo sem áudio legível: %s\n" % e)
+            via, cenas = "local", []
+            if self.cfg.descrever != "claude":
+                try:
+                    def f():
+                        with self.gpu.uso("descrever", J_VER.PESO_GB, lambda: J_VER.carregar(self.cfg)) as mp:
+                            return J_VER.rodar(mp, imgs)
+                    cenas = self._gpu(f)
+                except Exception as e:
+                    sys.stderr.write("Florence não rodou (%s); usando o Claude\n" % e)
+                    cenas = []
+            if not cenas and self.claude.configurada:
+                via = "claude"
+                pequenas = []
+                for im in imgs:
+                    im = im.copy()
+                    im.thumbnail((768, 768))
+                    pequenas.append(para_dataurl(im.convert("RGB"), "JPEG"))
+                t, _ = self.claude.texto("descrever", empresa, "", "", "Descreva em português, em 2 a 3 frases, o que aparece neste Story do Instagram (quadros de um mesmo vídeo ou uma foto) e transcreva o texto escrito na imagem, se houver, numa linha começando com TEXTO:.", 400, pequenas)
+                partes = t.split("TEXTO:")
+                cenas = [{"cena": partes[0].strip(), "texto": partes[1].strip() if len(partes) > 1 else ""}]
+            texto_tela = " / ".join(sorted({c["texto"] for c in cenas if c.get("texto")}))
+            resumo = " ".join(c["cena"] for c in cenas if c.get("cena"))
+            if via == "local" and self.claude.configurada and cenas:
+                try:
+                    resumo, _ = self.claude.texto("resumir", empresa, "", "", (
+                        "Resuma em português, em 1 a 2 frases objetivas, o que este Story do Instagram mostra e diz. "
+                        "Use só estas informações (descrições automáticas em inglês dos quadros, texto da tela e fala):\n"
+                        + "\n".join("- " + c["cena"] for c in cenas) + "\nTexto na tela: " + (texto_tela or "nenhum") + "\nFala: " + (fala[:1500] or "nenhuma")), 300)
+                except Exception:
+                    pass
+            return {"resumo": resumo.strip(), "cenas": cenas, "texto_tela": texto_tela, "fala": fala, "via": via}
+        finally:
+            try:
+                os.remove(caminho)
+            except OSError:
+                pass
+
+    def transcrever_arquivo(self, caminho):
+        def f():
+            with self.gpu.uso("transcrever", J_VOZ.PESO_GB, lambda: J_VOZ.carregar(self.cfg)) as w:
+                return J_VOZ.rodar(w, caminho)
         return self._gpu(f)
 
     def transcrever(self, dataurl, nome=""):
@@ -227,6 +295,10 @@ def criar_handler(sv):
                     if not b.get("audio"):
                         return self._json(400, {"erro": "falta o áudio"})
                     return self._json(200, sv.transcrever(b.get("audio"), b.get("nome") or ""))
+                if rota == "/descrever":
+                    if not b.get("midia"):
+                        return self._json(400, {"erro": "falta a foto ou o vídeo"})
+                    return self._json(200, sv.descrever(b.get("midia"), "video" if b.get("tipo") == "video" else "foto", b.get("nome") or "", b.get("empresa")))
                 if rota == "/claude/classificar":
                     dados, uso = sv.claude.ferramenta("classificar", b.get("empresa"), b.get("sistema") or "", b.get("empresa_md") or "",
                                                       "Classifique esta ideia da equipe (transcrição de áudio ou texto do celular):\n\n" + str(b.get("texto") or "")[:6000],
