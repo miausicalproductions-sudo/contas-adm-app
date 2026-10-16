@@ -39,8 +39,10 @@ Programa que roda no PC 1 (e, se quiser, no PC 2) e faz para o painel:
 - Se a chave vazar: apague-a no console da Anthropic e crie outra.
 
 ## Ligar e desligar
-- `parar.bat` desliga o miau-ia e libera a RAM e a placa. `ligar.bat` liga de novo (ele também liga sozinho com o Windows).
-- Parado, ele não ocupa a placa; os modelos saem da placa 90 s depois do último uso.
+- O miau-ia tem duas partes: o **serviço** (leve, fica sempre aberto e atende o painel) e a **IA local** (as IAs da placa, num processo separado).
+- A IA local **liga sozinha** no primeiro pedido e **desliga sozinha** depois de 10 min parada (`desligar_apos_s` no `config.toml`), liberando a RAM e a placa. Cada modelo sai da placa 90 s depois do último uso.
+- No painel: a pílula 🤖 no rodapé mostra qual IA está rodando; clique nela para abrir o **Monitor das IAs** e ligar ou desligar a IA local na hora.
+- `parar.bat` fecha o miau-ia inteiro; `ligar.bat` abre de novo (ele também abre sozinho com o Windows).
 
 ## Problemas
 - Para ver erros: feche o miau-ia escondido (Gerenciador de Tarefas → pythonw) e rode `iniciar.bat`. O registro fica em `dados/miau-ia.log`.

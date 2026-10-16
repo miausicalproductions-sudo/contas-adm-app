@@ -39,11 +39,14 @@ from jobs import recorte as J_REC  # noqa: E402
 from jobs import transcrever as J_VOZ  # noqa: E402
 from jobs import descrever as J_VER  # noqa: E402
 from jobs import midia as J_MID  # noqa: E402
+import trabalhador  # noqa: E402
+import collections  # noqa: E402
+import contextlib  # noqa: E402
 import base64  # noqa: E402
 import re  # noqa: E402
 import tempfile  # noqa: E402
 
-VERSAO = "1.2"
+VERSAO = "1.3"
 SCHEMA_CLASSE = {"type": "object", "properties": {
     "entrada": {"type": "string", "enum": ["ideia", "diretriz", "contexto", "pedido"],
                 "description": "ideia = ideia solta para o banco; diretriz = algo obrigatório num dia ou campanha; contexto = bastidor/informação; pedido = pedem um Story/post agora"},
@@ -55,11 +58,100 @@ SCHEMA_CLASSE = {"type": "object", "properties": {
 MAX_CORPO = 30 * 2**20
 
 
+NOMES_IA = {"recorte": ("✂️", "Recorte de fundo", "BiRefNet"), "figurinha": ("🎨", "Gerador de figurinhas", "SDXL Lightning"),
+            "transcrever": ("🎙", "Transcrição de áudio", "faster-whisper"), "descrever": ("👁", "Leitura de imagem", "Florence-2")}
+
+
+class Trabalhador:
+    """Liga, usa e desliga o processo das IAs da placa (trabalhador.py)."""
+
+    def __init__(self, cfg):
+        self.cfg = cfg
+        self.p = None
+        self.conn = None
+        self.trava = threading.Lock()
+        self.ult = time.time()
+        self.modelos = []
+        self.ligado_em = None
+        threading.Thread(target=self._vigia, daemon=True).start()
+
+    def ligado(self):
+        return self.p is not None and self.p.is_alive()
+
+    def _ligar(self):
+        if self.ligado():
+            return
+        import multiprocessing as mp
+        ctx = mp.get_context("spawn")
+        a, b = ctx.Pipe()
+        self.p = ctx.Process(target=trabalhador.principal, args=(b, self.cfg), daemon=True, name="miau-ia-trabalhador")
+        self.p.start()
+        self.conn = a
+        self.ligado_em = time.time()
+        self.modelos = []
+
+    def ligar(self):
+        with self.trava:
+            self._ligar()
+            self.ult = time.time()
+
+    def desligar(self):
+        with self.trava:
+            self._desligar()
+
+    def _desligar(self):
+        if self.p is None:
+            return
+        try:
+            if self.p.is_alive():
+                self.conn.send(("sair", None))
+                self.p.join(5)
+            if self.p.is_alive():
+                self.p.terminate()
+                self.p.join(3)
+        except Exception:
+            pass
+        self.p = None
+        self.conn = None
+        self.modelos = []
+        self.ligado_em = None
+
+    def chamar(self, nome, *args):
+        with self.trava:
+            self._ligar()
+            try:
+                self.conn.send((nome, args))
+                st, res, mods = self.conn.recv()
+            except (EOFError, OSError, BrokenPipeError):
+                self._desligar()
+                raise RuntimeError("a IA local fechou no meio da tarefa (falta de memória?). Tente de novo.")
+            finally:
+                self.ult = time.time()
+            self.modelos = mods
+            if st == "erro":
+                raise RuntimeError(res)
+            return res
+
+    def _vigia(self):
+        while True:
+            time.sleep(15)
+            lim = getattr(self.cfg, "desligar_apos_s", 600)
+            if lim and self.ligado() and time.time() - self.ult > lim and self.trava.acquire(False):
+                try:
+                    self._desligar()
+                finally:
+                    self.trava.release()
+
+
 class Servico:
     def __init__(self, cfg, cliente_claude=None):
         self.cfg = cfg
-        self.gpu = vram.Gerente(cfg.vram_gb, cfg.descarregar_apos_s)
+        self.trab = Trabalhador(cfg)
         self.claude = ClaudeAPIManager(cfg, cliente_claude)
+        self.agora = {}
+        self.recentes = collections.deque(maxlen=30)
+        self.trava_at = threading.Lock()
+        self._nat = 0
         self.fila = 0
         self.trava_fila = threading.Lock()
         self._pc2 = {"t": 0, "ok": False, "ms": None}
@@ -86,6 +178,36 @@ class Servico:
         with urllib.request.urlopen(req, timeout=timeout) as r:
             return json.load(r)
 
+    # ---------- o que está rodando agora (monitor do painel) ----------
+    @contextlib.contextmanager
+    def ativ(self, ia, tarefa, onde="placa de vídeo"):
+        with self.trava_at:
+            self._nat += 1
+            k = self._nat
+            self.agora[k] = {"ia": ia, "tarefa": tarefa, "onde": onde, "desde": time.time()}
+        ok = False
+        try:
+            yield
+            ok = True
+        finally:
+            with self.trava_at:
+                a = self.agora.pop(k, None)
+                if a:
+                    self.recentes.appendleft({**a, "dur": round(time.time() - a["desde"], 1), "ok": ok})
+
+    def atividade(self):
+        agora = time.time()
+        with self.trava_at:
+            at = [{**a, "seg": round(agora - a["desde"])} for a in self.agora.values()]
+            rec = list(self.recentes)[:15]
+        return {"agora": at, "recentes": rec, "ia_local": {"ligada": self.trab.ligado(), "modelos": self.trab.modelos if self.trab.ligado() else [],
+                "parada_ha_s": round(agora - self.trab.ult) if self.trab.ligado() else None, "desliga_apos_s": getattr(self.cfg, "desligar_apos_s", 600)},
+                "nomes": NOMES_IA, **vram.info()}
+
+    def _ia(self, chave, tarefa):
+        e, n, m = NOMES_IA[chave]
+        return self.ativ(e + " " + n + " (" + m + ")", tarefa)
+
     # ---------- tarefas ----------
     def _gpu(self, f):
         with self.trava_fila:
@@ -97,22 +219,13 @@ class Servico:
                 self.fila -= 1
 
     def recortar(self, img):
-        def f():
-            with self.gpu.uso("recorte", J_REC.PESO_GB, lambda: J_REC.carregar(self.cfg)) as s:
-                return J_REC.rodar(s, img)
-        return self._gpu(f)
+        with self._ia("recorte", "tirando o fundo de uma foto"):
+            return self._gpu(lambda: self.trab.chamar("recortar", img))
 
     def figurinhas(self, prompt, n, semente=None, estilo="figurinha"):
         estilo = estilo if estilo in J_FIG.ESTILOS else "figurinha"
-
-        def f():
-            with self.gpu.uso("figurinha", J_FIG.PESO_GB, lambda: J_FIG.carregar(self.cfg)) as p:
-                brutas = J_FIG.rodar(p, prompt, n, semente, estilo=estilo)
-            if not J_FIG.RECORTA[estilo]:
-                return brutas
-            with self.gpu.uso("recorte", J_REC.PESO_GB, lambda: J_REC.carregar(self.cfg)) as s:
-                return [aparar(J_REC.rodar(s, b)) for b in brutas]
-        return self._gpu(f)
+        with self._ia("figurinha", "desenhando %d %s: %s%s" % (n, estilo, prompt[:60], " + recorte" if J_FIG.RECORTA[estilo] else "")):
+            return self._gpu(lambda: self.trab.chamar("figurinhas", prompt, n, semente, estilo))
 
     def _arquivo(self, dataurl, nome, padrao="bin"):
         m = re.match(r"^data:([\w/+.-]+)(?:;[^,]*)?;base64,", str(dataurl or ""))
@@ -129,7 +242,7 @@ class Servico:
         from PIL import Image
         caminho = self._arquivo(dataurl, nome, "mp4" if tipo == "video" else "jpg")
         try:
-            imgs = J_MID.quadros(caminho, 3, self.cfg.simular) if tipo == "video" else [Image.open(caminho).convert("RGB")]
+            imgs = self.trab.chamar("quadros", caminho, 3) if tipo == "video" else [Image.open(caminho).convert("RGB")]
             fala = ""
             if tipo == "video":
                 try:
@@ -139,10 +252,8 @@ class Servico:
             via, cenas = "local", []
             if self.cfg.descrever != "claude":
                 try:
-                    def f():
-                        with self.gpu.uso("descrever", J_VER.PESO_GB, lambda: J_VER.carregar(self.cfg)) as mp:
-                            return J_VER.rodar(mp, imgs)
-                    cenas = self._gpu(f)
+                    with self._ia("descrever", "lendo um Story (%s, %d imagem%s)" % (tipo, len(imgs), "ns" if len(imgs) > 1 else "")):
+                        cenas = self._gpu(lambda: self.trab.chamar("ver", imgs))
                 except Exception as e:
                     sys.stderr.write("Florence não rodou (%s); usando o Claude\n" % e)
                     cenas = []
@@ -153,8 +264,9 @@ class Servico:
                     im = im.copy()
                     im.thumbnail((768, 768))
                     pequenas.append(para_dataurl(im.convert("RGB"), "JPEG"))
-                t, _ = self.claude.texto("descrever", empresa, "", "", "Descreva em português, em 2 a 3 frases, o que aparece neste Story do Instagram (quadros de um mesmo vídeo ou uma foto) e transcreva o texto escrito na imagem, se houver, numa linha começando com TEXTO:.", 400, pequenas)
-                partes = t.split("TEXTO:")
+                with self.ativ("⚡ Claude Haiku", "lendo o Story (a leitura local não rodou)", "nuvem"):
+                    t, _ = self.claude.texto("descrever", empresa, "", "", "Descreva em português, em 2 a 3 frases, o que aparece neste Story do Instagram (quadros de um mesmo vídeo ou uma foto) e transcreva o texto escrito na imagem, se houver, numa linha começando com TEXTO:.", 400, pequenas)
+                partes = t.split("TEXTO:")  # noqa
                 cenas = [{"cena": partes[0].strip(), "texto": partes[1].strip() if len(partes) > 1 else ""}]
             texto_tela = " / ".join(sorted({c["texto"] for c in cenas if c.get("texto")}))
             resumo = " ".join(c["cena"] for c in cenas if c.get("cena"))
@@ -174,27 +286,13 @@ class Servico:
                 pass
 
     def transcrever_arquivo(self, caminho):
-        def f():
-            with self.gpu.uso("transcrever", J_VOZ.PESO_GB, lambda: J_VOZ.carregar(self.cfg)) as w:
-                return J_VOZ.rodar(w, caminho)
-        return self._gpu(f)
+        with self._ia("transcrever", "transcrevendo um áudio"):
+            return self._gpu(lambda: self.trab.chamar("transcrever", caminho))
 
     def transcrever(self, dataurl, nome=""):
-        m = re.match(r"^data:([\w/+.-]+)(?:;[^,]*)?;base64,", str(dataurl or ""))
-        b64 = str(dataurl)[m.end():] if m else str(dataurl or "")
-        dados = base64.b64decode(b64)
-        if not dados:
-            raise ValueError("áudio vazio")
-        ext = (re.search(r"\.(\w{2,5})$", nome or "") or re.search(r"/(\w+)", m.group(1) if m else "") or [None, "webm"])[1]
-        with tempfile.NamedTemporaryFile(suffix="." + ext.replace("mpeg", "mp3"), delete=False) as t:
-            t.write(dados)
-            caminho = t.name
-
-        def f():
-            with self.gpu.uso("transcrever", J_VOZ.PESO_GB, lambda: J_VOZ.carregar(self.cfg)) as w:
-                return J_VOZ.rodar(w, caminho)
+        caminho = self._arquivo(dataurl, nome, "webm")
         try:
-            return self._gpu(f)
+            return self.transcrever_arquivo(caminho)
         finally:
             try:
                 os.remove(caminho)
@@ -207,7 +305,8 @@ class Servico:
             return d
         d.update(vram.info())
         d["simulado"] = self.cfg.simular
-        d["modelos_na_memoria"] = self.gpu.carregados()
+        d["modelos_na_memoria"] = self.trab.modelos if self.trab.ligado() else []
+        d["ia_local_ligada"] = self.trab.ligado()
         d["fila"] = self.fila
         d["pc2"] = {"endereco": self.cfg.pc2, "online": self.pc2_online(), "ms": self._pc2["ms"]} if self.cfg.pc2 else None
         d["claude"] = {"configurada": self.claude.configurada, "modelo": self.cfg.modelo,
@@ -264,6 +363,8 @@ def criar_handler(sv):
                 return self._json(401, {"erro": "código do PC errado (Config → IA local no painel)"})
             if self.path == "/claude/uso":
                 return self._json(200, sv.claude.resumo())
+            if self.path == "/atividade":
+                return self._json(200, sv.atividade())
             self._json(404, {"erro": "rota não existe"})
 
         def do_POST(self):
@@ -272,6 +373,13 @@ def criar_handler(sv):
             try:
                 b = self._corpo()
                 rota = self.path.split("?")[0]
+                if rota == "/ia/desligar":
+                    sv.trab.desligar()
+                    return self._json(200, {"ok": True, "ligada": False})
+                if rota == "/ia/ligar":
+                    sv.trab.ligar()
+                    sv.trab.chamar("ping")
+                    return self._json(200, {"ok": True, "ligada": True})
                 if rota == "/recorte":
                     img = de_dataurl(b.get("imagem"))
                     return self._json(200, {"imagem": para_dataurl(sv.recortar(img)), "onde": cfg.papel})
@@ -280,8 +388,9 @@ def criar_handler(sv):
                     prompt = str(b.get("prompt") or "").strip()[:300]
                     if not prompt:
                         return self._json(400, {"erro": "falta a descrição da figurinha"})
-                    if b.get("traduzir", True):
-                        prompt = sv.claude.prompt_figurinha(prompt)
+                    if b.get("traduzir", True) and sv.claude.configurada:
+                        with sv.ativ("⚡ Claude Haiku", "traduzindo o pedido da figurinha para o gerador", "nuvem"):
+                            prompt = sv.claude.prompt_figurinha(prompt)
                     if cfg.pc2 and not b.get("_local") and sv.pc2_online():
                         try:
                             r = sv.no_pc2("/figurinha", {"prompt": prompt, "n": n, "traduzir": False, "_local": True, "estilo": b.get("estilo") or "figurinha"})
@@ -300,7 +409,8 @@ def criar_handler(sv):
                         return self._json(400, {"erro": "falta a foto ou o vídeo"})
                     return self._json(200, sv.descrever(b.get("midia"), "video" if b.get("tipo") == "video" else "foto", b.get("nome") or "", b.get("empresa")))
                 if rota == "/claude/classificar":
-                    dados, uso = sv.claude.ferramenta("classificar", b.get("empresa"), b.get("sistema") or "", b.get("empresa_md") or "",
+                    with sv.ativ("⚡ Claude Haiku", "classificando uma ideia", "nuvem"):
+                      dados, uso = sv.claude.ferramenta("classificar", b.get("empresa"), b.get("sistema") or "", b.get("empresa_md") or "",
                                                       "Classifique esta ideia da equipe (transcrição de áudio ou texto do celular):\n\n" + str(b.get("texto") or "")[:6000],
                                                       "classificar", "Classifica a ideia para o banco de ideias da agência.", b.get("schema") or SCHEMA_CLASSE, max_tokens=800)
                     return self._json(200, {"dados": dados, "uso": uso})
@@ -311,8 +421,9 @@ def criar_handler(sv):
                         "layouts": ("criar_modelo", "Entrega os modelos de layout (camadas) que o painel desenha."),
                         "modelo": ("criar_modelo", "Entrega o modelo de layout (camadas) que recria a arte de referência."),
                     }[tarefa]
-                    dados, uso = sv.claude.ferramenta(tarefa, b.get("empresa"), b.get("sistema"), b.get("empresa_md"),
-                                                      b.get("pedido"), nome, desc, b.get("schema"), b.get("imagens"))
+                    with sv.ativ("🧠 Claude Sonnet", {"dia": "montando as telas do dia", "layouts": "criando os layouts", "modelo": "lendo a arte de referência"}[tarefa] + ((" · " + str((b.get("empresa") or {}).get("nome") or "")) if b.get("empresa") else ""), "nuvem"):
+                        dados, uso = sv.claude.ferramenta(tarefa, b.get("empresa"), b.get("sistema"), b.get("empresa_md"),
+                                                          b.get("pedido"), nome, desc, b.get("schema"), b.get("imagens"))
                     return self._json(200, {"dados": dados, "uso": uso})
                 if rota == "/claude/chat":
                     txt, uso = sv.claude.texto("chat", b.get("empresa"), b.get("sistema"), b.get("empresa_md"), b.get("mensagem"))

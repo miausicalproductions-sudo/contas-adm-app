@@ -28,7 +28,8 @@ class Config:
     # [gpu]
     simular: bool = False           # testes sem placa de vídeo: devolve imagens de mentira
     vram_gb: float = 7.0            # quanto a IA local pode ocupar (a placa tem 8 GB)
-    descarregar_apos_s: int = 90
+    descarregar_apos_s: int = 90        # tira o modelo da placa depois de parado
+    desligar_apos_s: int = 600          # desliga a IA local inteira (libera a RAM) depois de 10 min parada
     recorte_modelo: str = "birefnet-general"
     figurinha_modelo: str = "sdxl-lightning"
     whisper_modelo: str = "medium"      # "small" (mais leve) ou "large-v3" (mais preciso)

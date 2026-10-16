@@ -29,6 +29,7 @@ cache_ttl = "5m"                    # "5m" (padrão) ou "1h"
 simular = false            # true = sem placa de vídeo (só para testar o painel)
 vram_gb = 7.0              # quanto a IA local pode ocupar da placa de 8 GB
 descarregar_apos_s = 90    # tira os modelos da placa depois de 90 s parados
+desligar_apos_s = 600      # desliga a IA local inteira (libera a RAM) depois de 10 min parada; liga sozinha no próximo pedido
 recorte_modelo = "birefnet-general"   # ou "isnet-general-use" (mais leve)
 whisper_modelo = "medium"             # transcrição dos áudios: "small" (mais leve) ou "large-v3" (mais preciso)
 descrever = "local"                   # leitura dos Stories do celular: "local" (Florence-2 na placa) ou "claude" (Haiku, centavos)

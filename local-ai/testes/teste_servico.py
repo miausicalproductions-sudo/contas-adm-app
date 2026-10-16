@@ -153,6 +153,19 @@ class Testes(unittest.TestCase):
         self.assertEqual((c, len(d["cenas"])), (200, 3))
         self.assertIn("5000 bytes", d["fala"])
 
+    def test_monitor_ligar_desligar(self):
+        chamar(self.u1 + "/recorte", {"imagem": foto()})
+        c, d = chamar(self.u1 + "/atividade")
+        self.assertEqual(c, 200)
+        self.assertTrue(d["ia_local"]["ligada"])
+        self.assertTrue(any("Recorte" in r["ia"] for r in d["recentes"]))
+        c, d = chamar(self.u1 + "/ia/desligar", {})
+        self.assertEqual((c, d["ligada"]), (200, False))
+        c, d = chamar(self.u1 + "/atividade")
+        self.assertFalse(d["ia_local"]["ligada"])
+        c, d = chamar(self.u1 + "/recorte", {"imagem": foto()})  # liga sozinha no próximo pedido
+        self.assertEqual(c, 200)
+
     def test_schema_invalido(self):
         c, d = chamar(self.u1 + "/claude/dia", {"pedido": "x", "schema": "nada"})
         self.assertEqual(c, 400)
