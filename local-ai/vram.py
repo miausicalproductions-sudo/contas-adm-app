@@ -22,6 +22,19 @@ def _torch():
 
 
 def info():
+    """Status da placa sem abrir o CUDA (assim o miau-ia parado não ocupa memória da placa)."""
+    try:
+        import subprocess
+        r = subprocess.run(["nvidia-smi", "--query-gpu=name,memory.free,memory.total", "--format=csv,noheader,nounits"],
+                           capture_output=True, text=True, timeout=5, creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+        if r.returncode == 0 and r.stdout.strip():
+            nome, livre, total = [x.strip() for x in r.stdout.strip().splitlines()[0].split(",")]
+            return {"gpu": nome, "vram_livre_gb": round(float(livre) / 1024, 1), "vram_total_gb": round(float(total) / 1024, 1)}
+    except Exception:
+        pass
+    import sys
+    if "torch" not in sys.modules:   # sem nvidia-smi: não abre o CUDA só para olhar
+        return {"gpu": "NVIDIA (detalhes ao usar)"}
     t = _torch()
     if not t or not t.cuda.is_available():
         return {"gpu": None}
