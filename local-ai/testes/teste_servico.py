@@ -214,6 +214,21 @@ class Testes(unittest.TestCase):
         c, a = chamar(self.u1 + "/atividade")
         self.assertTrue(any("referência" in r["tarefa"] for r in a["recentes"]))
 
+    def test_config_pc2(self):
+        arq = os.path.join(self.tmp, "cfg_pc2.toml")
+        open(arq, "w").write('[servico]\ntoken = "t1"\n')
+        antes = (self.sv1.arq_config, self.sv1.cfg.pc2, self.sv1.cfg.pc2_token)
+        self.sv1.arq_config = arq
+        try:
+            c, d = chamar(self.u1 + "/config/pc2", {"pc2": "http://192.168.0.20:8765", "pc2_token": "abc"})
+            self.assertEqual(c, 200, d)
+            self.assertIn('pc2 = "http://192.168.0.20:8765"', open(arq).read())
+            c, d = chamar(self.u1 + "/config/pc2", {"pc2": "javascript:alert(1)"})
+            self.assertEqual(c, 400)
+        finally:
+            self.sv1.arq_config, self.sv1.cfg.pc2, self.sv1.cfg.pc2_token = antes
+            self.sv1._pc2["t"] = 0
+
     def test_schema_invalido(self):
         c, d = chamar(self.u1 + "/claude/dia", {"pedido": "x", "schema": "nada"})
         self.assertEqual(c, 400)

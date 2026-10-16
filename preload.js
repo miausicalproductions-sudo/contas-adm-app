@@ -8,5 +8,6 @@ contextBridge.exposeInMainWorld('desktop', {
   tmCos: () => ipcRenderer.invoke('tm-cos'),
   tmFit: h => ipcRenderer.send('tm-fit', h),
   checkUpdate: () => ipcRenderer.invoke('check-update'),
+  iaInstalar: papel => ipcRenderer.invoke('ia-instalar', papel),
   platform: process.platform
 });

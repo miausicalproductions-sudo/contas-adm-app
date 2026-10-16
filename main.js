@@ -121,12 +121,52 @@ ipcMain.on('tm-cmd', (e, k) => {
 });
 ipcMain.on('focus-main', () => showMain());
 
+/* ---------- IA interna (miau-ia) instalada pelo próprio programa: sem .bat ----------
+ * O instalador do Windows pergunta se este PC vai rodar a IA (arquivo instalar-ia.flag na pasta do programa);
+ * na primeira abertura o programa pergunta se é o PC 1 (principal) ou o PC 2 (apoio) e instala tudo sozinho.
+ * Também dá para instalar depois pelo painel: Config → IA local → Instalar a IA interna. */
+let iaWin = null;
+function iaInstalar(papel) {
+  if (process.platform !== 'win32') { dialog.showMessageBox({ type: 'info', title: NOME, message: 'A IA interna só roda no Windows com placa NVIDIA. Neste computador, use as IAs do PC 1 pela rede (Config → IA local).' }); return false; }
+  if (iaWin) { iaWin.focus(); return true; }
+  const ps = path.join(process.resourcesPath || __dirname, 'local-ai', 'instalar-tudo.ps1'), ps2 = path.join(__dirname, 'local-ai', 'instalar-tudo.ps1'), arq = fs.existsSync(ps) ? ps : ps2;
+  iaWin = new BrowserWindow({ width: 760, height: 620, title: 'Instalando a IA interna', icon: path.join(__dirname, 'build', 'icon.png'), autoHideMenuBar: true, webPreferences: { preload: path.join(__dirname, 'preload-ia.js'), contextIsolation: true } });
+  iaWin.on('closed', () => { iaWin = null; });
+  iaWin.loadFile(path.join(__dirname, 'ia.html'));
+  iaWin.webContents.once('did-finish-load', () => {
+    const { spawn } = require('child_process');
+    const p = spawn('powershell.exe', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', arq, '-Papel', papel], { windowsHide: true });
+    let buf = '', tok = '';
+    const linha = l => { if (/^##TOKEN /.test(l)) tok = l.slice(8).trim(); if (iaWin) iaWin.webContents.send('ia-linha', l); };
+    const le = d => { buf += d.toString('utf8'); const L = buf.split(/\r?\n/); buf = L.pop(); L.forEach(linha); };
+    p.stdout.on('data', le); p.stderr.on('data', le);
+    p.on('close', async code => {
+      if (buf) linha(buf);
+      const ok = code === 0;
+      savePrefs({ iaFeita: ok ? papel : '', iaTentou: Date.now() });
+      if (ok && papel === 'pc1' && tok && win) { try { await win.webContents.executeJavaScript(`try{localStorage.miauIA=JSON.stringify({url:'http://127.0.0.1:8765',tok:${JSON.stringify(tok)}});'ok'}catch(e){''}`); } catch (e) { } }
+      if (iaWin) iaWin.webContents.send('ia-fim', ok, papel);
+    });
+  });
+  return true;
+}
+ipcMain.handle('ia-instalar', (e, papel) => iaInstalar(papel === 'pc2' ? 'pc2' : 'pc1'));
+async function iaPrimeiraVez() {
+  if (process.platform !== 'win32' || prefs().iaFeita || prefs().iaPerguntou) return;
+  const flag = path.join(path.dirname(process.execPath), 'instalar-ia.flag');
+  if (!fs.existsSync(flag)) return;
+  savePrefs({ iaPerguntou: Date.now() });
+  const r = await dialog.showMessageBox(win, { type: 'question', title: NOME, message: 'Instalar a IA interna neste computador?', detail: 'Baixa e instala sozinho o Python, as IAs (figurinhas, recorte, transcrição, leitura) e os modelos: uns 15 GB e de 10 a 40 minutos. Precisa de placa de vídeo NVIDIA.\n\nPC 1 = o computador principal (guarda a chave do Claude).\nPC 2 = computador de apoio (ajuda o PC 1 pela rede).', buttons: ['Este é o PC 1 (principal)', 'Este é o PC 2 (apoio)', 'Agora não'], defaultId: 1, cancelId: 2 });
+  if (r.response === 0) iaInstalar('pc1'); else if (r.response === 1) iaInstalar('pc2');
+}
+
 app.whenReady().then(() => {
   Menu.setApplicationMenu(process.platform === 'darwin' ? Menu.buildFromTemplate([{ role: 'appMenu' }, { role: 'editMenu' }, { role: 'viewMenu' }, { role: 'windowMenu' }]) : null);
   createWindow();
   makeTray();
   setStart(prefs().iniciar !== 0);                          // abre junto com o Windows (padrão); regrava o caminho caso o programa tenha mudado de pasta
   if (win) win.webContents.on('did-finish-load', () => setTimeout(refreshTray, 3000));
+  if (win) win.webContents.once('did-finish-load', () => setTimeout(iaPrimeiraVez, 2500));
   setInterval(refreshTray, 2 * 60 * 1000);
   app.on('activate', () => { if (!BrowserWindow.getAllWindows().length) createWindow(true); else showMain(); });
 });

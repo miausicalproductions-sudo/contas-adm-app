@@ -47,7 +47,7 @@ import io  # noqa: E402
 import re  # noqa: E402
 import tempfile  # noqa: E402
 
-VERSAO = "1.12"
+VERSAO = "1.13"
 SCHEMA_CLASSE = {"type": "object", "properties": {
     "entrada": {"type": "string", "enum": ["ideia", "diretriz", "contexto", "pedido"],
                 "description": "ideia = ideia solta para o banco; diretriz = algo obrigatório num dia ou campanha; contexto = bastidor/informação; pedido = pedem um Story/post agora"},
@@ -470,6 +470,23 @@ def criar_handler(sv):
             try:
                 b = self._corpo()
                 rota = self.path.split("?")[0]
+                if rota == "/config/pc2":   # o painel do PC 1 grava o endereço e o código do PC 2 no config.toml
+                    if self.client_address[0] not in ("127.0.0.1", "::1"):
+                        return self._json(403, {"erro": "só o próprio PC 1 pode mudar a configuração"})
+                    end, tk = str(b.get("pc2") or "").strip().rstrip("/"), str(b.get("pc2_token") or "").strip()
+                    if end and not re.match(r"^https?://[\w.\-]+(:\d+)?$", end):
+                        return self._json(400, {"erro": "endereço inválido (ex.: http://192.168.0.20:8765)"})
+                    arq = sv.arq_config or os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.toml")
+                    t = open(arq, encoding="utf-8").read() if os.path.exists(arq) else "[servico]\n"
+                    for k, v in (("pc2", end), ("pc2_token", tk)):
+                        if re.search(r"^\s*%s\s*=" % k, t, re.M):
+                            t = re.sub(r'^(\s*%s\s*=\s*)"[^"]*"' % k, lambda m: m.group(1) + '"%s"' % v, t, count=1, flags=re.M)
+                        else:
+                            t = t.replace("[servico]", '[servico]\n%s = "%s"' % (k, v), 1)
+                    open(arq, "w", encoding="utf-8").write(t)
+                    cfg.pc2, cfg.pc2_token = end, tk
+                    sv._pc2["t"] = 0
+                    return self._json(200, {"ok": True, "pc2": sv.pc2_online() if end else False})
                 if rota == "/ia/desligar":
                     sv.trab.desligar()
                     return self._json(200, {"ok": True, "ligada": False})

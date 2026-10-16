@@ -1,23 +1,32 @@
 @echo off
 chcp 65001 >nul
 cd /d "%~dp0"
+rem /auto = sem pausas (usado pelo instalador do programa) · /pc2 = PC de apoio (atende o PC 1 pela rede, sem chave do Claude)
+set AUTO=
+set PAPEL=pc1
+for %%a in (%*) do (
+  if /i "%%~a"=="/auto" set AUTO=1
+  if /i "%%~a"=="/pc2" set PAPEL=pc2
+)
 echo ============================================================
 echo  Instalando a IA local da Studios Miau (miau-ia)
 echo  Precisa de internet e uns 15 GB livres. Demora de 10 a 30 min.
 echo ============================================================
+if defined PYEXE goto temPy
 where py >nul 2>nul
 if errorlevel 1 (
   echo Falta o Python. Instale o Python 3.12 em https://www.python.org/downloads/
   echo marcando "Add python.exe to PATH" e rode este arquivo de novo.
-  pause
+  if not defined AUTO pause
   exit /b 1
 )
+:temPy
 if not exist venv (
-  py -3.12 -m venv venv 2>nul || py -3.11 -m venv venv
+  if defined PYEXE ("%PYEXE%" -m venv venv) else (py -3.12 -m venv venv 2>nul || py -3.11 -m venv venv)
 )
 if not exist venv\Scripts\python.exe (
   echo Nao consegui criar o ambiente do Python 3.12 ou 3.11.
-  pause
+  if not defined AUTO pause
   exit /b 1
 )
 set PY=venv\Scripts\python.exe
@@ -27,6 +36,7 @@ echo -- PyTorch com CUDA 12.8 (RTX 4060 Ti e RTX 5060) --
 %PY% -m pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128 || goto erro
 %PY% -m pip install -r requirements.txt || goto erro
 %PY% criar_config.py || goto erro
+if "%PAPEL%"=="pc2" %PY% rede.py abrir
 echo.
 echo -- Baixando os modelos (uns 8 GB na primeira vez) --
 %PY% baixar_modelos.py
@@ -45,10 +55,10 @@ echo  So no PC 1: abra o config.toml no Bloco de Notas e cole a chave
 echo  da API do Claude em [claude] chave = "...". Depois reinicie o PC
 echo  (ou rode o iniciar.bat).
 echo ============================================================
-pause
+if not defined AUTO pause
 exit /b 0
 :erro
 echo.
 echo Deu erro na instalacao. Tire um print desta janela e mande para o Claude.
-pause
+if not defined AUTO pause
 exit /b 1

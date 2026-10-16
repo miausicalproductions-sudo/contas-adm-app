@@ -1,0 +1,14 @@
+<!doctype html><html lang=pt-BR><head><meta charset=utf-8><title>Instalando a IA interna</title>
+<style>body{font:14px system-ui,sans-serif;margin:0;background:#f6f5fa;color:#22203a}main{padding:18px 22px;display:grid;gap:10px;height:100vh;box-sizing:border-box;grid-template-rows:auto auto auto 1fr auto}
+h1{font-size:18px;margin:0}.bar{height:10px;background:#e3e0ee;border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:#5B4BDB;transition:width .4s}
+#log{background:#1d1b2c;color:#d8d6e6;font:12px/1.45 Consolas,monospace;border-radius:10px;padding:10px;overflow:auto;white-space:pre-wrap}#fim{display:none;background:#fff;border:1px solid #ddd9ec;border-radius:12px;padding:12px}
+code{background:#eee;padding:2px 6px;border-radius:6px;font-size:13px}button{font:inherit;padding:8px 14px;border-radius:10px;border:0;background:#22203a;color:#fff;cursor:pointer}</style></head>
+<body><main><h1>🤖 Instalando a IA interna (miau-ia)</h1><div id=et>Começando…</div><div class=bar><i id=br></i></div><div id=log></div><div id=fim></div></main>
+<script>
+const L=document.getElementById('log'),F=document.getElementById('fim'),ips=[];let tok='',pasta='';
+window.ia.on(l=>{const m=l.match(/^##ETAPA (\d)\/(\d) (.*)$/);if(m){document.getElementById('et').textContent='Etapa '+m[1]+' de '+m[2]+': '+m[3];document.getElementById('br').style.width=(m[1]/m[2]*100)+'%';return}
+ if(/^##TOKEN /.test(l)){tok=l.slice(8).trim();return}if(/^##PASTA /.test(l)){pasta=l.slice(8).trim();return}if(/^##IP /.test(l)){ips.push(l.slice(5).trim());return}
+ if(/^##ERRO /.test(l)){F.style.display='block';F.innerHTML='<b style="color:#C62F4A">⚠ Não terminou: '+l.slice(7).replace(/</g,'&lt;')+'</b><p>Tire um print desta janela e mande para o Claude. Dá para tentar de novo pelo painel: Config → IA local → Instalar a IA interna.</p>';return}
+ L.textContent+=l+'\n';L.scrollTop=L.scrollHeight});
+window.ia.done((ok,papel)=>{if(!ok)return;F.style.display='block';F.innerHTML=papel=='pc2'?'<b>✓ Pronto: este é o PC 2 (apoio).</b><p>No painel do <b>PC 1</b>: Config → IA local → <b>PC 2</b>, coloque:</p><p>Endereço: '+(ips.map(i=>'<code>'+i+'</code>').join(' ou ')||'(o IP deste PC):8765')+'<br>Código do PC 2: <code>'+tok+'</code></p><button onclick="window.close()">Fechar</button>':'<b>✓ Pronto: a IA interna está ligada neste PC.</b><p>O painel deste programa já foi configurado sozinho (endereço <code>http://127.0.0.1:8765</code>). Para o Claude pela API, cole a chave em <code>'+pasta+'\\config.toml</code> (linha <code>chave = "..."</code>).</p><button onclick="window.close()">Fechar</button>'});
+</script></body></html>
