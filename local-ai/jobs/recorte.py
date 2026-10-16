@@ -7,17 +7,43 @@ PESO_GB = 1.2
 def carregar(cfg):
     if cfg.simular:
         return "simulado"
-    try:  # onnxruntime-gpu acha as DLLs do CUDA que vêm com o PyTorch
-        import onnxruntime as ort
-        if hasattr(ort, "preload_dlls"):
-            ort.preload_dlls()
-    except Exception:
-        pass
+    _dlls_do_torch()
     from rembg import new_session
     try:
-        return new_session(cfg.recorte_modelo, providers=["CUDAExecutionProvider", "CPUExecutionProvider"])
+        s = new_session(cfg.recorte_modelo, providers=["CUDAExecutionProvider", "CPUExecutionProvider"])
     except Exception:
-        return new_session("isnet-general-use", providers=["CUDAExecutionProvider", "CPUExecutionProvider"])
+        s = new_session("isnet-general-use", providers=["CUDAExecutionProvider", "CPUExecutionProvider"])
+    try:
+        print("recorte rodando em:", s.inner_session.get_providers()[0])
+    except Exception:
+        pass
+    return s
+
+
+def _dlls_do_torch():
+    """O onnxruntime-gpu precisa das DLLs do CUDA 12 e do cuDNN 9. O PyTorch (cu128) já traz essas DLLs em torch/lib:
+    importar o torch primeiro e apontar o onnxruntime para essa pasta evita o "CUDA/cuDNN missing" (recorte no processador)."""
+    import os
+    import sys
+    try:
+        import torch
+        lib = os.path.join(os.path.dirname(torch.__file__), "lib")
+        if sys.platform == "win32" and os.path.isdir(lib):
+            os.add_dll_directory(lib)
+            os.environ["PATH"] = lib + os.pathsep + os.environ.get("PATH", "")
+        if torch.cuda.is_available():
+            torch.zeros(1).cuda()  # carrega cudart/cublas/cudnn do torch no processo
+    except Exception as e:
+        print("torch não carregou para o recorte:", e)
+    try:
+        import onnxruntime as ort
+        if hasattr(ort, "preload_dlls"):
+            try:
+                ort.preload_dlls(directory="")   # "" = usa as DLLs do PyTorch
+            except TypeError:
+                ort.preload_dlls()
+    except Exception as e:
+        print("preload_dlls:", e)
 
 
 def rodar(sessao, img):

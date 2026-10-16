@@ -19,6 +19,12 @@ def carregar(cfg):
     def sem_flash(arq):  # o código do Florence pede flash_attn, que não existe no Windows; não é necessário
         return [i for i in get_imports(arq) if i != "flash_attn"]
 
+    import transformers
+    # O código do Florence-2 foi escrito para transformers antigos: lê config.forced_bos_token_id,
+    # que as versões novas tiraram da classe base. Um valor padrão (None) resolve sem trocar de versão.
+    for nome in ("forced_bos_token_id", "forced_eos_token_id"):
+        if not hasattr(transformers.PretrainedConfig, nome):
+            setattr(transformers.PretrainedConfig, nome, None)
     dev = "cuda" if torch.cuda.is_available() else "cpu"
     tipo = torch.float16 if dev == "cuda" else torch.float32
     with patch("transformers.dynamic_module_utils.get_imports", sem_flash):
