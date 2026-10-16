@@ -57,7 +57,7 @@ input,select,textarea{border:1px solid var(--ln);border-radius:8px;background:#f
 .thbx{border-left:5px solid var(--t,#ccc);background:color-mix(in srgb,var(--t,#ccc) 18%,#fff);border-radius:10px;padding:8px 10px;display:grid;gap:3px;font-size:12.5px;margin-bottom:8px}.thbx span{color:var(--ink)}.thbx .row{gap:6px}
 .taib{border:1px solid var(--ln);border-radius:12px;padding:8px 10px;display:grid;gap:3px;font-size:12.5px;border-left:5px solid var(--t,#ccc)}.taib label{display:flex;gap:6px;align-items:center;font-weight:700;font-size:13.5px}.taib ul{margin:2px 0 0;padding-left:18px}
 #brua{text-decoration:none}#iapill{position:fixed;left:50%;transform:translateX(-50%);bottom:4px;z-index:96;background:#fff;color:#22203a;border:1px solid var(--ln);border-radius:999px;padding:5px 14px;font:inherit;font-size:12px;box-shadow:0 2px 12px #0002;cursor:pointer;max-width:min(560px,90vw);text-align:left;opacity:.72;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#iapill:hover{opacity:1}body:has(#ste) #iapill{bottom:auto;top:6px}#iapill.on{opacity:1;border-color:#5B4BDB;border-radius:14px;white-space:normal;animation:iapl 1.6s ease-in-out infinite}#iapill small{opacity:.7;margin-left:4px}
+#iapill:hover{opacity:1}body:has(#ste) #iapill{left:auto;right:18px;transform:none;bottom:10px;opacity:.85}#iapill.on{opacity:1;border-color:#5B4BDB;border-radius:14px;white-space:normal;animation:iapl 1.6s ease-in-out infinite}#iapill small{opacity:.7;margin-left:4px}
 @keyframes iapl{50%{box-shadow:0 0 0 5px #5B4BDB2e}}
 .iamg{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px}
 .iamc{border:1px solid var(--ln);border-radius:12px;padding:8px 10px;display:grid;gap:2px;font-size:12px}.iamc small{opacity:.7}.iamc span{font-weight:700;margin-top:3px}
@@ -580,7 +580,7 @@ button.fk{text-align:left;cursor:pointer;transition:transform .15s,box-shadow .1
 @media (max-width:760px){.ccn{grid-template-columns:1fr 1fr}}
 </style></head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:76*/const PV=76;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:77*/const PV=77;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];

@@ -478,7 +478,7 @@ def criar_handler(sv):
                 if "Authentication" in nome or "PermissionDenied" in nome:
                     if not str(cfg.chave).startswith("sk-ant-api"):
                         return self._json(401, {"erro": "O que está no config.toml não é uma chave de API (ela começa com sk-ant-api03-). Crie uma em console.anthropic.com → API Keys → Create Key e cole em chave = \"...\"."})
-                    return self._json(401, {"erro": "A chave da API no config.toml foi recusada pela Anthropic (apagada ou de outra conta?). Crie outra em console.anthropic.com → API Keys."})
+                    return self._json(401, {"erro": "A chave da API no config.toml foi recusada pela Anthropic (apagada, sem crédito ou de outra conta?). Crie outra em console.anthropic.com → API Keys."})
                 return self._json(500, {"erro": "%s: %s" % (nome, msg[:300])})
 
     return H
