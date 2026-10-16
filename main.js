@@ -39,6 +39,8 @@ function createWindow(forceShow) {
   });
   win.once('ready-to-show', () => { if (HIDDEN && !forceShow) return; if (splashWin && !splashWin.isDestroyed()) { splashWin.once('closed', () => { if (win) { win.maximize(); win.show(); } }); return; } win.maximize(); win.show(); });
   win.loadFile(pick());
+  // F11 liga/desliga a tela cheia
+  win.webContents.on('before-input-event', (e, input) => { if (input.type === 'keyDown' && input.key === 'F11') { e.preventDefault(); win.setFullScreen(!win.isFullScreen()); } });
   // links de fora (chat da IA, Instagram, Drive, WhatsApp) abrem no navegador do computador
   win.webContents.setWindowOpenHandler(({ url }) => { if (/^(https?:|mailto:)/.test(url)) shell.openExternal(url); return { action: 'deny' }; });
   win.webContents.on('will-navigate', (e, url) => { if (/^https?:/.test(url)) { e.preventDefault(); shell.openExternal(url); } });
@@ -227,3 +229,30 @@ function makeTray() {
     else tray.on('right-click', async () => { let t = {}; try { t = await Promise.race([refreshTray(), new Promise(ok => setTimeout(() => ok({}), 700))]); } catch (e) { } tray.popUpContextMenu(trayMenu(t)); });
   } catch (e) { tray = null; }
 }
+
+/* fontes instaladas no computador (para o editor de Stories): lista as pastas de fontes e entrega o arquivo escolhido */
+const FONTDIRS = () => process.platform === 'win32' ? [path.join(process.env.WINDIR || 'C:\\Windows', 'Fonts'), path.join(process.env.LOCALAPPDATA || '', 'Microsoft', 'Windows', 'Fonts')] : process.platform === 'darwin' ? ['/System/Library/Fonts', '/Library/Fonts', path.join(require('os').homedir(), 'Library', 'Fonts')] : ['/usr/share/fonts', path.join(require('os').homedir(), '.fonts')];
+function fontNome(p) {
+  let fd = null;
+  try {
+    fd = fs.openSync(p, 'r'); const h = Buffer.alloc(12); fs.readSync(fd, h, 0, 12, 0); const n = h.readUInt16BE(4); if (!n || n > 80) return '';
+    const T = Buffer.alloc(16 * n); fs.readSync(fd, T, 0, 16 * n, 12); let off = -1, len = 0;
+    for (let i = 0; i < n; i++) if (T.toString('latin1', i * 16, i * 16 + 4) === 'name') { off = T.readUInt32BE(i * 16 + 8); len = T.readUInt32BE(i * 16 + 12); }
+    if (off < 0) return ''; const N = Buffer.alloc(Math.min(len, 65536)); fs.readSync(fd, N, 0, N.length, off);
+    const cnt = N.readUInt16BE(2), so = N.readUInt16BE(4); let best = '';
+    for (let i = 0; i < cnt; i++) { const r = 6 + i * 12; if (r + 12 > N.length) break; const pid = N.readUInt16BE(r), nid = N.readUInt16BE(r + 6), l = N.readUInt16BE(r + 8), o = N.readUInt16BE(r + 10); if (nid !== 4 || so + o + l > N.length) continue;
+      const sb = Buffer.from(N.slice(so + o, so + o + l)); const t = (pid === 3 || pid === 0) && sb.length % 2 === 0 ? sb.swap16().toString('utf16le') : sb.toString('latin1'); if (pid === 3) return t.trim(); best = best || t.trim(); }
+    return best;
+  } catch (e) { return ''; } finally { if (fd !== null) try { fs.closeSync(fd); } catch (e) {} }
+}
+let FONTCACHE = null;
+ipcMain.handle('fontes-lista', async () => {
+  if (FONTCACHE) return FONTCACHE; const out = [], seen = new Set();
+  for (const d of FONTDIRS()) { let L = []; try { L = fs.readdirSync(d); } catch (e) { continue; } for (const f of L) { if (!/\.(ttf|otf)$/i.test(f)) continue; const p = path.join(d, f), n = fontNome(p) || f.replace(/\.(ttf|otf)$/i, ''); if (!n || seen.has(n)) continue; seen.add(n); out.push({ n, p }); } }
+  return (FONTCACHE = out.sort((a, b) => a.n.localeCompare(b.n)));
+});
+ipcMain.handle('fonte-ler', async (e, p) => {
+  if (typeof p !== 'string' || !/\.(ttf|otf)$/i.test(p)) return null; const r = path.resolve(p);
+  if (!FONTDIRS().some(d => r.toLowerCase().startsWith(path.resolve(d).toLowerCase() + path.sep))) return null;
+  try { const b = fs.readFileSync(r); return b.buffer.slice(b.byteOffset, b.byteOffset + b.byteLength); } catch (x) { return null; }
+});
