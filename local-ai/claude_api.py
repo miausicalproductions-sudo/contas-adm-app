@@ -161,6 +161,17 @@ class ClaudeAPIManager:
         uso = self._registrar(empresa, tarefa, modelo, r.usage)
         return "".join(getattr(b, "text", "") for b in r.content).strip(), uso
 
+    def testar(self):
+        """Chamada mínima (Haiku, 5 tokens) para conferir a chave; devolve o erro real da Anthropic."""
+        if not self.configurada:
+            return {"ok": False, "erro": "Não há chave em chave = \"...\" no config.toml deste PC."}
+        try:
+            r = self.cli.messages.create(model=self.cfg.modelo_rapido, max_tokens=5, messages=[{"role": "user", "content": "oi"}])
+            self._registrar({"id": "teste"}, "teste", self.cfg.modelo_rapido, r.usage)
+            return {"ok": True, "modelo": self.cfg.modelo_rapido}
+        except Exception as e:
+            return {"ok": False, "tipo": type(e).__name__, "status": getattr(e, "status_code", None), "erro": explicar(e)}
+
     def prompt_figurinha(self, descricao):
         """Português -> prompt curto em inglês para o gerador de imagens (modelo rápido, centavos)."""
         if not self.configurada or not descricao:
@@ -171,3 +182,29 @@ class ClaudeAPIManager:
             return t.splitlines()[0][:200] or descricao
         except Exception:
             return descricao
+
+
+def explicar(e):
+    """Erro da Anthropic em português + a mensagem original (sem a chave), para saber o que fazer."""
+    nome, cod = type(e).__name__, getattr(e, "status_code", None)
+    msg = str(getattr(e, "message", "") or e)
+    try:
+        corpo = getattr(e, "body", None) or {}
+        msg = ((corpo.get("error") or {}).get("message")) or msg
+    except Exception:
+        pass
+    m = msg.lower()
+    if "credit balance" in m or "billing" in m:
+        dica = "A conta da API está sem crédito: console.anthropic.com → Billing (Configurar cobrança)."
+    elif cod == 401 or "Authentication" in nome:
+        dica = "A Anthropic não reconheceu a chave (copiada pela metade, apagada ou de outra organização)."
+    elif cod == 403 or "PermissionDenied" in nome:
+        dica = "A chave existe, mas não tem permissão para este modelo ou para esta organização (plano de avaliação, workspace ou região)."
+    elif cod == 404:
+        dica = "Modelo não encontrado para esta conta: confira modelo e modelo_rapido no config.toml."
+    elif cod == 429 or "RateLimit" in nome:
+        dica = "Limite de uso atingido; tente em 1 minuto."
+    else:
+        dica = "Erro da API."
+    return "%s (Anthropic %s: %s)" % (dica, cod or nome, msg[:240])
+

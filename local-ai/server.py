@@ -31,7 +31,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import vram  # noqa: E402
-from claude_api import ClaudeAPIManager, ErroClaude, LimiteAtingido  # noqa: E402
+from claude_api import ClaudeAPIManager, ErroClaude, LimiteAtingido, explicar  # noqa: E402
 from config import carregar  # noqa: E402
 from jobs import aparar, de_dataurl, para_dataurl  # noqa: E402
 from jobs import figurinha as J_FIG  # noqa: E402
@@ -46,7 +46,7 @@ import base64  # noqa: E402
 import re  # noqa: E402
 import tempfile  # noqa: E402
 
-VERSAO = "1.4"
+VERSAO = "1.5"
 SCHEMA_CLASSE = {"type": "object", "properties": {
     "entrada": {"type": "string", "enum": ["ideia", "diretriz", "contexto", "pedido"],
                 "description": "ideia = ideia solta para o banco; diretriz = algo obrigatório num dia ou campanha; contexto = bastidor/informação; pedido = pedem um Story/post agora"},
@@ -342,8 +342,8 @@ class Servico:
         d["claude"] = {"configurada": self.claude.configurada, "modelo": self.cfg.modelo,
                        "modelo_rapido": self.cfg.modelo_rapido, "cache": self.cfg.cache_ttl, **self.claude.resumo()}
         d["claude"].pop("empresas", None)
-        if self.cfg.chave and not str(self.cfg.chave).startswith("sk-ant-api"):
-            d["claude"]["aviso"] = "a chave no config.toml não parece de API (deve começar com sk-ant-api03-)"
+        if self.cfg.chave and not str(self.cfg.chave).startswith("sk-ant-"):
+            d["claude"]["aviso"] = "a chave no config.toml não parece da Anthropic (começa com sk-ant-)"
         return d
 
 
@@ -459,6 +459,9 @@ def criar_handler(sv):
                         dados, uso = sv.claude.ferramenta(tarefa, b.get("empresa"), b.get("sistema"), b.get("empresa_md"),
                                                           b.get("pedido"), nome, desc, b.get("schema"), b.get("imagens"))
                     return self._json(200, {"dados": dados, "uso": uso})
+                if rota == "/claude/testar":
+                    with sv.ativ("⚡ Claude Haiku", "testando a chave da API", "nuvem"):
+                        return self._json(200, sv.claude.testar())
                 if rota == "/claude/chat":
                     txt, uso = sv.claude.texto("chat", b.get("empresa"), b.get("sistema"), b.get("empresa_md"), b.get("mensagem"))
                     return self._json(200, {"texto": txt, "uso": uso})
@@ -475,10 +478,8 @@ def criar_handler(sv):
                     return self._json(503, {"erro": "O Claude está ocupado agora; tente de novo em 1 minuto."})
                 if "credit balance" in msg.lower() or "billing" in msg.lower():
                     return self._json(402, {"erro": "A conta da API está sem crédito. Em console.anthropic.com → Billing (Configurar cobrança), adicione créditos e tente de novo."})
-                if "Authentication" in nome or "PermissionDenied" in nome:
-                    if not str(cfg.chave).startswith("sk-ant-api"):
-                        return self._json(401, {"erro": "O que está no config.toml não é uma chave de API (ela começa com sk-ant-api03-). Crie uma em console.anthropic.com → API Keys → Create Key e cole em chave = \"...\"."})
-                    return self._json(401, {"erro": "A chave da API no config.toml foi recusada pela Anthropic (apagada, sem crédito ou de outra conta?). Crie outra em console.anthropic.com → API Keys."})
+                if "Authentication" in nome or "PermissionDenied" in nome or "NotFound" in nome:
+                    return self._json(401, {"erro": explicar(e)})
                 return self._json(500, {"erro": "%s: %s" % (nome, msg[:300])})
 
     return H

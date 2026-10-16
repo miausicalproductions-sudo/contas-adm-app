@@ -53,6 +53,8 @@ def carregar(caminho=None):
                     c.precos.update({m: list(p) for m, p in v.items()})
                 elif hasattr(c, k):
                     setattr(c, k, v)
+    c.chave = str(c.chave or "").strip().strip('"').strip()   # espaço ou aspa colada junto quebra a chave
+    c.token = str(c.token or "").strip()
     if os.environ.get("MIAU_SIMULAR") == "1":
         c.simular = True
     if not os.path.isabs(c.pasta_dados):

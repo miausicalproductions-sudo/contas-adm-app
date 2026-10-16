@@ -180,6 +180,28 @@ class Testes(unittest.TestCase):
         self.sv1.arq_config = None
         vars(self.sv1.cfg).update(antes)
 
+    def test_testar_chave(self):
+        c, d = chamar(self.u1 + "/claude/testar", {})
+        self.assertEqual((c, d["ok"]), (200, True))
+        class Recusa(Exception):
+            status_code = 403
+            body = {"error": {"type": "permission_error", "message": "Your API key does not have permission"}}
+        PermissionDeniedError = type("PermissionDeniedError", (Recusa,), {})
+        velho = self.falso.create
+        def falha(**kw):
+            raise PermissionDeniedError("403")
+        self.falso.create = falha
+        try:
+            c, d = chamar(self.u1 + "/claude/testar", {})
+            self.assertFalse(d["ok"])
+            self.assertIn("permissão", d["erro"])
+            self.assertIn("does not have permission", d["erro"])
+            c, d = chamar(self.u1 + "/claude/classificar", {"empresa": {"id": "c1"}, "texto": "oi"})
+            self.assertEqual(c, 401)
+            self.assertIn("403", d["erro"])
+        finally:
+            self.falso.create = velho
+
     def test_schema_invalido(self):
         c, d = chamar(self.u1 + "/claude/dia", {"pedido": "x", "schema": "nada"})
         self.assertEqual(c, 400)
