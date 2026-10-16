@@ -47,7 +47,7 @@ import io  # noqa: E402
 import re  # noqa: E402
 import tempfile  # noqa: E402
 
-VERSAO = "1.9"
+VERSAO = "1.10"
 SCHEMA_CLASSE = {"type": "object", "properties": {
     "entrada": {"type": "string", "enum": ["ideia", "diretriz", "contexto", "pedido"],
                 "description": "ideia = ideia solta para o banco; diretriz = algo obrigatório num dia ou campanha; contexto = bastidor/informação; pedido = pedem um Story/post agora"},
@@ -297,17 +297,21 @@ class Servico:
             t.write(dados)
             return t.name
 
-    def descrever(self, dataurl, tipo="foto", nome="", empresa=None, quadros=3):
+    def descrever(self, dataurl, tipo="foto", nome="", empresa=None, quadros=3, idioma="pt"):
         """Story (foto ou vídeo) -> o que aparece, o texto escrito e a fala, resumidos em português."""
         from PIL import Image
         caminho = self._arquivo(dataurl, nome, "mp4" if tipo == "video" else "jpg")
         try:
             imgs = self.trab.chamar("quadros", caminho, max(1, min(8, quadros))) if tipo == "video" else [Image.open(caminho).convert("RGB")]
-            fala = ""
+            fala, fala_erro, fala_idioma = "", "", ""
             if tipo == "video":
                 try:
-                    fala = self.transcrever_arquivo(caminho).get("texto", "")
+                    tr = self.transcrever_arquivo(caminho, idioma)
+                    fala, fala_idioma = tr.get("texto", ""), tr.get("idioma", "")
+                    if not fala:
+                        fala_erro = "sem fala detectada (só música ou silêncio)"
                 except Exception as e:
+                    fala_erro = str(e)[:300]
                     sys.stderr.write("vídeo sem áudio legível: %s\n" % e)
             via, cenas = "local", []
             if self.cfg.descrever != "claude":
@@ -330,24 +334,27 @@ class Servico:
                 cenas = [{"cena": partes[0].strip(), "texto": partes[1].strip() if len(partes) > 1 else ""}]
             texto_tela = " / ".join(sorted({c["texto"] for c in cenas if c.get("texto")}))
             resumo = " ".join(c["cena"] for c in cenas if c.get("cena"))
+            em_ingles = via == "local"
             if via == "local" and self.claude.configurada and cenas:
                 try:
                     resumo, _ = self.claude.texto("resumir", empresa, "", "", (
                         "Resuma em português, em 1 a 2 frases objetivas, o que este Story do Instagram mostra e diz. "
                         "Use só estas informações (descrições automáticas em inglês dos quadros, texto da tela e fala):\n"
                         + "\n".join("- " + c["cena"] for c in cenas) + "\nTexto na tela: " + (texto_tela or "nenhum") + "\nFala: " + (fala[:1500] or "nenhuma")), 300)
+                    em_ingles = False
                 except Exception:
                     pass
-            return {"resumo": resumo.strip(), "cenas": cenas, "texto_tela": texto_tela, "fala": fala, "via": via}
+            return {"resumo": resumo.strip(), "cenas": cenas, "texto_tela": texto_tela, "fala": fala, "fala_erro": fala_erro, "idioma": fala_idioma, "via": via,
+                    "em_ingles": em_ingles}
         finally:
             try:
                 os.remove(caminho)
             except OSError:
                 pass
 
-    def transcrever_arquivo(self, caminho):
+    def transcrever_arquivo(self, caminho, idioma="pt"):
         with self._ia("transcrever", "transcrevendo um áudio"):
-            return self._gpu(lambda: self.trab.chamar("transcrever", caminho))
+            return self._gpu(lambda: self.trab.chamar("transcrever", caminho, idioma))
 
     def transcrever(self, dataurl, nome=""):
         caminho = self._arquivo(dataurl, nome, "webm")
@@ -496,7 +503,7 @@ def criar_handler(sv):
                         midia = baixar_midia(b.get("url"))
                     if not midia:
                         return self._json(400, {"erro": "falta a foto ou o vídeo"})
-                    return self._json(200, sv.descrever(midia, "video" if b.get("tipo") == "video" else "foto", b.get("nome") or "", b.get("empresa"), int(b.get("quadros") or 3)))
+                    return self._json(200, sv.descrever(midia, "video" if b.get("tipo") == "video" else "foto", b.get("nome") or "", b.get("empresa"), int(b.get("quadros") or 3), b.get("idioma") or "pt"))
                 if rota == "/claude/classificar":
                     with sv.ativ("⚡ Claude Haiku", "classificando uma ideia", "nuvem"):
                       dados, uso = sv.claude.ferramenta("classificar", b.get("empresa"), b.get("sistema") or "", b.get("empresa_md") or "",

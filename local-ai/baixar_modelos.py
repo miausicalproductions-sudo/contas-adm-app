@@ -63,8 +63,17 @@ if quais in ("tudo", "imagens"):
         print("    Placa agora:", placa())
 if quais in ("tudo", "voz"):
     print("\n[4] Transcrição de áudio (faster-whisper %s)..." % cfg.whisper_modelo)
-    transcrever.carregar(cfg)
-    print("    ok")
+    w = transcrever.carregar(cfg)
+    try:   # transcreve 2 s de um tom: é na hora de transcrever que faltam as DLLs da placa (cuDNN)
+        import math, struct, tempfile, wave
+        arq = os.path.join(tempfile.gettempdir(), "miau_teste_voz.wav")
+        with wave.open(arq, "wb") as wv:
+            wv.setnchannels(1); wv.setsampwidth(2); wv.setframerate(16000)
+            wv.writeframes(b"".join(struct.pack("<h", int(3000 * math.sin(i / 16000 * 2 * math.pi * 220))) for i in range(32000)))
+        transcrever.rodar(w, arq, "pt")
+        print("    ok (rodando %s)" % ("na placa" if isinstance(w, dict) and w.get("dev") == "cuda" else "no processador"))
+    except Exception as e:
+        print("    carregou, mas a transcrição falhou: %s" % e)
 if quais in ("tudo", "leitura") and cfg.descrever != "claude":
     print("\n[5] Leitura de imagem (Florence-2-large, ~1,6 GB)...")
     try:

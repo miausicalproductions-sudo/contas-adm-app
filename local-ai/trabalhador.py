@@ -34,9 +34,9 @@ def principal(conn, cfg):
             return brutas
         return [aparar(recortar(b)) for b in brutas]
 
-    def transcrever(caminho):
+    def transcrever(caminho, idioma="pt"):
         with g.uso("transcrever", J_VOZ.PESO_GB, lambda: J_VOZ.carregar(cfg)) as w:
-            return J_VOZ.rodar(w, caminho)
+            return J_VOZ.rodar(w, caminho, idioma)
 
     def ver(imgs):
         with g.uso("descrever", J_VER.PESO_GB, lambda: J_VER.carregar(cfg)) as mp:
