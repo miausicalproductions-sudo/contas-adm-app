@@ -47,7 +47,7 @@ import io  # noqa: E402
 import re  # noqa: E402
 import tempfile  # noqa: E402
 
-VERSAO = "1.11"
+VERSAO = "1.12"
 SCHEMA_CLASSE = {"type": "object", "properties": {
     "entrada": {"type": "string", "enum": ["ideia", "diretriz", "contexto", "pedido"],
                 "description": "ideia = ideia solta para o banco; diretriz = algo obrigatório num dia ou campanha; contexto = bastidor/informação; pedido = pedem um Story/post agora"},
@@ -309,7 +309,7 @@ class Servico:
                     tr = self.transcrever_arquivo(caminho, idioma)
                     fala, fala_idioma = tr.get("texto", ""), tr.get("idioma", "")
                     if not fala:
-                        fala_erro = "sem fala detectada (só música ou silêncio)"
+                        fala_erro = "sem fala detectada: " + (tr.get("diag") or "só música ou silêncio")
                 except Exception as e:
                     fala_erro = str(e)[:300]
                     sys.stderr.write("vídeo sem áudio legível: %s\n" % e)
