@@ -37,8 +37,8 @@ class Config:
     pasta_dados: str = os.path.join(PASTA, "dados")
 
     @property
-    def papel(self):
-        return "pc2" if self.escutar not in ("127.0.0.1", "localhost") and not self.pc2 else "pc1"
+    def papel(self):   # PC 2 = só ajuda nas figurinhas (sem chave do Claude); o PC 1 pode atender a rede (Mac da equipe)
+        return "pc2" if self.escutar not in ("127.0.0.1", "localhost") and not self.pc2 and not self.chave else "pc1"
 
 
 def carregar(caminho=None):

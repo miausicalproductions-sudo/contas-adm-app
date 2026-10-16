@@ -47,7 +47,7 @@ import io  # noqa: E402
 import re  # noqa: E402
 import tempfile  # noqa: E402
 
-VERSAO = "1.10"
+VERSAO = "1.11"
 SCHEMA_CLASSE = {"type": "object", "properties": {
     "entrada": {"type": "string", "enum": ["ideia", "diretriz", "contexto", "pedido"],
                 "description": "ideia = ideia solta para o banco; diretriz = algo obrigatório num dia ou campanha; contexto = bastidor/informação; pedido = pedem um Story/post agora"},
@@ -367,7 +367,13 @@ class Servico:
                 pass
 
     def health(self, completo):
-        d = {"ok": True, "servico": "miau-ia", "versao": VERSAO, "papel": self.cfg.papel}
+        d = {"ok": True, "servico": "miau-ia", "versao": VERSAO, "papel": self.cfg.papel, "rede": self.cfg.escutar not in ("127.0.0.1", "localhost")}
+        if completo and d["rede"]:
+            try:
+                import rede
+                d["enderecos"] = ["http://%s:%d" % (ip, self.cfg.porta) for ip in rede.ips()]
+            except Exception:
+                pass
         if not completo:
             return d
         d.update(vram.info())

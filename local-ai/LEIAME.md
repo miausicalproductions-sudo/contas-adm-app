@@ -27,6 +27,15 @@ Programa que roda no PC 1 (e, se quiser, no PC 2) e faz para o painel:
 | Leitura de imagem | Florence-2-large (se não carregar: Claude rápido) | Stories postados pelo celular (o que aparece e o texto na tela) |
 | Claude (API) | Sonnet / Haiku | ⚡ Gerar dia, layouts, modelo, classificar ideias, traduzir figurinhas |
 
+## Mac da equipe (ou outro computador) usando as IAs do PC 1
+O Mac não roda as IAs: ele pede ao PC 1 pela rede local (figurinhas, recorte, transcrição, leitura de vídeo e o Claude pela API).
+1. No PC 1: botão direito em **liberar-rede-equipe.bat** → Executar como administrador. Ele libera a porta 8765 no firewall (rede Privada), muda `escutar` para `"0.0.0.0"` no config.toml, reinicia o miau-ia e mostra o **endereço** (ex.: `http://192.168.0.15:8765`) e o **código do PC**.
+2. No Mac: painel → Config → IA local e Claude API → cole o endereço e o código → Salvar e testar.
+3. Peça no roteador um IP fixo para o PC 1 (se o IP mudar, troque o endereço no Mac).
+- O código do PC continua obrigatório: sem ele ninguém na rede usa as IAs nem a chave do Claude.
+- As tarefas automáticas (áudios do Telegram, Stories do celular) só rodam no painel do próprio PC 1, para não fazer nada duas vezes.
+- Para voltar a atender só o PC 1: `venv\Scripts\python rede.py fechar` e reinicie o miau-ia.
+
 ## PC 2 (opcional)
 1. Instale do mesmo jeito.
 2. No `config.toml` do PC 2: `escutar = "0.0.0.0"`. Não coloque a chave do Claude.
