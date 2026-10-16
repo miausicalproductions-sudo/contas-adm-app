@@ -61,6 +61,13 @@ jobs:
       - run: node -e "console.log('electron instalado:', require('electron/package.json').version)"
       - run: npx electron-builder --mac dmg --x64 --publish never -c.electronVersion=32.3.3 -c.mac.hardenedRuntime=false -c.mac.gatekeeperAssess=false
         env: { CSC_IDENTITY_AUTO_DISCOVERY: 'false' }
+      - name: Assinatura ad-hoc completa (o Catalina recusa app com assinatura quebrada)
+        run: |
+          APP=$(ls -d dist/mac*/*.app | head -1); echo "$APP"
+          codesign --force --deep --sign - "$APP" && codesign --verify --deep --verbose=2 "$APP"
+          rm -f dist/*.dmg
+          mkdir -p dmgsrc && ditto "$APP" "dmgsrc/$(basename "$APP")" && ln -s /Applications dmgsrc/Aplicativos
+          hdiutil create -volname "Studios Miau" -srcfolder dmgsrc -fs HFS+ -format UDZO -ov "dist/Contas-ADM-mac-$(node -p "require('./package.json').version").dmg"
       - uses: actions/upload-artifact@v4
         with: { name: mac, path: dist/*.dmg }
 

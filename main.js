@@ -33,7 +33,7 @@ function createWindow(forceShow) {
     icon: path.join(__dirname, 'build', 'icon.png'), backgroundColor: '#f6f5fa', autoHideMenuBar: true, show: false,
     webPreferences: { preload: path.join(__dirname, 'preload.js'), contextIsolation: true, nodeIntegration: false, spellcheck: true, backgroundThrottling: false }
   });
-  win.once('ready-to-show', () => { if (HIDDEN && !forceShow) return; win.maximize(); win.show(); });
+  win.once('ready-to-show', () => { if (HIDDEN && !forceShow) return; if (splashWin && !splashWin.isDestroyed()) { splashWin.once('closed', () => { if (win) { win.maximize(); win.show(); } }); return; } win.maximize(); win.show(); });
   win.loadFile(pick());
   // links de fora (chat da IA, Instagram, Drive, WhatsApp) abrem no navegador do computador
   win.webContents.setWindowOpenHandler(({ url }) => { if (/^(https?:|mailto:)/.test(url)) shell.openExternal(url); return { action: 'deny' }; });
@@ -160,7 +160,20 @@ async function iaPrimeiraVez() {
   if (r.response === 0) iaInstalar('pc1'); else if (r.response === 1) iaInstalar('pc2');
 }
 
+/* vídeo de abertura (logo animado, fundo verde já retirado): só ao abrir pela pessoa, não quando liga junto com o Windows */
+let splashWin = null;
+function splash() {
+  if (HIDDEN || prefs().abertura === 0) return;
+  try {
+    splashWin = new BrowserWindow({ width: 720, height: 540, frame: false, resizable: false, center: true, backgroundColor: '#1d1b2c', show: false, skipTaskbar: false, title: NOME, icon: path.join(__dirname, 'build', 'icon.png') });
+    splashWin.loadFile(path.join(__dirname, 'splash.html'));
+    splashWin.once('ready-to-show', () => splashWin && splashWin.show());
+    splashWin.on('closed', () => { splashWin = null; });
+  } catch (e) { splashWin = null; }
+}
+
 app.whenReady().then(() => {
+  splash();
   Menu.setApplicationMenu(process.platform === 'darwin' ? Menu.buildFromTemplate([{ role: 'appMenu' }, { role: 'editMenu' }, { role: 'viewMenu' }, { role: 'windowMenu' }]) : null);
   createWindow();
   makeTray();
@@ -191,6 +204,7 @@ function trayMenu(t) {
     { type: 'separator' },
     { label: 'Procurar atualização', click: async () => { showMain(); const r = await checkUpdate(true); if (r && (r.err || r.msg) && win) dialog.showMessageBox(win, { type: r.err ? 'warning' : 'info', message: r.err || r.msg, title: NOME }); } },
     { label: 'Abrir junto com o Windows', type: 'checkbox', checked: prefs().iniciar !== 0, click: m => setStart(m.checked) },
+    { label: 'Vídeo de abertura', type: 'checkbox', checked: prefs().abertura !== 0, click: m => savePrefs({ abertura: m.checked ? 1 : 0 }) },
     { type: 'separator' },
     { label: 'Sair', click: () => { quitting = true; app.quit(); } }
   ]);

@@ -1,0 +1,6 @@
+<!doctype html><html lang=pt-BR><head><meta charset=utf-8><title>Studios Miau</title>
+<style>html,body{margin:0;height:100%;background:#1d1b2c;overflow:hidden;cursor:pointer;-webkit-app-region:drag}
+body{display:grid;place-items:center}video{width:86%;max-height:86%;object-fit:contain;-webkit-app-region:no-drag}
+small{position:fixed;bottom:12px;left:0;right:0;text-align:center;color:#ffffff55;font:12px system-ui}</style></head>
+<body><video id=v src="build/abertura.webm" autoplay muted playsinline></video><small>clique para pular</small>
+<script>const v=document.getElementById('v'),fim=()=>{try{window.close()}catch(e){}};v.addEventListener('ended',()=>setTimeout(fim,350));v.addEventListener('error',fim);document.addEventListener('click',fim);setTimeout(fim,12000)</script></body></html>
