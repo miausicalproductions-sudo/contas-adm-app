@@ -26,10 +26,7 @@ echo.
 echo -- PyTorch com CUDA 12.8 (RTX 4060 Ti e RTX 5060) --
 %PY% -m pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128 || goto erro
 %PY% -m pip install -r requirements.txt || goto erro
-if not exist config.toml (
-  %PY% -c "import secrets;t=open('config.example.toml',encoding='utf-8').read();open('config.toml','w',encoding='utf-8').write(t.replace('token = \"\"','token = \"'+secrets.token_urlsafe(18)+'\"',1))"
-  echo Criei o config.toml com um codigo novo para este PC.
-)
+%PY% criar_config.py || goto erro
 echo.
 echo -- Baixando os modelos (uns 8 GB na primeira vez) --
 %PY% baixar_modelos.py
