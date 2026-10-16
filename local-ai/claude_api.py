@@ -13,6 +13,7 @@ import base64
 import json
 import os
 import re
+import sys
 import threading
 import time
 
@@ -150,14 +151,22 @@ class ClaudeAPIManager:
             raise ErroClaude("O Claude não devolveu o formato pedido.")
         return bloco.input, uso
 
-    def texto(self, tarefa, empresa, fixo, empresa_md, pedido, max_tokens=1500, imagens=None):
+    def texto(self, tarefa, empresa, fixo, empresa_md, pedido, max_tokens=1500, imagens=None, busca=False):
         if not self.configurada:
             raise ErroClaude("A chave da API não está no config.toml deste PC.")
         self._checar_teto()
         modelo = self.modelo_de(tarefa)
         conteudo = self._imagens(imagens) + [{"type": "text", "text": str(pedido or "")}] if imagens else str(pedido or "")
-        r = self.cli.messages.create(model=modelo, max_tokens=max_tokens, system=self._sistema(fixo, empresa_md),
-                                     messages=[{"role": "user", "content": conteudo}])
+        kw = dict(model=modelo, max_tokens=max_tokens, system=self._sistema(fixo, empresa_md), messages=[{"role": "user", "content": conteudo}])
+        r = None
+        if busca:   # pesquisa na web (dados atuais em vez de só a memória do modelo); se a conta não tiver, segue sem
+            try:
+                r = self.cli.messages.create(tools=[{"type": "web_search_20250305", "name": "web_search", "max_uses": 6}], **kw)
+            except Exception as e:
+                sys.stderr.write("pesquisa na web indisponível (%s); seguindo sem\n" % e)
+                r = None
+        if r is None:
+            r = self.cli.messages.create(**kw)
         uso = self._registrar(empresa, tarefa, modelo, r.usage)
         return "".join(getattr(b, "text", "") for b in r.content).strip(), uso
 

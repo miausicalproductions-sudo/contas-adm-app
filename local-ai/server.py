@@ -47,7 +47,7 @@ import io  # noqa: E402
 import re  # noqa: E402
 import tempfile  # noqa: E402
 
-VERSAO = "1.14"
+VERSAO = "1.15"
 SCHEMA_CLASSE = {"type": "object", "properties": {
     "entrada": {"type": "string", "enum": ["ideia", "diretriz", "contexto", "pedido"],
                 "description": "ideia = ideia solta para o banco; diretriz = algo obrigatório num dia ou campanha; contexto = bastidor/informação; pedido = pedem um Story/post agora"},
@@ -297,17 +297,22 @@ class Servico:
             t.write(dados)
             return t.name
 
-    def descrever(self, dataurl, tipo="foto", nome="", empresa=None, quadros=3, idioma="pt"):
+    def descrever(self, dataurl, tipo="foto", nome="", empresa=None, quadros=3, idioma="pt", passo=0):
         """Story (foto ou vídeo) -> o que aparece, o texto escrito e a fala, resumidos em português."""
         from PIL import Image
         caminho = self._arquivo(dataurl, nome, "mp4" if tipo == "video" else "jpg")
         try:
-            imgs = self.trab.chamar("quadros", caminho, max(1, min(8, quadros))) if tipo == "video" else [Image.open(caminho).convert("RGB")]
-            fala, fala_erro, fala_idioma = "", "", ""
+            tempos = []
+            if tipo == "video" and passo > 0:               # análise completa: 1 quadro a cada `passo` s + cortes de cena
+                par = self.trab.chamar("cenas", caminho, float(passo), max(4, min(30, quadros)))
+                imgs, tempos = [p[0] for p in par], [p[1] for p in par]
+            else:
+                imgs = self.trab.chamar("quadros", caminho, max(1, min(8, quadros))) if tipo == "video" else [Image.open(caminho).convert("RGB")]
+            fala, fala_erro, fala_idioma, segs = "", "", "", []
             if tipo == "video":
                 try:
                     tr = self.transcrever_arquivo(caminho, idioma)
-                    fala, fala_idioma = tr.get("texto", ""), tr.get("idioma", "")
+                    fala, fala_idioma, segs = tr.get("texto", ""), tr.get("idioma", ""), tr.get("segmentos") or []
                     if not fala:
                         fala_erro = "sem fala detectada: " + (tr.get("diag") or "só música ou silêncio")
                 except Exception as e:
@@ -332,6 +337,9 @@ class Servico:
                     t, _ = self.claude.texto("descrever", empresa, "", "", "Descreva em português, em 2 a 3 frases, o que aparece neste Story do Instagram (quadros de um mesmo vídeo ou uma foto) e transcreva o texto escrito na imagem, se houver, numa linha começando com TEXTO:.", 400, pequenas)
                 partes = t.split("TEXTO:")  # noqa
                 cenas = [{"cena": partes[0].strip(), "texto": partes[1].strip() if len(partes) > 1 else ""}]
+            if tempos and len(tempos) == len(cenas):
+                for c, t in zip(cenas, tempos):
+                    c["t"] = t
             texto_tela = " / ".join(sorted({c["texto"] for c in cenas if c.get("texto")}))
             resumo = " ".join(c["cena"] for c in cenas if c.get("cena"))
             em_ingles = via == "local"
@@ -340,11 +348,11 @@ class Servico:
                     resumo, _ = self.claude.texto("resumir", empresa, "", "", (
                         "Resuma em português, em 1 a 2 frases objetivas, o que este Story do Instagram mostra e diz. "
                         "Use só estas informações (descrições automáticas em inglês dos quadros, texto da tela e fala):\n"
-                        + "\n".join("- " + c["cena"] for c in cenas) + "\nTexto na tela: " + (texto_tela or "nenhum") + "\nFala: " + (fala[:1500] or "nenhuma")), 300)
+                        + "\n".join("- " + ("[%ss] " % c["t"] if "t" in c else "") + c["cena"] for c in cenas) + "\nTexto na tela: " + (texto_tela or "nenhum") + "\nFala: " + (fala[:1500] or "nenhuma")), 300)
                     em_ingles = False
                 except Exception:
                     pass
-            return {"resumo": resumo.strip(), "cenas": cenas, "texto_tela": texto_tela, "fala": fala, "fala_erro": fala_erro, "idioma": fala_idioma, "via": via,
+            return {"resumo": resumo.strip(), "cenas": cenas, "texto_tela": texto_tela, "fala": fala, "fala_erro": fala_erro, "idioma": fala_idioma, "via": via, "segmentos": segs[:120],
                     "em_ingles": em_ingles}
         finally:
             try:
@@ -526,7 +534,7 @@ def criar_handler(sv):
                         midia = baixar_midia(b.get("url"))
                     if not midia:
                         return self._json(400, {"erro": "falta a foto ou o vídeo"})
-                    return self._json(200, sv.descrever(midia, "video" if b.get("tipo") == "video" else "foto", b.get("nome") or "", b.get("empresa"), int(b.get("quadros") or 3), b.get("idioma") or "pt"))
+                    return self._json(200, sv.descrever(midia, "video" if b.get("tipo") == "video" else "foto", b.get("nome") or "", b.get("empresa"), int(b.get("quadros") or 3), b.get("idioma") or "pt", float(b.get("passo") or 0)))
                 if rota == "/claude/classificar":
                     with sv.ativ("⚡ Claude Haiku", "classificando uma ideia", "nuvem"):
                       dados, uso = sv.claude.ferramenta("classificar", b.get("empresa"), b.get("sistema") or "", b.get("empresa_md") or "",
@@ -551,7 +559,7 @@ def criar_handler(sv):
                     tarefa = b.get("tarefa") if b.get("tarefa") in ("chat", "roteiro", "sugerir") else "chat"
                     rot = {"roteiro": ("🧠 Claude Sonnet", "adaptando um formato viral"), "sugerir": ("🧠 Claude Sonnet", "sugerindo perfis de referência")}.get(tarefa, ("⚡ Claude Haiku", "respondendo"))
                     with sv.ativ(rot[0], rot[1] + ((" · " + str((b.get("empresa") or {}).get("nome") or "")) if b.get("empresa") else ""), "nuvem"):
-                        txt, uso = sv.claude.texto(tarefa, b.get("empresa"), b.get("sistema"), b.get("empresa_md"), b.get("mensagem"), int(b.get("max_tokens") or 2500))
+                        txt, uso = sv.claude.texto(tarefa, b.get("empresa"), b.get("sistema"), b.get("empresa_md"), b.get("mensagem"), int(b.get("max_tokens") or 2500), busca=bool(b.get("busca")) and tarefa == "sugerir")
                     return self._json(200, {"texto": txt, "uso": uso})
                 return self._json(404, {"erro": "rota não existe"})
             except LimiteAtingido as e:

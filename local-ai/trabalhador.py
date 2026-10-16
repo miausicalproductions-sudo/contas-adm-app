@@ -45,7 +45,10 @@ def principal(conn, cfg):
     def quadros(caminho, n):
         return J_MID.quadros(caminho, n, cfg.simular)
 
-    F = {"recortar": recortar, "figurinhas": figurinhas, "transcrever": transcrever, "ver": ver, "quadros": quadros,
+    def cenas(caminho, passo, maximo):
+        return J_MID.cenas(caminho, passo, maximo, cfg.simular)
+
+    F = {"cenas": cenas, "recortar": recortar, "figurinhas": figurinhas, "transcrever": transcrever, "ver": ver, "quadros": quadros,
          "liberar": lambda: g.liberar_tudo(), "ping": lambda: "ok"}
     while True:
         try:
