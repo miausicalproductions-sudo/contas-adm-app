@@ -43,6 +43,14 @@ if quais in ("tudo", "imagens"):
     t0 = time.time()
     p = figurinha.carregar(cfg)
     print("    ok (%.0f s)" % (time.time() - t0))
+    print("[2b] Estilo das referências (IP-Adapter, uns 3 GB na primeira vez)...")
+    try:
+        from huggingface_hub import hf_hub_download, snapshot_download
+        hf_hub_download(figurinha.IPA[0], figurinha.IPA[2], subfolder=figurinha.IPA[1])
+        snapshot_download(figurinha.IPA_ENC[0], allow_patterns=[figurinha.IPA_ENC[1] + "/*"])
+        print("    ok")
+    except Exception as e:
+        print("    não baixou agora (%s): baixa sozinho na primeira figurinha com referência." % e)
     if testar:
         print("[3] Teste: gerando uma figurinha...")
         t0 = time.time()

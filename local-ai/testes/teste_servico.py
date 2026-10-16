@@ -207,6 +207,13 @@ class Testes(unittest.TestCase):
         self.assertEqual(c, 400)
         self.assertIn("Instagram", d["erro"])
 
+    def test_figurinha_com_referencias(self):
+        c, d = chamar(self.u1 + "/figurinha", {"prompt": "gato", "n": 1, "_local": True, "refs": [foto()], "forca": "forte", "extra": "kawaii"})
+        self.assertEqual((c, len(d["imagens"])), (200, 1))
+        self.assertTrue(d["prompt"].endswith("kawaii"))
+        c, a = chamar(self.u1 + "/atividade")
+        self.assertTrue(any("referência" in r["tarefa"] for r in a["recentes"]))
+
     def test_schema_invalido(self):
         c, d = chamar(self.u1 + "/claude/dia", {"pedido": "x", "schema": "nada"})
         self.assertEqual(c, 400)

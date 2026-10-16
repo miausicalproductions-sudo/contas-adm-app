@@ -27,9 +27,9 @@ def principal(conn, cfg):
         with g.uso("recorte", J_REC.PESO_GB, lambda: J_REC.carregar(cfg)) as s:
             return J_REC.rodar(s, img)
 
-    def figurinhas(prompt, n, semente, estilo):
+    def figurinhas(prompt, n, semente, estilo, refs=None, forca="medio"):
         with g.uso("figurinha", J_FIG.PESO_GB, lambda: J_FIG.carregar(cfg)) as p:
-            brutas = J_FIG.rodar(p, prompt, n, semente, estilo=estilo)
+            brutas = J_FIG.rodar(p, prompt, n, semente, estilo=estilo, refs=refs, forca=forca)
         if not J_FIG.RECORTA.get(estilo, True):
             return brutas
         return [aparar(recortar(b)) for b in brutas]

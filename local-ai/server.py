@@ -43,10 +43,11 @@ import trabalhador  # noqa: E402
 import collections  # noqa: E402
 import contextlib  # noqa: E402
 import base64  # noqa: E402
+import io  # noqa: E402
 import re  # noqa: E402
 import tempfile  # noqa: E402
 
-VERSAO = "1.8"
+VERSAO = "1.9"
 SCHEMA_CLASSE = {"type": "object", "properties": {
     "entrada": {"type": "string", "enum": ["ideia", "diretriz", "contexto", "pedido"],
                 "description": "ideia = ideia solta para o banco; diretriz = algo obrigatório num dia ou campanha; contexto = bastidor/informação; pedido = pedem um Story/post agora"},
@@ -274,10 +275,17 @@ class Servico:
         with self._ia("recorte", "tirando o fundo de uma foto"):
             return self._gpu(lambda: self.trab.chamar("recortar", img))
 
-    def figurinhas(self, prompt, n, semente=None, estilo="figurinha"):
+    def figurinhas(self, prompt, n, semente=None, estilo="figurinha", refs=None, forca="medio"):
         estilo = estilo if estilo in J_FIG.ESTILOS else "figurinha"
-        with self._ia("figurinha", "desenhando %d %s: %s%s" % (n, estilo, prompt[:60], " + recorte" if J_FIG.RECORTA[estilo] else "")):
-            return self._gpu(lambda: self.trab.chamar("figurinhas", prompt, n, semente, estilo))
+        R = []
+        for r in (refs or [])[:3]:
+            try:
+                from PIL import Image
+                R.append(Image.open(io.BytesIO(base64.b64decode(str(r).split(",", 1)[-1]))).convert("RGBA"))
+            except Exception:
+                pass
+        with self._ia("figurinha", "desenhando %d %s: %s%s%s" % (n, estilo, prompt[:60], " · no estilo de %d referência%s" % (len(R), "s" if len(R) > 1 else "") if R else "", " + recorte" if J_FIG.RECORTA[estilo] else "")):
+            return self._gpu(lambda: self.trab.chamar("figurinhas", prompt, n, semente, estilo, R, forca))
 
     def _arquivo(self, dataurl, nome, padrao="bin"):
         m = re.match(r"^data:([\w/+.-]+)(?:;[^,]*)?;base64,", str(dataurl or ""))
@@ -467,14 +475,16 @@ def criar_handler(sv):
                     if b.get("traduzir", True) and sv.claude.configurada:
                         with sv.ativ("⚡ Claude Haiku", "traduzindo o pedido da figurinha para o gerador", "nuvem"):
                             prompt = sv.claude.prompt_figurinha(prompt)
+                    if b.get("extra"):   # estilo da empresa e o que a equipe não quer (já em inglês, vindo do painel)
+                        prompt = (prompt + ", " + str(b.get("extra"))[:400]).strip(", ")
                     if cfg.pc2 and not b.get("_local") and sv.pc2_online():
                         try:
-                            r = sv.no_pc2("/figurinha", {"prompt": prompt, "n": n, "traduzir": False, "_local": True, "estilo": b.get("estilo") or "figurinha"})
+                            r = sv.no_pc2("/figurinha", {"prompt": prompt, "n": n, "traduzir": False, "_local": True, "estilo": b.get("estilo") or "figurinha", "refs": b.get("refs") or [], "forca": b.get("forca") or "medio"})
                             r["onde"] = "pc2"
                             return self._json(200, r)
                         except Exception as e:
                             sys.stderr.write("PC 2 falhou, fazendo no PC 1: %s\n" % e)
-                    imgs = sv.figurinhas(prompt, n, b.get("semente"), b.get("estilo") or "figurinha")
+                    imgs = sv.figurinhas(prompt, n, b.get("semente"), b.get("estilo") or "figurinha", b.get("refs") or [], b.get("forca") or "medio")
                     return self._json(200, {"imagens": [para_dataurl(i) for i in imgs], "prompt": prompt, "onde": cfg.papel})
                 if rota == "/transcrever":
                     if not b.get("audio"):
