@@ -6,6 +6,7 @@ import os
 import sys
 import tempfile
 import threading
+import time
 import unittest
 import urllib.error
 import urllib.request
@@ -165,6 +166,19 @@ class Testes(unittest.TestCase):
         self.assertFalse(d["ia_local"]["ligada"])
         c, d = chamar(self.u1 + "/recorte", {"imagem": foto()})  # liga sozinha no próximo pedido
         self.assertEqual(c, 200)
+
+    def test_y_relê_config(self):
+        antes = dict(vars(self.sv1.cfg))
+        arq = os.path.join(self.tmp, "config.toml")
+        open(arq, "w").write('[servico]\ntoken = "t1"\n[claude]\nteto_mensal_usd = 5\n')
+        self.sv1.arq_config, self.sv1._mt = arq, None
+        self.sv1.recarregar()
+        open(arq, "w").write('[servico]\ntoken = "t1"\n[claude]\nteto_mensal_usd = 7\n')
+        os.utime(arq, (time.time() + 5, time.time() + 5))
+        chamar(self.u1 + "/atividade")
+        self.assertEqual(self.sv1.cfg.teto_mensal_usd, 7)
+        self.sv1.arq_config = None
+        vars(self.sv1.cfg).update(antes)
 
     def test_schema_invalido(self):
         c, d = chamar(self.u1 + "/claude/dia", {"pedido": "x", "schema": "nada"})

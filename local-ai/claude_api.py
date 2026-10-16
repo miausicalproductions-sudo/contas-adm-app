@@ -38,6 +38,14 @@ class ClaudeAPIManager:
             import anthropic
             self.cli = anthropic.Anthropic(api_key=cfg.chave, max_retries=3, timeout=240)
 
+    def trocar_chave(self, chave):
+        """Chave nova no config.toml: vale na hora, sem reiniciar o miau-ia."""
+        if chave:
+            import anthropic
+            self.cli = anthropic.Anthropic(api_key=chave, max_retries=3, timeout=240)
+        else:
+            self.cli = None
+
     # ---------- estado ----------
     @property
     def configurada(self):

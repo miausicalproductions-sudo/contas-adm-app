@@ -46,7 +46,7 @@ import base64  # noqa: E402
 import re  # noqa: E402
 import tempfile  # noqa: E402
 
-VERSAO = "1.3"
+VERSAO = "1.4"
 SCHEMA_CLASSE = {"type": "object", "properties": {
     "entrada": {"type": "string", "enum": ["ideia", "diretriz", "contexto", "pedido"],
                 "description": "ideia = ideia solta para o banco; diretriz = algo obrigatório num dia ou campanha; contexto = bastidor/informação; pedido = pedem um Story/post agora"},
@@ -155,6 +155,36 @@ class Servico:
         self.fila = 0
         self.trava_fila = threading.Lock()
         self._pc2 = {"t": 0, "ok": False, "ms": None}
+
+    # ---------- config.toml mudou? relê sem reiniciar ----------
+    arq_config = None
+    _mt = None
+
+    def recarregar(self):
+        if not self.arq_config:
+            return
+        try:
+            mt = os.path.getmtime(self.arq_config)
+        except OSError:
+            return
+        if self._mt is None:
+            self._mt = mt
+            return
+        if mt == self._mt:
+            return
+        self._mt = mt
+        try:
+            novo = carregar(self.arq_config)
+        except Exception as e:  # arquivo salvo pela metade ou com erro: mantém o que estava valendo
+            sys.stderr.write("config.toml com erro, mantive o anterior: %s\n" % e)
+            return
+        chave_mudou = novo.chave != self.cfg.chave
+        for k in ("chave", "modelo", "modelo_rapido", "teto_mensal_usd", "cache_ttl", "precos", "token", "pc2", "pc2_token",
+                  "desligar_apos_s", "descarregar_apos_s", "descrever"):
+            setattr(self.cfg, k, getattr(novo, k))
+        if chave_mudou:
+            self.claude.trocar_chave(self.cfg.chave)
+        print("config.toml relido%s" % (" (chave nova do Claude)" if chave_mudou else ""))
 
     # ---------- PC 2 ----------
     def pc2_online(self):
@@ -312,6 +342,8 @@ class Servico:
         d["claude"] = {"configurada": self.claude.configurada, "modelo": self.cfg.modelo,
                        "modelo_rapido": self.cfg.modelo_rapido, "cache": self.cfg.cache_ttl, **self.claude.resumo()}
         d["claude"].pop("empresas", None)
+        if self.cfg.chave and not str(self.cfg.chave).startswith("sk-ant-api"):
+            d["claude"]["aviso"] = "a chave no config.toml não parece de API (deve começar com sk-ant-api03-)"
         return d
 
 
@@ -357,6 +389,7 @@ def criar_handler(sv):
             self.end_headers()
 
         def do_GET(self):
+            sv.recarregar()
             if self.path.split("?")[0] == "/health":
                 return self._json(200, sv.health(self._autorizado()))
             if not self._autorizado():
@@ -368,6 +401,7 @@ def criar_handler(sv):
             self._json(404, {"erro": "rota não existe"})
 
         def do_POST(self):
+            sv.recarregar()
             if not self._autorizado():
                 return self._json(401, {"erro": "código do PC errado (Config → IA local no painel)"})
             try:
@@ -439,8 +473,12 @@ def criar_handler(sv):
                 msg = str(e)
                 if "RateLimit" in nome or "Overloaded" in nome or "529" in msg:
                     return self._json(503, {"erro": "O Claude está ocupado agora; tente de novo em 1 minuto."})
-                if "Authentication" in nome:
-                    return self._json(401, {"erro": "A chave da API no config.toml foi recusada pela Anthropic."})
+                if "credit balance" in msg.lower() or "billing" in msg.lower():
+                    return self._json(402, {"erro": "A conta da API está sem crédito. Em console.anthropic.com → Billing (Configurar cobrança), adicione créditos e tente de novo."})
+                if "Authentication" in nome or "PermissionDenied" in nome:
+                    if not str(cfg.chave).startswith("sk-ant-api"):
+                        return self._json(401, {"erro": "O que está no config.toml não é uma chave de API (ela começa com sk-ant-api03-). Crie uma em console.anthropic.com → API Keys → Create Key e cole em chave = \"...\"."})
+                    return self._json(401, {"erro": "A chave da API no config.toml foi recusada pela Anthropic (apagada ou de outra conta?). Crie outra em console.anthropic.com → API Keys."})
                 return self._json(500, {"erro": "%s: %s" % (nome, msg[:300])})
 
     return H
@@ -453,6 +491,8 @@ def main():
     if cfg.escutar not in ("127.0.0.1", "localhost") and not cfg.token:
         sys.exit("Para escutar na rede (%s) é obrigatório ter token no config.toml." % cfg.escutar)
     sv = Servico(cfg)
+    sv.arq_config = os.environ.get("MIAU_CONFIG") or os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.toml")
+    sv.recarregar()
     srv = ThreadingHTTPServer((cfg.escutar, cfg.porta), criar_handler(sv))
     print("miau-ia %s em http://%s:%d (%s%s)%s" % (VERSAO, cfg.escutar, cfg.porta, cfg.papel.upper(),
           ", SIMULADO" if cfg.simular else "", " · Claude: " + cfg.modelo if sv.claude.configurada else " · Claude: sem chave"))
