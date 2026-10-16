@@ -5,28 +5,35 @@ Se o Florence não carregar nesta máquina, o servidor usa o Claude rápido (Hai
 """
 PESO_GB = 1.8
 MODELO = "microsoft/Florence-2-large"
+MODELO_NATIVO = "florence-community/Florence-2-large"   # mesma rede, convertida para o Florence-2 nativo do transformers
 
 
 def carregar(cfg):
     if cfg.simular:
         return "simulado"
+    import torch
+    dev = "cuda" if torch.cuda.is_available() else "cpu"
+    tipo = torch.float16 if dev == "cuda" else torch.float32
+    try:  # transformers novos já têm o Florence-2: usa a cópia oficial convertida (pesos completos, sem código remoto)
+        from transformers import AutoProcessor, Florence2ForConditionalGeneration
+        modelo = Florence2ForConditionalGeneration.from_pretrained(MODELO_NATIVO, torch_dtype=tipo).to(dev).eval()
+        proc = AutoProcessor.from_pretrained(MODELO_NATIVO)
+        return {"m": modelo, "p": proc, "dev": dev, "tipo": tipo}
+    except ImportError:
+        pass
+    # transformers antigos: código do próprio repositório da Microsoft
     from unittest.mock import patch
 
-    import torch
+    import transformers
     from transformers import AutoModelForCausalLM, AutoProcessor
     from transformers.dynamic_module_utils import get_imports
 
     def sem_flash(arq):  # o código do Florence pede flash_attn, que não existe no Windows; não é necessário
         return [i for i in get_imports(arq) if i != "flash_attn"]
 
-    import transformers
-    # O código do Florence-2 foi escrito para transformers antigos: lê config.forced_bos_token_id,
-    # que as versões novas tiraram da classe base. Um valor padrão (None) resolve sem trocar de versão.
     for nome in ("forced_bos_token_id", "forced_eos_token_id"):
         if not hasattr(transformers.PretrainedConfig, nome):
             setattr(transformers.PretrainedConfig, nome, None)
-    dev = "cuda" if torch.cuda.is_available() else "cpu"
-    tipo = torch.float16 if dev == "cuda" else torch.float32
     with patch("transformers.dynamic_module_utils.get_imports", sem_flash):
         modelo = AutoModelForCausalLM.from_pretrained(MODELO, trust_remote_code=True, torch_dtype=tipo, attn_implementation="eager").to(dev).eval()
     proc = AutoProcessor.from_pretrained(MODELO, trust_remote_code=True)

@@ -60,8 +60,20 @@ if quais in ("tudo", "voz"):
 if quais in ("tudo", "leitura") and cfg.descrever != "claude":
     print("\n[5] Leitura de imagem (Florence-2-large, ~1,6 GB)...")
     try:
-        descrever.carregar(cfg)
-        print("    ok")
+        mp = descrever.carregar(cfg)
+        from PIL import Image, ImageDraw
+        im = Image.new("RGB", (640, 360), (250, 220, 120))
+        d = ImageDraw.Draw(im)
+        d.ellipse((60, 90, 260, 290), fill=(150, 90, 40))
+        try:
+            from PIL import ImageFont
+            fonte = ImageFont.truetype("arial.ttf", 64)
+        except Exception:
+            fonte = None
+        d.text((300, 140), "PROMO 20%", fill=(20, 20, 20), font=fonte)
+        r = descrever.rodar(mp, [im])[0]
+        print("    ok · teste: cena = %r · texto lido = %r" % (r.get("cena", "")[:120], r.get("texto", "")))
+        print("    (se a cena ou o texto vierem sem sentido, a leitura local não está boa: use descrever = \"claude\" no config.toml)")
     except Exception as e:
         print("    não carregou (%s). Os Stories do celular serão lidos pelo Claude rápido (centavos)." % e)
 print("\nPronto: modelos baixados.")
