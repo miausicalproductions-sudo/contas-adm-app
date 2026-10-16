@@ -46,7 +46,7 @@ import base64  # noqa: E402
 import re  # noqa: E402
 import tempfile  # noqa: E402
 
-VERSAO = "1.7"
+VERSAO = "1.8"
 SCHEMA_CLASSE = {"type": "object", "properties": {
     "entrada": {"type": "string", "enum": ["ideia", "diretriz", "contexto", "pedido"],
                 "description": "ideia = ideia solta para o banco; diretriz = algo obrigatório num dia ou campanha; contexto = bastidor/informação; pedido = pedem um Story/post agora"},
@@ -60,6 +60,28 @@ MAX_CORPO = 30 * 2**20
 
 NOMES_IA = {"recorte": ("✂️", "Recorte de fundo", "BiRefNet"), "figurinha": ("🎨", "Gerador de figurinhas", "SDXL Lightning"),
             "transcrever": ("🎙", "Transcrição de áudio", "faster-whisper"), "descrever": ("👁", "Leitura de imagem", "Florence-2")}
+
+
+HOSTS_MIDIA = (".cdninstagram.com", ".fbcdn.net", ".fbsbx.com")
+
+
+def baixar_midia(url, limite=100 * 2**20):
+    """Vídeo/foto de um post do Instagram (link do CDN da Meta, que vem da Business Discovery) -> data URL."""
+    import base64
+    from urllib.parse import urlparse
+    h = (urlparse(str(url)).hostname or "").lower()
+    if not str(url).startswith("https://") or not any(h.endswith(x) for x in HOSTS_MIDIA):
+        raise ValueError("só baixo mídia do Instagram (link do CDN da Meta)")
+    req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    try:
+        with urllib.request.urlopen(req, timeout=60) as r:
+            tipo = (r.headers.get("Content-Type") or "video/mp4").split(";")[0]
+            dados = r.read(limite + 1)
+    except urllib.error.HTTPError as e:
+        raise ValueError("o link do vídeo expirou ou foi recusado (%s): clique em ↻ para buscar de novo" % e.code)
+    if len(dados) > limite:
+        raise ValueError("vídeo grande demais (mais de 100 MB)")
+    return "data:%s;base64,%s" % (tipo, base64.b64encode(dados).decode())
 
 
 class Trabalhador:
@@ -267,12 +289,12 @@ class Servico:
             t.write(dados)
             return t.name
 
-    def descrever(self, dataurl, tipo="foto", nome="", empresa=None):
+    def descrever(self, dataurl, tipo="foto", nome="", empresa=None, quadros=3):
         """Story (foto ou vídeo) -> o que aparece, o texto escrito e a fala, resumidos em português."""
         from PIL import Image
         caminho = self._arquivo(dataurl, nome, "mp4" if tipo == "video" else "jpg")
         try:
-            imgs = self.trab.chamar("quadros", caminho, 3) if tipo == "video" else [Image.open(caminho).convert("RGB")]
+            imgs = self.trab.chamar("quadros", caminho, max(1, min(8, quadros))) if tipo == "video" else [Image.open(caminho).convert("RGB")]
             fala = ""
             if tipo == "video":
                 try:
@@ -390,6 +412,26 @@ def criar_handler(sv):
 
         def do_GET(self):
             sv.recarregar()
+            if self.path.startswith("/midia?"):   # vídeo/foto do Instagram para o <video> do painel (o link do CDN às vezes não abre direto)
+                from urllib.parse import parse_qs, urlparse
+                q = parse_qs(urlparse(self.path).query)
+                if cfg.token and not hmac.compare_digest((q.get("k") or [""])[0], cfg.token):
+                    return self._json(401, {"erro": "código do PC errado"})
+                try:
+                    d = baixar_midia((q.get("u") or [""])[0])
+                except Exception as e:
+                    return self._json(400, {"erro": str(e)})
+                import base64
+                tipo, b64 = d[5:].split(";base64,", 1)
+                dados = base64.b64decode(b64)
+                self.send_response(200)
+                self._cors()
+                self.send_header("Content-Type", tipo)
+                self.send_header("Content-Length", str(len(dados)))
+                self.send_header("Cache-Control", "private, max-age=3600")
+                self.end_headers()
+                self.wfile.write(dados)
+                return
             if self.path.split("?")[0] == "/health":
                 return self._json(200, sv.health(self._autorizado()))
             if not self._autorizado():
@@ -439,9 +481,12 @@ def criar_handler(sv):
                         return self._json(400, {"erro": "falta o áudio"})
                     return self._json(200, sv.transcrever(b.get("audio"), b.get("nome") or ""))
                 if rota == "/descrever":
-                    if not b.get("midia"):
+                    midia = b.get("midia")
+                    if not midia and b.get("url"):
+                        midia = baixar_midia(b.get("url"))
+                    if not midia:
                         return self._json(400, {"erro": "falta a foto ou o vídeo"})
-                    return self._json(200, sv.descrever(b.get("midia"), "video" if b.get("tipo") == "video" else "foto", b.get("nome") or "", b.get("empresa")))
+                    return self._json(200, sv.descrever(midia, "video" if b.get("tipo") == "video" else "foto", b.get("nome") or "", b.get("empresa"), int(b.get("quadros") or 3)))
                 if rota == "/claude/classificar":
                     with sv.ativ("⚡ Claude Haiku", "classificando uma ideia", "nuvem"):
                       dados, uso = sv.claude.ferramenta("classificar", b.get("empresa"), b.get("sistema") or "", b.get("empresa_md") or "",
@@ -463,7 +508,10 @@ def criar_handler(sv):
                     with sv.ativ("⚡ Claude Haiku", "testando a chave da API", "nuvem"):
                         return self._json(200, sv.claude.testar())
                 if rota == "/claude/chat":
-                    txt, uso = sv.claude.texto("chat", b.get("empresa"), b.get("sistema"), b.get("empresa_md"), b.get("mensagem"))
+                    tarefa = b.get("tarefa") if b.get("tarefa") in ("chat", "roteiro", "sugerir") else "chat"
+                    rot = {"roteiro": ("🧠 Claude Sonnet", "adaptando um formato viral"), "sugerir": ("🧠 Claude Sonnet", "sugerindo perfis de referência")}.get(tarefa, ("⚡ Claude Haiku", "respondendo"))
+                    with sv.ativ(rot[0], rot[1] + ((" · " + str((b.get("empresa") or {}).get("nome") or "")) if b.get("empresa") else ""), "nuvem"):
+                        txt, uso = sv.claude.texto(tarefa, b.get("empresa"), b.get("sistema"), b.get("empresa_md"), b.get("mensagem"), int(b.get("max_tokens") or 2500))
                     return self._json(200, {"texto": txt, "uso": uso})
                 return self._json(404, {"erro": "rota não existe"})
             except LimiteAtingido as e:

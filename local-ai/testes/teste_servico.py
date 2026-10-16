@@ -202,6 +202,11 @@ class Testes(unittest.TestCase):
         finally:
             self.falso.create = velho
 
+    def test_descrever_url_so_instagram(self):
+        c, d = chamar(self.u1 + "/descrever", {"url": "https://exemplo.com/v.mp4", "tipo": "video"})
+        self.assertEqual(c, 400)
+        self.assertIn("Instagram", d["erro"])
+
     def test_schema_invalido(self):
         c, d = chamar(self.u1 + "/claude/dia", {"pedido": "x", "schema": "nada"})
         self.assertEqual(c, 400)
