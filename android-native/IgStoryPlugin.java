@@ -24,6 +24,35 @@ public class IgStoryPlugin extends Plugin {
         JSObject r = new JSObject(); r.put("ok", f.exists() && f.length() > 0); r.put("path", f.getAbsolutePath()); call.resolve(r);
     }
 
+    // Salva a arte na galeria (Imagens/Studios Miau). Android 10+ não pede permissão; o Google Fotos mostra a pasta e pode fazer backup dela.
+    @PluginMethod
+    public void gallery(PluginCall call) {
+        String data = call.getString("data"), name = clean(call.getString("name")), mime = call.getString("mime", "image/jpeg"), album = call.getString("album", "Studios Miau");
+        if (data == null) { call.reject("faltou o arquivo"); return; }
+        try {
+            byte[] bytes = Base64.decode(data, Base64.DEFAULT);
+            android.net.Uri uri;
+            if (android.os.Build.VERSION.SDK_INT >= 29) {
+                android.content.ContentValues v = new android.content.ContentValues();
+                v.put(android.provider.MediaStore.MediaColumns.DISPLAY_NAME, name);
+                v.put(android.provider.MediaStore.MediaColumns.MIME_TYPE, mime);
+                v.put(android.provider.MediaStore.MediaColumns.RELATIVE_PATH, android.os.Environment.DIRECTORY_PICTURES + "/" + album);
+                v.put(android.provider.MediaStore.MediaColumns.IS_PENDING, 1);
+                android.content.ContentResolver cr = getContext().getContentResolver();
+                uri = cr.insert(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, v);
+                if (uri == null) throw new Exception("a galeria recusou o arquivo");
+                java.io.OutputStream o = cr.openOutputStream(uri); o.write(bytes); o.close();
+                v.clear(); v.put(android.provider.MediaStore.MediaColumns.IS_PENDING, 0); cr.update(uri, v, null, null);
+            } else {
+                File d = new File(android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_PICTURES), album); d.mkdirs();
+                File f = new File(d, name); FileOutputStream o = new FileOutputStream(f); o.write(bytes); o.close();
+                android.media.MediaScannerConnection.scanFile(getContext(), new String[]{f.getAbsolutePath()}, new String[]{mime}, null);
+                uri = Uri.fromFile(f);
+            }
+            JSObject r = new JSObject(); r.put("ok", true); r.put("uri", uri.toString()); call.resolve(r);
+        } catch (Exception e) { call.reject("não consegui salvar na galeria: " + e.getMessage()); }
+    }
+
     @PluginMethod
     public void save(PluginCall call) {
         String data = call.getString("data");

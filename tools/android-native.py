@@ -11,5 +11,7 @@ if 'com.instagram.android' not in m:
     m = m.replace('<application', '<queries>\n        <package android:name="com.instagram.android" />\n        <intent><action android:name="com.instagram.share.ADD_TO_STORY" /></intent>\n    </queries>\n\n    <application', 1)
 if 'androidx.core.content.FileProvider' not in m:
     m = m.replace('</application>', '        <provider android:name="androidx.core.content.FileProvider" android:authorities="${applicationId}.fileprovider" android:exported="false" android:grantUriPermissions="true">\n            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths" />\n        </provider>\n    </application>', 1)
+if 'WRITE_EXTERNAL_STORAGE' not in m:  # só Android 9 ou anterior precisa para salvar na galeria
+    m = m.replace('<application', '<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />\n\n    <application', 1)
 open(man, 'w').write(m)
 print('recurso dos Stories ok')

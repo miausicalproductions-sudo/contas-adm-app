@@ -783,7 +783,7 @@ body:not(.edbx-show) #ste .stebx:not(.on):not(.inner):not(.dropt):not(.tf):not(:
 #stegs i.gh{left:0;right:0;height:1px;margin-top:-.5px}
 </style></head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:141*/const PV=141;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:142*/const PV=142;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -1766,7 +1766,7 @@ function gridPanel(ds){if(!sel)return'';if(!GO)return`<div class=grid2><div clas
 /* v111: baixar todos os arquivos dos posts de um dia (no celular abre o "Salvar / compartilhar" para ir à galeria) */
 const DLX={files:null,ext:{'image/jpeg':'jpg','image/png':'png','image/webp':'webp','image/gif':'gif','video/mp4':'mp4','video/quicktime':'mov'}};
 function dlBar(h){let b=document.getElementById('dlbar');if(!h){if(b)b.remove();return}if(!b){b=document.createElement('div');b.id='dlbar';document.body.appendChild(b)}b.innerHTML=h}
-function dlSave(fs){fs.forEach((f,i)=>setTimeout(()=>{const u=URL.createObjectURL(f),a=document.createElement('a');a.href=u;a.download=f.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)},i*400))}
+function dlSave(fs){if(IGN()&&/android/i.test(navigator.userAgent)){dlGal(fs,'').catch(()=>{});return}fs.forEach((f,i)=>setTimeout(()=>{const u=URL.createObjectURL(f),a=document.createElement('a');a.href=u;a.download=f.name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)},i*400))}
 async function mdayDl(k){
  if(k=='hoje')k=iso(new Date());
  const L=pf(k),it=[];
@@ -4387,8 +4387,10 @@ async function zipMake(files,folder){
  e.setUint32(0,0x06054b50,true);e.setUint16(8,files.length,true);e.setUint16(10,files.length,true);e.setUint32(12,cs,true);e.setUint32(16,off,true);
  return new Blob([...parts,...cen,e.buffer],{type:'application/zip'})}
 function dlName(){const s=STU,sl=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^\w]+/g,'-').replace(/^-+|-+$/g,''),emp=sl(s&&s.c&&s.c.name)||'empresa',dia=(s&&s.p&&s.p.date)||iso(new Date());let n=1;try{const m=JSON.parse(localStorage.dlseq||'{}'),k=emp+'_'+dia;n=(m[k]||0)+1;m[k]=n;localStorage.dlseq=JSON.stringify(m)}catch(e){}return emp+'_'+dia+'_'+String(n).padStart(2,'0')}
+async function dlGal(fs,nm){const b64=f=>new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(String(r.result).split(',')[1]);r.onerror=no;r.readAsDataURL(f)});let n=0,err='';for(const f of fs){try{await igc('gallery',{name:(nm?nm+'_':'')+f.name.replace(/\s+/g,'-'),data:await b64(f),mime:f.type||'image/jpeg',album:'Studios Miau'});n++}catch(x){err=String(x&&x.message||x)}}
+ if(n)stat('● '+n+' tela'+(n>1?'s':'')+' salva'+(n>1?'s':'')+' na galeria (pasta Studios Miau)');if(err&&!n)alert('Não consegui salvar na galeria: '+err+'\nSe o app é antigo, instale a versão nova do Studios Miau (Android).');return n}
 async function dlZip(fs){
- const nm=dlName();
+ const nm=dlName();if(IGN()&&/android/i.test(navigator.userAgent)){try{if(await dlGal(fs,nm))return}catch(x){}}
  try{const files=fs.map(f=>new File([f],nm+'_'+f.name.replace(/^tela /,'tela-'),{type:f.type})),b=await zipMake(files,nm),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=nm+'.zip';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),8000);stat('● baixado: '+nm+'.zip ('+fs.length+' tela'+(fs.length>1?'s':'')+')')}
  catch(x){console.warn(x);fs.forEach((f,i)=>setTimeout(()=>{const u=URL.createObjectURL(f),a=document.createElement('a');a.href=u;a.download=nm+'_'+f.name;a.click();setTimeout(()=>URL.revokeObjectURL(u),4000)},i*350))}}
 function stFiles(){const s=STU,H=s.fmt=='st'?1920:1350;return Promise.all(s.S.map((x,i)=>new Promise(ok=>{const cv=document.createElement('canvas');cv.width=1080;cv.height=H;artDraw(cv,x,s.lays[i],{...s.cfg,...artX(s,i),logoImg:s.logoImg,user:((S.ig||{})[s.p.co]||{}).user||s.c.name,idx:i,n:s.S.length,hol:artPlan(s.p,s.S,s.imgs.map(y=>y.img)).hol,figpos:s.p.figpos});cv.toBlob(b=>ok(new File([b],`tela ${pad(i+1)}.jpg`,{type:'image/jpeg'})),'image/jpeg',.92)})))}
