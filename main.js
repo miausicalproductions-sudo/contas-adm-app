@@ -40,7 +40,18 @@ function createWindow(forceShow) {
   win.once('ready-to-show', () => { if (HIDDEN && !forceShow) return; if (splashWin && !splashWin.isDestroyed()) { splashWin.once('closed', () => { if (win) { win.maximize(); win.show(); } }); return; } win.maximize(); win.show(); });
   win.loadFile(pick());
   // F11 liga/desliga a tela cheia
-  win.webContents.on('before-input-event', (e, input) => { if (input.type === 'keyDown' && input.key === 'F11') { e.preventDefault(); win.setFullScreen(!win.isFullScreen()); } });
+  // Ctrl/⌘ + e − aumentam/diminuem a interface (telas menores, como MacBook); Ctrl/⌘ 0 volta ao normal; o tamanho fica guardado
+  const zApply = () => { const z = +prefs().zoom || 1; try { win.webContents.setZoomFactor(Math.max(.6, Math.min(1.8, z))); } catch (e) { } };
+  win.webContents.on('did-finish-load', zApply);
+  win.webContents.on('before-input-event', (e, input) => {
+    if (input.type !== 'keyDown') return;
+    if (input.key === 'F11') { e.preventDefault(); win.setFullScreen(!win.isFullScreen()); return; }
+    if ((input.control || input.meta) && !input.alt && ['+', '=', '-', '_', '0'].includes(input.key)) {
+      e.preventDefault(); let z = +prefs().zoom || 1;
+      z = input.key === '0' ? 1 : Math.round((z + (input.key === '-' || input.key === '_' ? -.1 : .1)) * 10) / 10;
+      z = Math.max(.6, Math.min(1.8, z)); savePrefs({ zoom: z }); zApply();
+    }
+  });
   // links de fora (chat da IA, Instagram, Drive, WhatsApp) abrem no navegador do computador
   win.webContents.setWindowOpenHandler(({ url }) => { if (/^(https?:|mailto:)/.test(url)) shell.openExternal(url); return { action: 'deny' }; });
   win.webContents.on('will-navigate', (e, url) => { if (/^https?:/.test(url)) { e.preventDefault(); shell.openExternal(url); } });
