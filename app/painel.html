@@ -999,7 +999,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:163*/const PV=163;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:164*/const PV=164;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -4612,6 +4612,7 @@ document.addEventListener('drop',async e=>{if(!EDX)return;const w=e.target.close
  if(el){elAdd(el,p.x/1080*100,p.y/H*100);return}const k=edHit(p);if(ph!==''){edPhotoTo(k,+ph);return}
  try{STU.imgs.push({id:'local'+uid(),img:await loadImg(URL.createObjectURL(fs[0]))});edPhotoTo(k,STU.imgs.length-1)}catch(x){alert('Não consegui abrir essa imagem.')}},true);
 function edInline(k){const s=STU,x=s.S[EDX.i],b=(EDX.box||{})[k],cv=document.getElementById('stecv');if(!b||!cv)return false;const L=edLayer(k),t=L?nrm(L.tipo||''):'',one=L&&t=='texto'&&/^\d+$/.test(String(L.linha||'').trim());let get,set;
+ if(L&&t=='texto'&&L.txt==null&&/^\d+$/.test(String(L.linha||'').trim())){const n=+L.linha,cur=((x.b||[]).map(v=>String(v).trim()).filter(Boolean)[n-1]||'');L.txt=cur;delete L.linha}
  if(L&&L.txt!=null){get=()=>L.txt;set=v=>{L.txt=v}}
  else if(k=='t'||t=='titulo'){get=()=>x.t||'';set=v=>{x.t=v.replace(/\n/g,' ')}}
  else if(k=='b'||(t=='texto'&&!isSel(L.linha))){get=()=>(x.b||[]).join('\n');set=v=>{x.b=v.split('\n')}}
