@@ -1000,7 +1000,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:168*/const PV=168;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:169*/const PV=169;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -4476,7 +4476,7 @@ function edDragT(e,k,h){if(h=='rot'){const MS=(EDX.ms||[]).filter(q=>(EDX.DI||{}
    if(ev.shiftKey&&h.length==2){const nh=o.h*(w/o.w);if(h.includes('n'))y=o.y+o.h-nh;hh=nh}}L.x=+x.toFixed(1);L.y=+y.toFixed(1);L.w=+Math.max(2,w).toFixed(1);L.h=+Math.max(1,hh).toFixed(1)}
   else if(SZ){const d=h.includes('e')?dxp/b.w:h.includes('w')?-dxp/b.w:h.includes('s')?dyp/b.h:-dyp/b.h;edSet({[SZ[0]]:Math.max(SZ[1],Math.min(SZ[2],Math.round(os*(1+d))))})}edRAF()};
  const up=()=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up);edShow()};addEventListener('pointermove',mv);addEventListener('pointerup',up)}
-document.addEventListener('pointerdown',e=>{if(!EDX||!e.target.closest||e.button||!document.getElementById('ste'))return;if(EDX.tool||e.shiftKey||e.ctrlKey||e.metaKey||e.altKey)return;const T=e.target;if(T.closest('.stehd,.sth2,button,input,select,textarea,label,a,.pszoom,.psfdd,#edcm,#pop'))return;if(!T.closest('#ste .stew'))return;const cv=document.getElementById('stecv');if(!cv)return;const tot=cv.width*cv.height;let vazio=true;for(const n of document.elementsFromPoint(e.clientX,e.clientY)){if(!(n.classList&&n.classList.contains('stebx')))continue;const k=n.dataset.k,b=(EDX.box||{})[k];if(k=='f'||(b&&b.w*b.h<tot*.8)){vazio=false;break}}
+document.addEventListener('pointerdown',e=>{if(!EDX||!e.target.closest||e.button||!document.getElementById('ste'))return;if(EDX.tool||e.ctrlKey||e.metaKey||e.altKey)return;const T=e.target;if(T.closest('.stehd,.sth2,button,input,select,textarea,label,a,.pszoom,.psfdd,#edcm,#pop'))return;if(!T.closest('#ste .stew'))return;const cv=document.getElementById('stecv');if(!cv)return;const tot=cv.width*cv.height;let vazio=true;for(const n of document.elementsFromPoint(e.clientX,e.clientY)){if(!(n.classList&&n.classList.contains('stebx')))continue;const k=n.dataset.k,b=(EDX.box||{})[k];if(k=='f'||(b&&b.w*b.h<tot*.8)){vazio=false;break}}
  if(!vazio)return;e.preventDefault();e.stopImmediatePropagation();
  /* v168: arrastar a partir do vazio (de fora para dentro da arte) seleciona as camadas que o retângulo tocar */
  const sx=e.clientX,sy=e.clientY,add=e.shiftKey,base=add?(EDX.ms||[]).slice():[],r0=cv.getBoundingClientRect(),sc=cv.clientWidth/cv.width;let box=null,K=[];
@@ -4484,7 +4484,7 @@ document.addEventListener('pointerdown',e=>{if(!EDX||!e.target.closest||e.button
   const ax0=(x0-r0.left)/sc,ay0=(y0-r0.top)/sc,ax1=(x1-r0.left)/sc,ay1=(y1-r0.top)/sc;K=Object.keys(EDX.box||{}).filter(k=>{const b=EDX.box[k];if(!b||k=='f'||b.w*b.h>=tot*.8)return false;const L=edL(k);if(L&&(L.trava||L.oculto))return false;return b.x<ax1&&b.x+b.w>ax0&&b.y<ay1&&b.y+b.h>ay0});
   document.querySelectorAll('#ste .stebx').forEach(n=>n.classList.toggle('on',K.includes(n.dataset.k)||base.includes(n.dataset.k)))};
  const up=()=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up);if(box){box.remove();const ms=[...new Set([...base,...K])];EDX.ms=ms;EDX.sel=ms.length?ms[ms.length-1]:'';EDX.inner=null;edShow();stat(ms.length?'● '+ms.length+' camada(s) selecionada(s) · arraste uma delas para mover todas':'nenhuma camada no retângulo');return}
-  if(EDX.sel===''&&!(EDX.ms||[]).length)return;EDX.sel='';EDX.ms=[];EDX.inner=null;edShow()};
+  if(add||(EDX.sel===''&&!(EDX.ms||[]).length))return;EDX.sel='';EDX.ms=[];EDX.inner=null;edShow()};
  addEventListener('pointermove',mv);addEventListener('pointerup',up)},true);
 document.addEventListener('keydown',e=>{if(!EDX||EDX.sel!==''||!document.getElementById('ste'))return;if(e.target.closest&&e.target.closest('input,textarea,select'))return;const c=e.ctrlKey||e.metaKey,k=(e.key||'').toLowerCase();if(['delete','backspace','arrowleft','arrowright','arrowup','arrowdown','f2'].includes(k)||(c&&['j','g'].includes(k))){e.preventDefault();e.stopImmediatePropagation()}},true);
 document.addEventListener('pointerdown',e=>{if(!EDX||!e.target.closest||!document.getElementById('ste'))return;
