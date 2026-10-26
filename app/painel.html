@@ -1001,7 +1001,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:177*/const PV=177;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:178*/const PV=178;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -5537,13 +5537,17 @@ function crTxtLayers(z){const L=[],Z=z.Z;if(z.T)L.push({tipo:'texto',txt:z.T,x:8
  if(z.cta)L.push({tipo:'texto',txt:z.cta,x:12,y:Z.c[0],w:76,h:Z.c[1]-Z.c[0],tam:4.6,cor:z.dk?'#ffffff':'texto',alinhar:'centro'});return L}
 function crImgPrompt(Q,i,TX){const D=Q.dias[i],c=co(Q.co),cf=artCfg(Q.co),Pl=palDef(cf),dd=dt(D.data),L=crImgList(D);let n=0;
  const it=L.map(x=>{n++;const st=x.st,op=st.opcoes||[],ob=x.k==0?crObs(st):'',fg=x.k==0&&!x.car&&(op.length>=2||/enquete|quiz|caixinha|pergunta/i.test((st.quadro||'')+' '+(st.texto||'')));
-  if(TX){const z=crTxtZones(x),Z=z.Z,W=1080,px=a=>Math.round(a/100*z.H),ar=(nm,r,x0,x1,o)=>'\n   • '+nm+': x '+Math.round(x0/100*W)+'–'+Math.round(x1/100*W)+', y '+px(r[0])+'–'+px(r[1])+(o?' ('+o+')':'');
-   return'IMAGEM '+n+' — '+(x.car?'Carrossel (Story '+(x.j+1)+'), slide '+(x.k+1)+' · vertical 4:5 (1080×1350)':'Story '+(x.j+1)+' · vertical 9:16 (1080×1920)')+(x.k==0&&st.quadro?' · quadro: '+st.quadro:'')
-    +'\n   Ideia da cena (só contexto: NÃO ponha estas palavras na imagem): '+[z.T,z.B].filter(Boolean).join(' — ').replace(/["“”]/g,'')
-    +'\n   SEM TEXTO: nenhuma letra, palavra, número, placa, etiqueta, legenda ou logo (no text, no letters, no words, no typography).'+(x.k==0&&st.visual?'\n   Cena / visual: '+st.visual:'')+(st.ped?'\n   PEDIDO ESPECIAL DA EQUIPE (obrigatório): '+st.ped:'')+(ob?'\n   Observações da equipe: '+ob:'')
-    +crCliTxt(st)+'\n   ÁREAS QUE PRECISAM FICAR LIVRES (fundo liso ou levemente desfocado, '+(z.bgc?'na cor '+z.bgc+(z.dk?' (o texto entra em branco)':''):z.dk?'ESCURO (o texto entra em branco)':'claro')+' e sem detalhes: nada de rosto, objeto, enfeite ou letra dentro delas):'
-    +ar('título',Z.t,8,92,'o programa escreve o título aqui')+(Z.b?ar('texto de apoio',Z.b,10,90):'')+(Z.e?ar('figurinha de '+(op.length?'enquete ('+op.join(' / ')+')':'interação')+' do Instagram',Z.e,14,86,'não desenhe a enquete'):'')+(Z.c?ar('chamada',Z.c,12,88):'')
-    +'\n   • personagem/objeto principal: dentro de y '+px(Z.s[0])+'–'+px(Z.s[1])+(x.car?'':' (abaixo das áreas de texto e acima de y 1590)')}
+  if(TX){const z=crTxtZones(x),Z=z.Z,pc=v=>Math.round(v),top=pc(Z.s[0]-1),bt=Math.floor(Z.s[1]),u=crCli(st),pr=String(st.ped||'').split(/\s*[,;]\s*/).filter(y=>y&&!/^fundo\s*(claro|escuro|#[0-9a-f]{6})\.?$/i.test(y)).join(', ').replace(/["“”]/g,''),
+    vis=String(x.k==0&&st.visual||'').replace(/["“”]/g,'').replace(/\s*(\be\s+)?(espa[cç]o|lugar|[aá]rea)\s+(livre\s+)?(para|pra)\s+[^.;,]*/gi,'').replace(/[^.;,]*\b(texto|frase|t[ií]tulo|bot[aã]o|enquete|figurinha|escrit[oa]|letreiro|legenda|cta|rea[cç][aã]o)\b[^.;,]*/gi,'').replace(/\s*[,;.]\s*([,;.]\s*)+/g,'. ').replace(/^[\s,;.]+|[\s,;.]+$/g,'').trim(),
+    bgd=z.bgc?'solid flat color '+z.bgc:z.dk?'dark, smooth, flat color (one of the brand colors)':'light, smooth, flat color (very light brand tint)',
+    gp='Vertical 9:16 image (1080x1920). '+(vis?'Scene: '+vis+'. ':'Scene: a simple, friendly scene for a pet clinic Instagram Story, with the pet as the main character. ')+(u?'Use the real pet from the attached photo (same breed, colors and coat). ':'')+(pr?'Extra request from the team (in Portuguese): '+pr+'. ':'')
+     +'Composition: the UPPER part of the image, from the top edge down to '+top+'% of the height, is completely EMPTY: '+bgd+', no objects, no shapes, no decorations, no frames (reserved negative space). '
+     +'The main subject sits in the lower part, between '+top+'% and '+bt+'% of the height, centered.'+(Z.c?' Keep a clean empty horizontal strip between '+pc(Z.c[0])+'% and '+pc(Z.c[1])+'% of the height.':'')+' The bottom '+(100-bt)+'% is only background continuing. '
+     +'Brand colors: '+[Pl.c1,Pl.c2,Pl.c3].filter(Boolean).join(', ')+'.'+(cf.stnote?' Style: '+String(cf.stnote).replace(/\n+/g,' ').replace(/["“”]/g,'').slice(0,240)+'.':'')
+     +' NO text, NO letters, NO words, NO numbers, NO typography, NO signs, NO labels, NO speech bubbles, NO buttons, NO user interface, NO logos, NO watermark.';
+   return'IMAGEM '+n+' — '+(x.car?'Carrossel (Story '+(x.j+1)+'), slide '+(x.k+1):'Story '+(x.j+1))+(x.k==0&&st.quadro?' · '+st.quadro:'')
+    +(pr?'\n   Pedido da equipe para esta imagem (obrigatório, já está no prompt): '+pr:'')+(u?'\n   Vou anexar a foto do cliente "'+u.name+'": use o pet REAL dela nesta imagem.':'')
+    +'\n   PROMPT PARA O GERADOR (use exatamente este, sem acrescentar nada):\n   '+gp}
   return'IMAGEM '+n+' — '+(x.car?'Carrossel (Story '+(x.j+1)+'), slide '+(x.k+1)+' · vertical 4:5 (1080×1350)':'Story '+(x.j+1)+' · vertical 9:16 (1080×1920)')+(x.k==0&&st.quadro?' · quadro: '+st.quadro:'')
    +'\n   Texto escrito na imagem: '+(x.tx?'"'+x.tx+'"':'(nenhum: só a cena)')+(x.k==0&&st.visual?'\n   Cena / visual: '+st.visual:'')
    +(fg?'\n   Deixe um espaço livre no meio da parte de baixo para a figurinha '+(op.length?'de enquete ('+op.join(' / ')+')':'de interação')+' do Instagram. Não desenhe a enquete.':'')
@@ -5555,9 +5559,9 @@ Gere uma imagem de cada vez, na ordem abaixo (IMAGEM 1, depois IMAGEM 2…), tod
 
 REGRAS PARA TODAS:
 - Mesma linguagem visual em todas (é uma sequência do mesmo dia). Cores da marca: ${[Pl.c1,Pl.c2,Pl.c3].filter(Boolean).join(', ')||'as da marca'}.${cf.stnote?'\n- Estilo da marca: '+String(cf.stnote).replace(/\n+/g,' '):''}
-${TX?`- NÃO escreva NENHUM texto, letra, número ou logo nas imagens. Os textos são colocados depois, pelo nosso programa, nas áreas indicadas em cada imagem: essas áreas precisam ficar livres, com fundo liso (claro, com letra escura; ou escuro, com letra branca, quando a tela pedir fundo escuro).
-- Quando você escrever o prompt de cada imagem para o gerador, NÃO copie as frases das telas: descreva só a cena e termine sempre com "no text, no letters, no words, no typography, no logos". Se alguma imagem sair com qualquer letra, gere essa imagem de novo, sem texto, antes de seguir.
-- Respeite as coordenadas em pixels de cada imagem (0,0 é o canto de cima à esquerda). Nos Stories, NADA importante nos 250 px do topo nem nos 330 px de baixo (y 0–250 e 1590–1920): a barra do Instagram cobre essas faixas; ali só pode continuar o fundo.`:`- Escreva os textos EXATAMENTE como estão abaixo, em português do Brasil, com acentos corretos. Não invente frases, não traduza, não acrescente texto.
+${TX?`- As imagens NÃO levam nenhum texto: os textos, a enquete e os botões são colocados depois pelo nosso programa, em cima da área vazia de cada imagem.
+- Para cada imagem, gere usando o PROMPT PARA O GERADOR que está nela, exatamente como está (é em inglês de propósito). Não acrescente frases, títulos, nomes, datas, enquetes, botões nem balões de fala.
+- Se alguma imagem sair com qualquer letra ou número, ou com algo dentro da área vazia de cima, gere essa imagem de novo antes de seguir.`:`- Escreva os textos EXATAMENTE como estão abaixo, em português do Brasil, com acentos corretos. Não invente frases, não traduza, não acrescente texto.
 - Letras grandes e legíveis no celular. Nada de texto nos 250 px do topo nem nos 330 px de baixo (a barra do Instagram cobre essas áreas).`}
 - Sem molduras de celular, sem marca d'água, sem logos inventados. Se eu anexar fotos ou o logo, use-os.
 
