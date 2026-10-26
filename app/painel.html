@@ -1001,7 +1001,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:192*/const PV=192;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:193*/const PV=193;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -3385,10 +3385,36 @@ function aiPick(p,c,imgs){AIPK={p,c,imgs};document.getElementById('aipk')?.remov
 function aiGo(p,dest,c,imgs){if(dest=='pick'){try{navigator.clipboard.writeText(p).catch(()=>prompt('Copie o texto:',p))}catch(x){prompt('Copie o texto:',p)}document.querySelector('#pop')?.remove();stat('● Prompt copiado');aiPick(p,c,imgs);return}const cp=navigator.clipboard?navigator.clipboard.writeText(p).catch(()=>prompt('Copie o texto:',p)):prompt('Copie o texto:',p);
  if(dest=='copy'){}else if(dest=='co'&&c.chat)open(c.chat,'_blank');else{const A=AI[dest]||AI.claude,x=encodeURIComponent(p);open(A.lim&&x.length<A.lim?A.u+x:A.u.split('?')[0],'_blank')}
  document.querySelector('#pop')?.remove();stat(dest=='copy'?'● pedido copiado':'● pedido copiado: se o chat abrir vazio, cole com Ctrl+V');showAtx(imgs)}
+/* v193: vídeo animado a partir de um storytelling: a IA devolve as cenas em JSON e o motor do painel anima */
+const VIDRULES=`PEDIDO: transforme o STORYTELLING abaixo num VÍDEO de cenas animadas (Reels/Stories, 9:16, 1080×1920). Entregue UM arquivo .json para download (não cole o JSON no chat), neste formato:
+{"formato":"video","cenas":[{"duracao":2.2,"transicao":"corte|fade|slide-left|slide-up|zoom|wipe","canvas":{"width":1080,"height":1920,"background":"#hex"},"layers":[...]}]}
+Cada cena usa as MESMAS camadas do guia abaixo (text, rect, group, path, sticker, art_slot, emoji, doodle…), e o nosso programa anima e monta o MP4.
+REGRAS DO VÍDEO:
+- 8 a 14 cenas de 1,5 a 3 s cada (total de 20 a 35 s). Troque de cena antes de 3 s: é isso que prende.
+- Cena 1 = gancho em até 2 s: frase curta e forte (até 6 palavras) + uma imagem que intriga. Última cena: chamada para ação + @ ou logo da marca.
+- Uma ideia por cena. Texto na tela com no máximo 8 palavras, grande (90 a 140 px), em até 2 linhas.
+- Cada cena tem de 2 a 5 camadas: fundo, objeto principal, texto e no máximo 1 detalhe. Nada de cena lotada.
+- Toda camada que aparece entra com "animation" curta (0,3 a 0,6 s), com delays escalonados: objeto 0, texto 0,15 a 0,3, detalhe 0,4. Ponha um loop leve (float ou pulse) no objeto principal para a cena não ficar parada.
+- Objeto desenhado com várias formas (calculadora, celular, gráfico, cartão, presente, casa…) vai num "group" com id, e a animação fica NO GRUPO (ele se move inteiro).
+- Detalhes animados: gráfico de barras = um rect por barra com "grow" e delays de 0,1 em 0,1; linha de gráfico, seta, sublinhado ou rabisco = "path" com stroke e "draw" (caneta); números e valores = text com "typewriter".
+- Pet, pessoa ou personagem: art_slot com prompt (ou a foto do cliente), nunca desenhado com formas.
+- Transições: corte seco na maioria (ritmo), fade ou zoom nas viradas da história, slide-left numa sequência ou lista.
+- Mesma identidade em todas as cenas: cores da marca, as mesmas 1 ou 2 fontes; o fundo pode alternar entre 2 ou 3 cores da paleta.
+- Zona segura: textos e objetos importantes entre y 250 e 1500 (embaixo ficam a legenda e os botões do Reels).
+Depois do arquivo, escreva em 3 linhas: sugestão de música (clima e batidas por minuto), a legenda do post e o texto da capa.`;
+function vidStoryMd(q){const st=String(q.info||q.how&&!/^📋/.test(q.how)&&q.how||q.cap||'').trim();
+ popAt({clientX:innerWidth/2,clientY:90},`<div class=aim id=vsm style="display:grid;gap:8px;width:min(560px,94vw)"><b>🎞 Vídeo animado a partir de uma história</b><small class=mu>Conte a história como contaria para um amigo (começo, virada, final). A IA transforma em cenas curtas animadas; não precisa de roteiro falado.</small><textarea id=vsmt rows=7 placeholder="Ex.: A Dona Maria achava que vacina de gato era frescura. O Mingau ficou doente, ela descobriu que a vacina custa menos que 1 dia de internação…">${esc(st)}</textarea><div class=row style="gap:8px"><button type=button class=btn data-vsm=go>📋 Copiar o pedido e abrir o editor</button><button type=button class=chip data-vsm=only>Só copiar</button></div></div>`);const pp=document.getElementById('pop');if(pp)pp.style.zIndex=300;setTimeout(()=>document.getElementById('vsmt')?.focus(),50)}
+document.addEventListener('click',async e=>{const b=e.target.closest&&e.target.closest('[data-vsm]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();const q=AIQ;if(!q)return;const story=(document.getElementById('vsmt')||{}).value||'';if(story.trim().length<20)return alert('Escreva a história com um pouco mais de detalhe (pelo menos uma ou duas frases).');
+ const c=co(q.co),msg=stjGuia(q.co,VIDRULES+'\n\nSTORYTELLING ('+c.name+'):\n'+story.trim().slice(0,4000)+(q.txt?'\n\nTítulo do post: '+q.txt:'')).replace(/UM ARQUIVO POR TELA com os nomes pedidos no roteiro \([^)]*\)/,'UM ÚNICO ARQUIVO video.json com TODAS as cenas (formato "video" pedido abaixo)').replace(/LEMBRETE FINAL:[^\n]*/,'LEMBRETE FINAL: entregue UM ÚNICO arquivo .json com {"formato":"video","cenas":[...]} (todas as cenas no mesmo arquivo, cada uma com duracao e transicao), validado, sem colar o JSON no chat e sem gerar imagem.');document.querySelector('#pop')?.remove();
+ let ok=false;try{await navigator.clipboard.writeText(msg);ok=true}catch(x){try{const ta=document.createElement('textarea');ta.value=msg;ta.style.cssText='position:fixed;left:-9999px';document.body.appendChild(ta);ta.select();ok=document.execCommand('copy');ta.remove()}catch(y){}}
+ if(!ok){modal('Pedido do vídeo','<textarea readonly style="width:100%;height:50vh">'+esc(msg)+'</textarea>');return}
+ if(!String(q.info||'').includes(story.trim().slice(0,60))){q.info=(q.info?q.info+'\n\n':'')+'🎞 História do vídeo: '+story.trim();touch('p',q)}
+ if(b.dataset.vsm=='only'){stat('● pedido do vídeo copiado: cole na IA; quando vier o .json, abra Criar arte e arraste no editor');return}
+ try{if(MD)closeMd();openMd(Po(q.id)||q,false);await sleep(250);await stOpen({none:1});await sleep(350);if(STU)edOpen(0);stat('● pedido do vídeo copiado: cole na IA e arraste aqui o .json que ela entregar. Depois: Animar → 🎞 Vídeo com todas as telas')}catch(x){console.warn(x)}},true);
 function igAiMenu(e,q){e.stopImmediatePropagation();AIQ=q;const c=co(q.co),T=q.type;rsEnsure(q.co);
  const card=(k,ic,t,sub)=>`<button class=aicard data-act=aik data-k="${k}"><b>${ic} ${t}</b><span>${sub}</span></button>`,d=aiDest(c),di=aiDest(c,1);
  const cria=[...(iaCfg().url&&T!='feed'?[card('dia','⚡','Gerar dia (Claude API)','sem copiar e colar · já abre montado')]:[]),card('full','🧩','Roteiro completo','passo a passo + legenda'),card('hooks','🎣','10 ganchos','para escolher o melhor')];
- if(T=='stories')cria.push(card('story','📱','Telas do Story','o texto de cada tela'));if(T=='reels')cria.push(card('reels','🎬','Roteiro do Reels','cenas e capa'));if(T=='carrossel'||T=='feed')cria.push(card('carousel','🎠','Carrossel','tela por tela'));if(T=='stories'||T=='carrossel'||T=='feed')cria.push(card('layouts','🧩','Gerar layouts','3 modelos editáveis das telas'));
+ if(T=='stories')cria.push(card('story','📱','Telas do Story','o texto de cada tela'));if(T=='reels')cria.push(card('reels','🎬','Roteiro do Reels','cenas e capa'));if(T=='reels'||T=='stories')cria.push(card('vjson','🎞','Vídeo animado (JSON)','de uma história · cenas de 2–3 s'));if(T=='carrossel'||T=='feed')cria.push(card('carousel','🎠','Carrossel','tela por tela'));if(T=='stories'||T=='carrossel'||T=='feed')cria.push(card('layouts','🧩','Gerar layouts','3 modelos editáveis das telas'));
  const txt=[];if(T!='stories')txt.push(card('cap','✍️','Legenda pronta','2 versões'));if(q.cap)txt.push(card('human','🧹','Revisar o texto','tirar a cara de IA'));if(T!='stories')txt.push(card('tags','#️⃣','Hashtags','3 a 5 certeiras'));
  const m=popAt(e,`<div class=aim><div class=aih><b>${IK.ai} Pedir à IA</b><small>um clique: o pedido vai copiado e o chat abre</small></div>
  <div class=aigr><small>Criar</small><div class=aicards>${cria.join('')}</div></div>
@@ -3396,7 +3422,7 @@ function igAiMenu(e,q){e.stopImmediatePropagation();AIQ=q;const c=co(q.co),T=q.t
  <div class=aigr><small>Imagem</small><div class=aicards>${card('art','🎨','Pedido da arte',aiIco(di)+'abre no '+(AI[di]||AI.chatgpt).n)}</div></div>
  <div class=aidst><span class=mu>Textos abrem no:</span>${c.chat?`<button data-act=aidst data-v=co class="${d=='co'?'on':''}">${aiIco('co')}Chat da empresa</button>`:''}${Object.keys(AI).map(k=>`<button data-act=aidst data-v=${k} class="${d==k?'on':''}">${aiIco(k)}${AI[k].n}</button>`).join('')}<button data-act=aidst data-v=copy class="${d=='copy'?'on':''}">${aiIco('copy')}Só copiar</button></div></div>`);
  m.style.width='min(460px,94vw)';const r=m.getBoundingClientRect();m.style.left=Math.max(8,Math.min(r.left,innerWidth-r.width-8))+'px';m.style.top=Math.max(8,Math.min(r.top,innerHeight-r.height-8))+'px'}
-async function aiPick(k){const q=AIQ;if(!q)return;const c=co(q.co);
+async function aiPick(k){const q=AIQ;if(!q)return;const c=co(q.co);if(k=='vjson'){document.querySelector('#pop')?.remove();return vidStoryMd(q)}
  if(['art','full','story','carousel','reels','layouts','dia'].includes(k)){document.querySelector('#pop')?.remove();const r=await cliQueue(q.co,{p:q});if(!r)return;if(r.u)cliRes(r.u,q);else cliUnres(q);
   if(k=='art')return artGo({...q,st:'arte'},r.u||null);if(k=='layouts')return layGo(q,r);if(k=='dia')return diaGo(q,r);
   await rsEnsure(q.co);CLIP={co:q.co,u:r.u||null};let msg;try{msg=k=='full'?mkPostPrompt(q,r.u||undefined)+igDataTxt(q.co):igPrompt(k,q)}finally{CLIP=null}
@@ -4846,7 +4872,7 @@ document.addEventListener('paste',e=>{
 },true);
 
 async function stOpen(cliR){if(!MD)return;const p=collect();if(!p.date)return alert('Escolha a data antes.');const c=co(p.co);let txt=p.cap||((telaGet(p.id)||{}).cap)||'';const jj0=stjParse(txt);if(jj0){txt=jj0.rest;const mc=$('#mcap');if(mc){mc.value=txt;mc.dispatchEvent(new Event('input',{bubbles:true}))}}let P=artParse(txt);if(!P.S.length){P={S:[{t:p.txt||'Escreva o título aqui',b:[],bg:'',fig:!!p.fig}],bgs:[]};}
- const fmt=p.type=='stories'?'st':'fd';STU={p:{...p,cap:txt||'TELA 1: '+(p.txt||'Escreva o título aqui')+'\n'},c,fmt,S:P.S,bgs:P.bgs,gpt:P.gpt||'',fontAI:P.font||'',imgs:[],cfg:artCfg(p.co),lays:null};{const mn=P.mdl&&mdlList(p.co).find(m=>nrm(m.n)==nrm(P.mdl));if(mn)mdlApply(mn.n);else if(STU.cfg.mdef)mdlApply(STU.cfg.mdef)}telaLoad1();if(STU.fontAI){STU.cfg.font=STU.fontAI;fontEnsure(STU.fontAI).then(()=>stRender())}fontEnsure(STU.cfg.font).then(()=>stRender());
+ const fmt=p.type=='stories'||p.type=='reels'?'st':'fd';STU={p:{...p,cap:txt||'TELA 1: '+(p.txt||'Escreva o título aqui')+'\n'},c,fmt,S:P.S,bgs:P.bgs,gpt:P.gpt||'',fontAI:P.font||'',imgs:[],cfg:artCfg(p.co),lays:null};{const mn=P.mdl&&mdlList(p.co).find(m=>nrm(m.n)==nrm(P.mdl));if(mn)mdlApply(mn.n);else if(STU.cfg.mdef)mdlApply(STU.cfg.mdef)}telaLoad1();if(STU.fontAI){STU.cfg.font=STU.fontAI;fontEnsure(STU.fontAI).then(()=>stRender())}fontEnsure(STU.cfg.font).then(()=>stRender());
  try{await Promise.all(['700 60px "Bricolage Grotesque"','500 40px "Plus Jakarta Sans"','800 40px "Plus Jakarta Sans"','400 60px "Bebas Neue"','700 60px "Playfair Display"','italic 600 60px "Playfair Display"','700 60px "Poppins"'].map(f=>document.fonts.load(f)))}catch(e){}
  if(c.photo)try{STU.logoImg=await loadImg(c.photo)}catch(e){}if(STU.cfg.logoArt)try{STU.logoArtImg=await loadImg(STU.cfg.logoArt)}catch(e){}[STU.cfg.font2||'Patrick Hand'].forEach(n=>fontEnsure(n).then(()=>stRender()));
  stShow();const me=STU,cq=cliR&&(cliR.u||cliR.none)?Promise.resolve(cliR):cliQueue(p.co,{p});stat('carregando as fotos do post…');
