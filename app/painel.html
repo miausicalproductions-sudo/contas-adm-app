@@ -1001,7 +1001,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:186*/const PV=186;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:187*/const PV=187;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -5993,7 +5993,7 @@ function guides(gx,gy,sc){
  let g=document.getElementById('stegs');
  if(!gx.length&&!gy.length){if(g)g.innerHTML='';return}
  if(!g){g=document.createElement('div');g.id='stegs';host.appendChild(g)}
- g.innerHTML=gx.map(v=>`<i class=gv style="left:${(v*sc).toFixed(1)}px"></i>`).join('')+gy.map(v=>`<i class=gh style="top:${(v*sc).toFixed(1)}px"></i>`).join('')}
+ const cv=document.getElementById('stecv'),W=cv?cv.width:1080,H=cv?cv.height:1920;g.innerHTML=gx.map(v=>`<i class=gv style="left:${(v/W*100).toFixed(3)}%"></i>`).join('')+gy.map(v=>`<i class=gh style="top:${(v/H*100).toFixed(3)}%"></i>`).join('')}
 
 /* encaixe: bordas e centro do que está sendo arrastado puxam para a tela e para as outras camadas */
 function snap(){
@@ -6018,15 +6018,15 @@ function syncGrid(){
  let g=document.getElementById('stegrid');
  const on=O.grid!='off'&&(O.gfix||(D&&D.moving&&!D.handle));
  if(!on){if(g)g.style.display='none';return}
- const sc=cv.clientWidth/cv.width,H=cv.height,k=O.grid+'|'+sc.toFixed(3)+'|'+H+'|'+STU.fmt;
+ const H=cv.height,k=O.grid+'|'+H+'|'+STU.fmt;
  if(!g){g=document.createElement('div');g.id='stegrid';host.appendChild(g)}
  g.style.display='';if(g._k==k)return;g._k=k;
- const G=gridGeo(STU.fmt=='st',H),f=v=>(v*sc).toFixed(1),m=O.grid,h=[];
- if(m=='c'||m=='m')G.cols.forEach(c=>h.push(`<i class=gb style="left:${f(c[0])}px;width:${f(c[1]-c[0])}px"></i>`));
+ const G=gridGeo(STU.fmt=='st',H),m=O.grid,h=[],fx=v=>(v/1080*100).toFixed(3)+'%',fy=v=>(v/H*100).toFixed(3)+'%';
+ if(m=='c'||m=='m')G.cols.forEach(c=>h.push(`<i class=gb style="left:${fx(c[0])};width:${fx(c[1]-c[0])}"></i>`));
  const X=[G.m*10.8,1080-G.m*10.8],Y=G.yb.slice();
  if(m=='t'){X.push(...G.tx);Y.push(...G.ty)}if(m=='m')Y.push(...G.rows.slice(1,-1));
- X.forEach((v,i)=>h.push(`<i class="gl gv${i<2?' gm':''}" style="left:${f(v)}px"></i>`));
- Y.forEach((v,i)=>h.push(`<i class="gl gh${i<2?' gm':''}" style="top:${f(v)}px"></i>`));
+ X.forEach((v,i)=>h.push(`<i class="gl gv${i<2?' gm':''}" style="left:${fx(v)}"></i>`));
+ Y.forEach((v,i)=>h.push(`<i class="gl gh${i<2?' gm':''}" style="top:${fy(v)}"></i>`));
  g.innerHTML=h.join('')}
 
 const _draw=edDraw;
