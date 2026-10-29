@@ -1020,7 +1020,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:215*/const PV=215;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:216*/const PV=216;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -2979,6 +2979,7 @@ document.addEventListener('click',async e=>{const g=e.target.closest('[data-go]'
  if(act=='edpn'&&EDX){edPn(a.dataset.v);return}
  if(act=='ednotex'&&EDX){EDX.notex=!EDX.notex;edDraw();stat(EDX.notex?'● texturas DESLIGADAS na visualização (só para teste; a exportação continua com elas)':'● texturas ligadas');return}
  if(act=='edanim'&&EDX){edAnimPlay();return}
+ if(act=='edimgs'){document.querySelectorAll('#ste .psfdd').forEach(q=>q.hidden=true);imgsCopy();return}
  if(act=='edref'||act=='edrefreq'){document.querySelectorAll('#ste .psfdd').forEach(q=>q.hidden=true);act=='edref'?refPanel():refReq();return}
  if(act=='edjfala'){document.querySelectorAll('#ste .psfdd').forEach(q=>q.hidden=true);veTelasCopy();return}
  if(act=='edjanim'){try{localStorage.setItem('miau_jsonanim',stjAnimOn()?'0':'1')}catch(e){}document.querySelectorAll('#ste .psfdd').forEach(q=>q.hidden=true);stat(stjAnimOn()?'● as animações do JSON da IA serão aplicadas na próxima importação':'● o JSON da IA entra sem animação: só anima quando você usar ✨ Animar');return}
@@ -5090,6 +5091,31 @@ async function refReq(){const s=STU;if(!s||!EDX)return;const i=EDX.i;s._ref=s._r
 8. Antes de entregar, confira camada por camada contra a imagem (posição, tamanho, cor). Entregue o .json; depois vou mostrar a comparação com o que o painel desenhou para você corrigir.`;
  let g=stjGuia(s.p.co,rot);try{await navigator.clipboard.write([new ClipboardItem({'image/png':png,'text/plain':new Blob([g],{type:'text/plain'})})]);stat('● imagem original + pedido copiados: cole na IA')}catch(e){try{await navigator.clipboard.write([new ClipboardItem({'image/png':png})]);stat('● imagem copiada; o texto vai numa janela');prompt('Copie o texto:',g)}catch(e2){const u=URL.createObjectURL(png),a=document.createElement('a');a.href=u;a.download='original-tela'+(i+1)+'.png';a.click();prompt('Copie o texto:',g)}}}
 document.addEventListener('click',async e=>{const a=e.target.closest&&e.target.closest('[data-act=refcopy],[data-act=refup],[data-act=refnew]');if(!a)return;e.stopPropagation();const k=a.dataset.act;if(k=='refcopy')return refCopy();if(k=='refnew'){if(STU&&EDX&&STU._ref)delete STU._ref[EDX.i];return refPanel()}if(k=='refup')return refPanel()},true);
+/* ===== v216: pedido para o ChatGPT criar as IMAGENS de todas as telas de uma vez (cenário ilustrado a partir do roteiro) ===== */
+function imgsPedido(s){const n=s.S.length,co=(s.c&&s.c.name)||'a empresa';let pal='';try{const q=palDef(artCfg(s.p.co));pal=`principal ${q.c1}, apoio ${q.c2}, destaque ${q.c3}, fundo ${q.bg}`}catch(e){}
+ const tela=s.S.map((x,i)=>{const tx=[x.t].concat(x.b||[]).map(v=>String(v||'').replace(/\*/g,'').trim()).filter(Boolean).join(' / ');const fala=x.cortes?(typeof veScrTxt=='function'?veScrTxt(x).replace(/\*/g,''):''):'';return `TELA ${i+1}: ${tx||'(sem texto ainda)'}${fala&&fala!=tx?'\n   fala/roteiro: '+fala:''}`}).join('\n');
+ return `TAREFA: gere ${n} IMAGENS (uma por tela), uma de cada vez, na ordem, cada uma em formato VERTICAL 9:16 (1080×1920). Depois de cada imagem pode responder só "ok, tela N". Gere TODAS, sem pedir confirmação.
+
+EMPRESA: ${co}${pal?'\nPALETA BASE (adapte ao clima de cada tela, sem perder a identidade): '+pal:''}
+TEMA/ASSUNTO: ${s.p.txt||'(siga o roteiro abaixo)'}
+
+ESTILO (igual em TODAS as telas, para a série parecer da mesma família):
+- ilustração digital rica e acolhedora, cartoon/semi-realista, cores saturadas, iluminação com brilho e profundidade (primeiro plano, plano médio, fundo);
+- cenário COMPLETO e coerente com o assunto da tela: céu/ambiente, elementos grandes, elementos pequenos espalhados, texturas, luz; nada de fundo liso nem de degradê vazio;
+- se o assunto pedir personagens (pets, pessoas, objetos), desenhe-os com expressão simpática, bem recortados do fundo;
+- fontes e lettering: NÃO escreva texto nenhum dentro da imagem (nem palavras, nem letras, nem números, nem QR code): o texto será colocado depois, editável.
+
+COMPOSIÇÃO (muito importante):
+- deixe áreas LIMPAS e de baixo detalhe onde o texto vai entrar: ~topo (até 25% da altura) e/ou a faixa central e inferior conforme o que a tela precisa; descreva mentalmente onde fica o texto antes de desenhar;
+- mantenha as bordas (~8%) sem elementos importantes (zona segura do Instagram);
+- se uma tela tem interação (enquete, caixinha, link), deixe a área correspondente livre.
+
+TELAS (siga o conteúdo de cada uma; o texto abaixo NÃO deve aparecer escrito na imagem, serve para você entender o clima e o que desenhar):
+${tela}
+
+Comece agora pela tela 1.`}
+async function imgsCopy(){const s=STU;if(!s||!s.S||!s.S.length){stat('⚠ abra um dia com telas antes');return}const t=imgsPedido(s);try{await navigator.clipboard.writeText(t);stat('● PEDIDO COPIADO ('+s.S.length+' telas): cole no ChatGPT')}catch(e){prompt('Copie o pedido:',t)}
+ try{const b=document.createElement('div');b.textContent='✓ Copiado! Cole no ChatGPT';b.style.cssText='position:fixed;left:50%;top:40%;transform:translateX(-50%);z-index:9999;background:#16a34a;color:#fff;font:700 22px sans-serif;padding:18px 28px;border-radius:14px;box-shadow:0 8px 30px #0006;pointer-events:none';document.body.appendChild(b);setTimeout(()=>b.remove(),1600)}catch(e){}}
 /* ===== v158: selecionar vários posts no calendário (Ctrl/⌘ ou Shift + clique, ou arrastar um retângulo no vazio) e apagar com Delete ===== */
 const PSEL=new Set();
 function pselPaint(){document.querySelectorAll('#m [data-act=editp][data-id]').forEach(el=>el.classList.toggle('psel',PSEL.has(el.dataset.id)));let b=document.getElementById('pselbar');if(!PSEL.size){b&&b.remove();return}if(!b){b=document.createElement('div');b.id='pselbar';document.body.appendChild(b)}b.innerHTML=`<b>${PSEL.size} post${PSEL.size>1?'s':''} selecionado${PSEL.size>1?'s':''}</b><button type=button data-psel=del>🗑 Excluir (Delete)</button><button type=button data-psel=x>✕ Limpar (Esc)</button>`}
@@ -5364,6 +5390,7 @@ const edFileMenu=()=>{const s=STU,M=mdlList(s.p.co),dia=!!(STU.p.cron||STU._crp)
  <hr>
  <details class=psgp><summary>🤖 IA e JSON</summary>
  <button type=button data-act=edfile data-v=jguia title="Copia o guia com o roteiro: se este post é de um dia do Cronograma, vai o pedido do dia inteiro">📋 Copiar ${dia?'pedido do dia inteiro':'guia + roteiro'}</button>${dia?'<button type=button data-act=edfile data-v=jguia1>📋 Copiar só esta tela</button>':''}
+ <button type=button data-act=edimgs title="Copia UM pedido para o ChatGPT criar as imagens (cenário ilustrado, sem texto) de todas as telas do dia, na mesma estética">🎨 Pedido: criar as imagens de todas as telas</button>
  <button type=button data-act=edref title="Mostra a imagem original ao lado do JSON desenhado, com um mapa de diferenças, e copia um pedido de correção para a IA">🔍 Comparar com a imagem original…</button>
  <button type=button data-act=edrefreq title="Copia a imagem original + um pedido para a IA reproduzi-la o mais fiel possível em JSON">🖼 Pedido: imagem → JSON</button>
  <button type=button data-act=edjfala title="O painel levanta as frases e os tempos da fala e pede à IA que decida quantas telas o vídeo precisa">🎙 Pedir as telas pela fala</button>
