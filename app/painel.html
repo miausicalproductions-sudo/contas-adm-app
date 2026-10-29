@@ -1019,7 +1019,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:209*/const PV=209;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:210*/const PV=210;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -5304,7 +5304,7 @@ document.addEventListener('dragstart',e=>{const t=e.target.closest&&e.target.clo
 document.addEventListener('dragover',e=>{if(!EDX)return;const w=e.target.closest&&(e.target.closest('#ste .stecv')||e.target.closest('#ste .stew'));if(!w)return;const T=[...(e.dataTransfer.types||[])];if(!T.some(t=>t=='text/phk'||t=='text/elid'||t=='Files'))return;e.preventDefault();e.stopPropagation();e.dataTransfer.dropEffect='copy';const k=T.includes('text/elid')?null:edHit(edPt(e));document.querySelectorAll('#stebx .stebx').forEach(b=>b.classList.toggle('dropt',b.dataset.k==k))},true);
 document.addEventListener('drop',async e=>{if(!EDX)return;const w=e.target.closest&&(e.target.closest('#ste .stecv')||e.target.closest('#ste .stew'));if(!w)return;const ph=e.dataTransfer.getData('text/phk'),el=e.dataTransfer.getData('text/elid'),fs=[...(e.dataTransfer.files||[])].filter(f=>/^image\//.test(f.type));if(ph===''&&!el&&!fs.length)return;e.preventDefault();e.stopPropagation();document.querySelectorAll('#stebx .dropt').forEach(b=>b.classList.remove('dropt'));const p=edPt(e),H=STU.fmt=='st'?1920:1350;
  if(el){elAdd(el,p.x/1080*100,p.y/H*100);return}const k=edHit(p);if(ph!==''){edPhotoTo(k,+ph);return}
- {const L=k?edLayer(k):null,tp=L?nrm(L.tipo||''):'',frame=k=='f'||tp=='foto'||(tp=='forma'&&!e.shiftKey);if(!frame||fs.length>1){await edAddImgs(fs);stat('🖼 '+(fs.length>1?fs.length+' imagens soltas':'imagem solta')+' na tela (para pôr dentro de uma forma ou moldura, solte em cima dela)');return}}   /* v196: imagem solta em qualquer lugar vira camada nova */
+ {const L=k?edLayer(k):null,tp=L?nrm(L.tipo||''):'',frame=k=='f'||tp=='foto'||(tp=='forma'&&!e.shiftKey);if(!frame||fs.length>1){if(await edAutoImgs(fs,frame))return;await edAddImgs(fs);stat('🖼 '+(fs.length>1?fs.length+' imagens soltas':'imagem solta')+' na tela (para pôr dentro de uma forma ou moldura, solte em cima dela)');return}}   /* v196: imagem solta em qualquer lugar vira camada nova */
  try{STU.imgs.push({id:'local'+uid(),img:await loadImg(URL.createObjectURL(fs[0]))});edPhotoTo(k,STU.imgs.length-1)}catch(x){alert('Não consegui abrir essa imagem.')}},true);
 function edInline(k){const s=STU,x=s.S[EDX.i],b=(EDX.box||{})[k],cv=document.getElementById('stecv');if(!b||!cv)return false;const L=edLayer(k),t=L?nrm(L.tipo||''):'',one=L&&t=='texto'&&/^\d+$/.test(String(L.linha||'').trim());let get,set;
  if(L&&t=='texto'&&L.txt==null&&/^\d+$/.test(String(L.linha||'').trim())){const n=+L.linha,cur=((x.b||[]).map(v=>String(v).trim()).filter(Boolean)[n-1]||'');L.txt=cur;delete L.linha}
@@ -5387,6 +5387,20 @@ let IGW=null;function igBeep(ok){try{const A=new(window.AudioContext||window.web
 function igWatch(){const now={};live('posts').forEach(p=>{if(p.ig)now[p.id]=p.ig+'|'+(p.igerr||'')});if(IGW){const bad=[],good=[];Object.keys(now).forEach(id=>{if(now[id]==IGW[id])return;const p=Po(id);if(!p)return;if(p.ig=='erro')bad.push(p);else if(p.ig=='ok'&&!/^ok/.test(IGW[id]||''))good.push(p)});
  if(bad.length){if(localStorage.snd!='0')igBeep(0);const m='⚠ Não publiquei: '+(bad[0].txt||TYPES[bad[0].type])+' ('+co(bad[0].co).name+') · '+igErrPt(bad[0].igerr).slice(0,180);stat(m);let d=document.getElementById('igal');if(!d){d=document.createElement('div');d.id='igal';d.style.cssText='position:fixed;right:16px;bottom:16px;z-index:200;max-width:min(420px,92vw);background:#C62F4A;color:#fff;border-radius:12px;padding:12px 40px 12px 14px;font-size:13.5px;box-shadow:0 10px 30px rgba(0,0,0,.25);cursor:pointer';d.title='Clique para fechar';d.onclick=()=>d.remove();document.body.appendChild(d)}d.textContent=m+(bad.length>1?' (e mais '+(bad.length-1)+')':'')}else if(good.length){if(localStorage.snd!='0')igBeep(1);stat('● publicado no Instagram: '+(good[0].txt||TYPES[good[0].type]))}}IGW=now}
 const loadImg=src=>new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=src});
+/* v210: várias imagens do ChatGPT de uma vez: cada uma vai sozinha para a sua tela (no espaço vazio da arte; sem espaço, vira fundo) */
+async function edAutoImgs(fs0,hitFrame){
+ if(!EDX||!STU)return false;const fs=[...fs0].filter(f=>f&&/^image\//.test(f.type||'image/png'));if(!fs.length)return false;if(STU._dslots&&(STU._dfill||0)<STU._dslots.length)return false;
+ const s=STU,slotOf=i=>{const x=s.S[i];if(!x)return null;const isM=x.mod&&(s.lays||[])[i]=='mod',C=(isM?x.mod.camadas:x.extra)||[],q=C.findIndex(L=>L&&L.vazio&&!L.fid);return q>=0?(isM?'c':'x')+q:null},withSlot=s.S.map((_,i)=>i).filter(i=>slotOf(i)),all=s.S.map((_,i)=>i);
+ let pairs=[];
+ if(fs.length==1){if(hitFrame||!withSlot.length)return false;pairs=[[withSlot.includes(EDX.i)?EDX.i:withSlot[0],fs[0]]]}
+ else{const num=f=>{const m=String(f.name||'').match(/(?:^|[^a-z])(?:tela|story|slide|cena|screen|s)[\s_-]*0*(\d{1,2})(?!\d)/i);return m?+m[1]:null},ns=fs.map(num);
+  if(ns.every(n=>n!=null&&n>=1&&n<=s.S.length)&&new Set(ns).size==ns.length)pairs=fs.map((f,k)=>[ns[k]-1,f]).sort((a,b)=>a[0]-b[0]);
+  else{fs.sort((a,b)=>(a.lastModified||0)-(b.lastModified||0)||String(a.name||'').localeCompare(String(b.name||''),'pt',{numeric:true}));const T=withSlot.length?withSlot:all;pairs=fs.slice(0,T.length).map((f,k)=>[T[k],f])}}
+ if(!pairs.length)return false;const back=EDX.i,done=[];
+ for(const [i,f] of pairs){let im;try{im=await loadImg(URL.createObjectURL(f))}catch(e){alert('Não consegui abrir '+(f.name||'a imagem')+'.');continue}
+  s.imgs.push({id:'local'+uid(),img:im});EDX.i=i;EDX.sel=null;edPhotoTo(slotOf(i),s.imgs.length-1);done.push(i+1)}
+ EDX.i=done.length?pairs[0][0]:back;try{stRender();edShow()}catch(e){}
+ const left=fs.length-pairs.length;stat('🖼 '+done.length+' imagem'+(done.length>1?'ns':'')+' nas telas '+done.join(', ')+(left>0?' · sobraram '+left+' sem tela: arraste para a tela certa':'')+' · confira o encaixe e ajuste se precisar');return true}
 /* ===== inserir imagem externa no editor (botão 📥 e Ctrl+V) ===== */
 async function edAddImgs(files){
  if(!EDX||!STU)return;
@@ -5421,7 +5435,7 @@ document.addEventListener('click',e=>{
  e.preventDefault();e.stopPropagation();
  let inp=document.getElementById('edimgin');
  if(!inp){inp=document.createElement('input');inp.type='file';inp.accept='image/*';inp.multiple=true;inp.id='edimgin';inp.style.display='none';
-  inp.addEventListener('change',()=>{const fs=[...inp.files];inp.value='';edAddImgs(fs)});
+  inp.addEventListener('change',async()=>{const fs=[...inp.files];inp.value='';if(!(await edAutoImgs(fs,false)))edAddImgs(fs)});
   document.body.appendChild(inp)}
  inp.click();
 },true);
