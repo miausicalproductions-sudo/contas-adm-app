@@ -240,6 +240,7 @@ html.edmob,html.edmob body{overflow:hidden!important;overscroll-behavior:none}ht
 @media(max-width:760px){.vemain{grid-template-columns:1fr}#vecv{height:34vh}.vetlbox{grid-template-columns:48px minmax(0,1fr)}}
 .vewb{position:absolute;top:6px;height:32px;background:#5a3d7a;border:1px solid #b48ae0;border-radius:5px;overflow:hidden;white-space:nowrap;font-size:12px;padding:6px 4px;cursor:grab;box-sizing:border-box}.vewb.on{background:#7a4fb0;outline:2px solid #fff}.vewb .vehd{width:6px}
 #ve textarea{width:100%;background:#23242c;color:#eee;border:1px solid #ffffff2a;border-radius:6px;padding:6px 8px;font:inherit;box-sizing:border-box}#ve input[type=color]{padding:0;height:30px;width:100%}
+.vesl{display:grid;gap:3px;font-size:12px;color:#c3c7d6}.vesl input{width:100%}.vesl2{display:flex;justify-content:space-between;opacity:.7}details.vesec>summary{cursor:pointer;padding:2px 0}details.vesec[open]{display:grid;gap:8px}
 .psfdd details.psgp>summary{padding:7px 14px;cursor:pointer;font-size:12.5px;font-weight:600;list-style:none}.psfdd details.psgp>summary::-webkit-details-marker{display:none}.psfdd details.psgp>summary::after{content:" ▸";opacity:.5}.psfdd details.psgp[open]>summary::after{content:" ▾"}.psfdd details.psgp[open]{background:#0000000a;padding-bottom:4px}.psfdd details.psgp>button,.psfdd details.psgp>label{padding-left:26px}
 .psfdd{position:absolute;left:0;top:100%;z-index:20;background:#f3f3f3;color:#222;border:1px solid #999;box-shadow:0 8px 24px #0006;min-width:330px;padding:4px 0;display:grid;max-height:70vh;overflow:auto}.psfdd[hidden]{display:none}
 .psfdd button{background:none;border:0;text-align:left;font:inherit;font-size:12.5px;padding:6px 14px;cursor:pointer;display:flex;gap:10px;color:#222;align-items:center}.psfdd button:hover{background:#2d7dd2;color:#fff}.psfdd kbd{margin-left:auto;opacity:.6;font:inherit;font-size:11px}.psfdd small{padding:0 14px 5px 36px;opacity:.65;font-size:11px}.psfdd hr{border:0;border-top:1px solid #ccc;margin:4px 0;width:100%}
@@ -1017,7 +1018,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:207*/const PV=207;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:208*/const PV=208;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -3446,7 +3447,7 @@ REGRAS DO VÍDEO:
 - Pet, pessoa ou personagem: art_slot com prompt (ou a foto do cliente), nunca desenhado com formas.
 - Transições: corte seco na maioria (ritmo), fade ou zoom nas viradas da história, slide-left numa sequência ou lista.
 - Mesma identidade em todas as cenas: cores da marca, as mesmas 1 ou 2 fontes; o fundo pode alternar entre 2 ou 3 cores da paleta.
-- Zona segura: textos e objetos importantes entre y 250 e 1500 (embaixo ficam a legenda e os botões do Reels).
+- Zona segura: textos e objetos importantes entre y 250 e 1500 (embaixo ficam a legenda e os botões do Reels). Se o vídeo for narrado, o programa desenha a legenda falada por cima numa faixa em torno de y 1340: deixe-a livre e escolha fonte e cores que combinem com ela.
 Depois do arquivo, escreva em 3 linhas: sugestão de música (clima e batidas por minuto), a legenda do post e o texto da capa.`;
 function vidStoryMd(q,pre){const st=String(pre||q.info||q.how&&!/^📋/.test(q.how)&&q.how||q.cap||'').trim();
  popAt({clientX:innerWidth/2,clientY:90},`<div class=aim id=vsm style="display:grid;gap:8px;width:min(560px,94vw)"><b>🎞 Vídeo animado a partir de uma história</b><small class=mu>Conte a história como contaria para um amigo (começo, virada, final). A IA transforma em cenas curtas animadas; não precisa de roteiro falado.</small><textarea id=vsmt rows=7 placeholder="Ex.: A Dona Maria achava que vacina de gato era frescura. O Mingau ficou doente, ela descobriu que a vacina custa menos que 1 dia de internação…">${esc(st)}</textarea><div class=row style="gap:8px"><button type=button class=btn data-vsm=go>📋 Copiar o pedido e abrir o editor</button><button type=button class=chip data-vsm=only>Só copiar</button></div></div>`);const pp=document.getElementById('pop');if(pp)pp.style.zIndex=300;setTimeout(()=>document.getElementById('vsmt')?.focus(),50)}
@@ -4776,7 +4777,7 @@ function veAlign(){const A=VE.au,toks=veTok(VE.script);if(!A){stat('⚠ carregue
  let cw=0,cp=0;const pred=wt.map((w,i)=>{cw+=w;const t=Q.s0+tau*cw+cp;cp+=pw[i];return t}),anc=[],win=Math.max(.7,S*.05);let gi=0,lastEnd=Q.s0;
  for(let i=0;i<n-1;i++){if(!pw[i])continue;let best=-1,bd=1e9;for(let g=gi;g<Q.G.length;g++){const m=(Q.G[g].a+Q.G[g].b)/2;if(Q.G[g].a<lastEnd+.1)continue;if(m>pred[i]+win)break;const d=Math.abs(m-pred[i]);if(d<=win&&d<bd){bd=d;best=g}}if(best>=0){anc.push({i,a:Q.G[best].a,b:Q.G[best].b});gi=best+1;lastEnd=Q.G[best].b}}
  const out=[];let from=0,s=Q.s0;const seg=(i0,i1,s0,e0)=>{const T=[];let tot=0;for(let i=i0;i<=i1;i++){tot+=wt[i]*tau+(i<i1?pw[i]:0)}const f=(e0-s0)/Math.max(.01,tot);let t=s0;for(let i=i0;i<=i1;i++){const d=wt[i]*tau*f;out.push({w:toks[i],t0:+t.toFixed(3),t1:+(t+d).toFixed(3)});t+=d+(i<i1?pw[i]*f:0)}};
- anc.forEach(x=>{seg(from,x.i,s,x.a);from=x.i+1;s=x.b});seg(from,n-1,s,Q.s1);VE.words=out;veSave();return{n,anc:anc.length,pun:pw.filter(Boolean).length}}
+ anc.forEach(x=>{seg(from,x.i,s,x.a);from=x.i+1;s=x.b});seg(from,n-1,s,Q.s1);VE.words=out;veFixWords(VE.words);veSave();return{n,anc:anc.length,pun:pw.filter(Boolean).length}}
 /* ---------- chunks e desenho ---------- */
 function veChunks(){const W=VE.words,g=Math.max(1,VE.cap.grp|0||3),C=[];let cur=null;W.forEach(x=>{const lw=cur?cur.w[cur.w.length-1]:null,gap=lw?x.t0-lw.t1:9;if(!cur||cur.w.length>=g||gap>.45||/[.!?…]["”')]*$/.test(lw.w)||(/[,;:]["”')]*$/.test(lw.w)&&cur.w.length>=2)){cur={w:[]};C.push(cur)}cur.w.push(x)});
  C.forEach((c,k)=>{c.t0=c.w[0].t0;const nx=C[k+1],le=c.w[c.w.length-1].t1;c.t1=nx&&nx.t0-le<.5?nx.t0:le+.25});return C}
@@ -4791,27 +4792,9 @@ function veCap(ctx,T){const c=VE.cap;if(!c||!c.on||!VE.words.length)return;const
   if(c.box){const px=S*.28,py=S*.12;ctx.fillStyle=hi;const r=S*.28,bx=x-px,by=y-S*.86-py,bw=lw+px*2,bh=lh+py;ctx.beginPath();if(ctx.roundRect)ctx.roundRect(bx,by,bw,bh,r);else ctx.rect(bx,by,bw,bh);ctx.fill()}
   if(c.sw>0&&!c.box){ctx.strokeStyle=c.sc;ctx.lineWidth=c.sw*(W/1080);let xx=x;L.forEach(i=>{ctx.strokeText(words[i],xx,y);xx+=ws[i]+sp})}
   L.forEach(i=>{const wd=ch.w[i],on=T>=wd.t0&&T<wd.t1+.04;ctx.fillStyle=c.box?c.col:(on&&c.act!==0?hi:c.col);ctx.fillText(words[i],x,y);x+=ws[i]+sp});y+=lh});ctx.restore()}
-function veCapDef(s){const co0=(s.p&&s.p.co)||'',a=(typeof artCfg=='function'&&co0)?artCfg(co0):{};return{on:1,...VEPRE.karaoke,hi:a.c1&&/^#/.test(a.c1)?a.c1:'#FFD43B',y:.7,act:1}}
+function veCapDef(s){const co0=(s.p&&s.p.co)||'',a=(typeof artCfg=='function'&&co0)?artCfg(co0):{};return{on:1,...VEPRE.karaoke,hi:a.c1&&/^#/.test(a.c1)?a.c1:'#FFD43B',y:.7,act:1,...(((s.S[0]||{}).ov||{}).vecap||{})}}
 async function veFonts(){try{await fontEnsure(VE.cap.font||'Bricolage Grotesque')}catch(e){}}
 /* ---------- tela das legendas ---------- */
-function veLegSide(){const c=VE.cap,n=VE.words.length;
- return`<div class=vesec><b>Legendas</b><small class=mu>Cole o roteiro da fala (o mesmo que foi para o ElevenLabs). O painel acha a fala no áudio e coloca cada palavra no tempo; depois você ajusta na linha do tempo.</small>
- <textarea id=ve_script rows=6 placeholder="Cole aqui o texto da narração…">${esc(VE.script)}</textarea>
- <div class=row><button class=chip data-ve=usetxt>📝 Usar os textos das telas</button><button class=btn data-ve=align ${VE.au?'':'disabled'}>🎯 Alinhar ao áudio</button></div>
- ${VE.au?'':'<small style="color:#ffb86b">Falta o áudio: volte à aba ① Áudio.</small>'}
- <details><summary class=mu>sem roteiro? deixar o painel ouvir e escrever</summary><div class=veg><label>Modelo<select data-vo=asrm>${Object.keys(VEASR).map(k=>`<option value=${k}${(VE.asrm||'base')==k?' selected':''}>${VEASR[k][1]}</option>`).join('')}</select></label></div><button class=chip data-ve=asr ${VE.au&&!VE.busy?'':'disabled'}>🎤 Transcrever o áudio</button><small class=mu>Roda no seu aparelho, sem custo. Na 1ª vez baixa o modelo (precisa de internet). Pode errar nomes: corrija nas palavras da linha do tempo.</small></details>
- ${n?`<small class=mu>${n} palavras na linha do tempo${VE.alInfo?' · '+esc(VE.alInfo):''}. Clique numa palavra para corrigir o texto ou o tempo.</small>`:''}</div>
- <div class=vesec><b>Aparência</b><label class=veck><input type=checkbox data-vc=on ${c.on?'checked':''}> mostrar as legendas no vídeo</label>
- <div class=veg><label>Estilo pronto<select data-vc=pre><option value="">— escolher —</option>${Object.keys(VEPRE).map(k=>`<option value=${k}>${VEPRE[k].n}</option>`).join('')}</select></label>
- <label>Fonte<select data-vc=font>${[...new Set([c.font].concat(FONTS.map(f=>f[0])))].map(f=>`<option${f==c.font?' selected':''}>${esc(f)}</option>`).join('')}</select></label>
- <label>Tamanho<input type=range min=40 max=160 step=2 data-vc=size value="${c.size}"></label>
- <label>Posição (altura)<input type=range min=.15 max=.9 step=.01 data-vc=y value="${c.y}"></label>
- <label>Palavras por bloco<input type=number min=1 max=6 data-vc=grp value="${c.grp}"></label>
- <label>Cor do texto<input type=color data-vc=col value="${c.col}"></label>
- <label>${c.box?'Cor da caixa':'Cor da palavra falada'}<input type=color data-vc=hi value="${c.hi}"></label>
- <label>Contorno (${c.sw})<input type=range min=0 max=24 step=1 data-vc=sw value="${c.sw}"></label></div>
- <div class=row><label class=veck><input type=checkbox data-vc=up ${c.up?'checked':''}> CAIXA ALTA</label><label class=veck><input type=checkbox data-vc=pop ${c.pop?'checked':''}> efeito pop</label><label class=veck><input type=checkbox data-vc=act ${c.act===0?'':'checked'}> pintar a palavra falada</label></div>
- <button class=chip data-ve=capti title="Usa a fonte e a cor do título da tela que está na prévia">🎨 Pegar fonte e cor do título da tela atual</button></div>`}
 function veTLw(){const P=VE.pps;return`<div class="vetr vecp">${VE.words.map((w,k)=>`<div class="vewb${VE.sel&&VE.sel.t=='w'&&VE.sel.k==k?' on':''}" data-vw=${k} style="left:${w.t0*P}px;width:${Math.max(8,(w.t1-w.t0)*P-1)}px" title="${esc(w.w)}">${esc(w.w)}<i class=vehd data-vwh=${k}></i></div>`).join('')}</div>`}
 function veLabw(){return'<div class=vel2>Legendas</div>'}
 function veFit(){const w=document.getElementById('vetlw');if(w&&VE.D>0)VE.pps=VEZ(30,140,(w.clientWidth-60)/VE.D)}
@@ -4852,31 +4835,16 @@ function veFitScenes(){if(!veNeedWords())return 0;const s=VE.s,W=VE.words,n=s.S.
  for(let i=0;i<n.length-1;i++){cum+=n[i];const ix=Math.min(W.length-1,Math.round(cum*W.length/N));st.push(Math.max(st[i]+.5,+(W[ix].t0-.04).toFixed(2)))}st.push(tot);
  for(let i=1;i<=n.length;i++)if(st[i]>tot-.5*(n.length-i+1))st[i]=Math.max(st[i-1]+.3,tot-.5*(n.length-i+1));
  VE.sc=s.S.map((x,i)=>({i,d:Math.max(.3,+(st[i+1]-st[i]).toFixed(3)),tr:i?((old.find(c=>c.i==i)||{}).tr||seqT(x)):'corte'}));veLay();return 1}
-function veCutsRot(lv){if(!veNeedWords())return 0;const s=VE.s,W=VE.words,B=[];s.S.forEach((x,i)=>{if(x.cortes)roBeats(x.cortes).forEach(b=>B.push({k:b.k,n:Math.max(1,roWords(b.txt))}))});if(!B.length){stat('⚠ nenhuma tela tem as marcas {zoom} do roteirista');return 0}
+function veCutsRot(lv,pace){if(!veNeedWords())return 0;const s=VE.s,W=VE.words,B=[];s.S.forEach((x,i)=>{if(x.cortes)roBeats(x.cortes).forEach(b=>B.push({k:b.k,n:Math.max(1,roWords(b.txt))}))});if(!B.length){stat('⚠ nenhuma tela tem as marcas {zoom} do roteirista');return 0}
  const I=ZMI[lv]||ZMI.normal,L1=1+.6*I,L2=1+I,L3=1+2*I,R=v=>+v.toFixed(3),N=B.reduce((a,b)=>a+b.n,0),ev=[];let idx=0,cur=1;
  B.forEach(b=>{const ix=Math.min(W.length-1,Math.round(idx*W.length/N)),w=W[ix],t=+Math.max(0,w.t0-.04).toFixed(2),nx=W[Math.min(W.length-1,Math.round((idx+b.n)*W.length/N))],d=Math.max(.3,+((nx&&nx.t0>w.t0?nx.t0:w.t1+.5)-t).toFixed(2));let e;
   if(b.k=='leve')e={t,z:R(L1),k:'key',d};else if(b.k=='forte')e={t,z:R(L3),k:'seco'};else if(b.k=='tira')e={t,z:1,k:'seco'};else if(b.k=='corte')e={t,z:R(cur>=L2-.001?1:L2),k:'seco'};else e={t,z:R(L2),k:'seco'};cur=e.z;ev.push(e);idx+=b.n});
- VE.zm=ev;return ev.length}
-/* cortes pelo tempo da fala: trechos curtos (até maxd s); 1º de cada cena = zoom suave, palavra em MAIÚSCULAS = zoom seco forte, os outros alternam entre dar e tirar zoom */
-function veCutsPlat(lv,maxd){if(!veNeedWords())return 0;const W=VE.words,I=ZMI[lv]||ZMI.normal,L1=1+.6*I,L2=1+I,L3=1+2*I,R=v=>+v.toFixed(3),ev=[];maxd=VEZ(.8,5,+maxd||1.6);let cur=1;
- VE.sc.forEach(c=>{const ws=W.filter(w=>w.t0>=c.t0-.03&&w.t0<c.t0+c.d-.03);if(!ws.length){ev.push({t:+c.t0.toFixed(2),z:1,k:'seco'});cur=1;return}
-  const ch=[];let k0=null;ws.forEach(w=>{const lw=k0?k0.w[k0.w.length-1]:null;if(!k0||w.t1-k0.t0>maxd||k0.w.length>=4||(lw&&/[.!?…,;:]["”')]*$/.test(lw.w)&&lw.t1-k0.t0>=.7)){k0={t0:w.t0,w:[]};ch.push(k0)}k0.w.push(w)});
-  ch.forEach((q,j)=>{const t=j?+Math.max(c.t0,q.t0-.04).toFixed(2):+c.t0.toFixed(2),nx=ch[j+1]?ch[j+1].t0:c.t0+c.d,d=Math.max(.3,+(nx-t).toFixed(2));let e;
-   if(j==0)e={t,z:R(L1),k:'key',d};else if(q.w.some(w=>veCaps(w.w)))e={t,z:R(L3),k:'seco'};else e={t,z:R(cur>=L2-.001?1:L2),k:'seco'};cur=e.z;ev.push(e)})});
- VE.zm=ev;return ev.length}
-function veCutSide(){const o=VE.cut,rot=veHasRot();return`<div class=vesec><b>Cortes automáticos</b><small class=mu>Zoom suave (keyframe) e zoom seco no ritmo da fala. Você escolhe quem decide os cortes e depois ajusta tudo na linha do tempo.</small>
- <div class=veg><label>Quem faz os cortes<select data-vo=who><option value=plat${o.who=='plat'?' selected':''}>🤖 Plataforma (pelo tempo da fala)</option><option value=rot${o.who=='rot'?' selected':''}${rot?'':' disabled'}>✍ Roteirista (marcas {zoom} do roteiro)${rot?'':' — sem marcas'}</option></select></label>
- <label>Força do zoom<select data-vo=lv>${[['leve','Leve'],['normal','Normal'],['forte','Forte']].map(q=>`<option value=${q[0]}${o.lv==q[0]?' selected':''}>${q[1]}</option>`).join('')}</select></label>
- ${o.who=='plat'?`<label>Corte a cada (s, no máx.)<input type=number data-vo=maxd min=.8 max=5 step=.1 value="${o.maxd}"></label>`:''}</div>
- <div class=row><button class=btn data-ve=cuts>✨ Aplicar os cortes</button><button class=chip data-ve=fitsc title="Põe a troca de cada tela exatamente na palavra em que ela começa">↔ Trocar as telas nas palavras certas</button></div>
- <small class=mu>Refaz só os zooms (e, se pedir, as trocas de tela). As legendas e o áudio ficam como estão.</small></div>
- <div class=vesec><b>Ajuste manual</b><small class=mu>Arraste a borda direita de uma cena para mudar onde ela troca. Duplo clique na faixa 🔍 cria um zoom. Selecione para ajustar abaixo.</small>
- <div class=row><button class=chip data-ve=split>✂ Dividir cena no cursor</button><button class=chip data-ve=addzs>🔍 Zoom seco aqui</button><button class=chip data-ve=addzk>🔍 Zoom suave aqui</button><button class=chip data-ve=addz1>↺ Voltar a 1× aqui</button></div></div>`}
+ ev=veCutPace(ev,pace);VE.zm=ev;return ev.length}
 document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('#ve [data-ve]');if(!a)return;const k=a.dataset.ve;
- if(k=='cuts'){const o=VE.cut;let n=o.who=='rot'?veCutsRot(o.lv):veCutsPlat(o.lv,o.maxd);if(n){VE.sel=null;veSave();veTL();veInspUp();veRender();stat('● '+n+' cortes de zoom aplicados ('+(o.who=='rot'?'do roteirista':'pela plataforma')+'): ajuste na linha do tempo')}return}
+ if(k=='cuts'){const o=VE.cut;const pc=o.pace==null?50:o.pace;let n=o.who=='rot'?veCutsRot(o.lv,pc):veCutsPlat(o.lv,pc);if(n){VE.sel=null;veSave();veTL();veInspUp();veRender();stat('● '+n+' cortes de zoom aplicados ('+(o.who=='rot'?'do roteirista':'pela plataforma')+'): ajuste na linha do tempo')}return}
  if(k=='fitsc'){if(veFitScenes()){VE.sel=null;veSave();veTL();veInspUp();veRender();stat('● as trocas de tela agora acontecem na palavra em que cada tela começa')}return}
 },true);
-document.addEventListener('change',e=>{const t=e.target;if(!t||!t.dataset||!t.dataset.vo||!t.closest('#ve'))return;const q=t.dataset.vo;VE.cut[q]=q=='maxd'?VEZ(.8,5,+String(t.value).replace(',','.')||1.6):t.value;veSave();if(q=='who')veUI()});
+document.addEventListener('change',e=>{const t=e.target;if(!t||!t.dataset||!t.dataset.vo||!t.closest('#ve'))return;const q=t.dataset.vo;VE.cut[q]=q=='pace'?VEZ(0,100,+t.value):q=='strong'?(t.checked?1:0):t.value;veSave();if(q=='who'||q=='pace')veUI()});
 
 /* ---------- v207: transcrição no navegador (Whisper via transformers.js), para quando não há roteiro ---------- */
 const VEASR={tiny:['Xenova/whisper-tiny','Rápido (~40 MB)'],base:['Xenova/whisper-base','Melhor (~80 MB)']};
@@ -4887,11 +4855,95 @@ async function veTranscribe(){if(VE.busy)return;if(!VE.au){stat('⚠ carregue o 
   if(!VE.asr||VE.asrk!=key){let last=0;VE.asr=await mod.pipeline('automatic-speech-recognition',VEASR[key][0],{progress_callback:p=>{if(p&&p.status=='progress'&&p.progress!=null){const q=Math.round(p.progress);if(q!=last){last=q;say('🎤 baixando o modelo… '+q+'%')}}}});VE.asrk=key}
   say('🎤 ouvindo o áudio…');const au=await veMono16(VE.au),r=await VE.asr(au,{language:'portuguese',task:'transcribe',return_timestamps:'word',chunk_length_s:30,stride_length_s:5}),ch=(r&&r.chunks)||[];
   const W=[];ch.forEach(c=>{const w=String(c.text||'').trim();if(!w||!/[\p{L}\p{N}]/u.test(w))return;const a=(c.timestamp&&c.timestamp[0])||0,b=(c.timestamp&&c.timestamp[1])||a+.3;W.push({w,t0:+a.toFixed(3),t1:+Math.max(a+.08,b).toFixed(3)})});
-  if(!W.length)throw new Error('não reconheci fala neste áudio');VE.words=W;VE.script=W.map(x=>x.w).join(' ');VE.alInfo='transcrito automaticamente: confira as palavras';veSave();stat('● '+W.length+' palavras reconhecidas: confira e corrija na linha do tempo')}
+  if(!W.length)throw new Error('não reconheci fala neste áudio');veFixWords(W);VE.words=W;VE.script=W.map(x=>x.w).join(' ');VE.alInfo='transcrito automaticamente: confira as palavras';veSave();stat('● '+W.length+' palavras reconhecidas: confira e corrija na linha do tempo')}
  catch(e){console.warn(e);stat('⚠ a transcrição não funcionou: '+(e.message||e));alert('Não consegui transcrever ('+(e.message||e)+'). Precisa de internet na 1ª vez, para baixar o modelo. Você pode colar o roteiro e usar "Alinhar ao áudio".')}
  VE.busy=0;veUI();veTL();veRender()}
 document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('#ve [data-ve=asr]');if(a)veTranscribe()},true);
 document.addEventListener('change',e=>{const t=e.target;if(t&&t.dataset&&t.dataset.vo=='asrm'&&t.closest('#ve'))VE.asrm=t.value},true);
+/* ---------- v208: texto corrido editável (com dicionário que aprende), ritmo da edição e cortes nas sílabas fortes ---------- */
+const veNz=w=>String(w||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^\p{L}\p{N}]/gu,'');
+const veKeepCase=w=>String(w||'').replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu,'');
+const veDicKey=()=>'vedic_'+((VE.s&&VE.s.p&&VE.s.p.co)||'x');
+function veDicGet(){try{const g=G_(veDicKey());return g&&!g.del&&g.ref?JSON.parse(g.ref):{}}catch(e){return{}}}
+function veDicSet(d){try{const cid=(VE.s.p||{}).co;let g=G_(veDicKey());if(!g){g={id:veDicKey(),co:cid,kind:'cfg',name:'vedic',color:'',date:'',ref:'',ts:0,del:0};S.grid.push(g)}g.ref=JSON.stringify(d);g.del=0;touch('g',g)}catch(e){console.warn(e)}}
+/* troca, em todas as palavras, o que o painel já aprendeu que está errado (ex.: "uét clin" → "Wet Clean") */
+function veFixWords(W){const D=veDicGet(),keys=Object.keys(D).map(k=>k.split(' ')).filter(k=>k.length&&k[0]).sort((a,b)=>b.length-a.length);if(!keys.length)return 0;let n=0;
+ for(let i=0;i<W.length;i++){for(const k of keys){const m=k.length;if(i+m>W.length)continue;let ok=1;for(let j=0;j<m;j++)if(veNz(W[i+j].w)!=k[j]){ok=0;break}if(!ok)continue;const right=String(D[k.join(' ')]||'').split(/\s+/).filter(Boolean);if(!right.length)continue;
+   const last=String(W[i+m-1].w),tail=(last.match(/[.,!?…;:"”')]+$/)||[''])[0],lead=(String(W[i].w).match(/^["“'(]+/)||[''])[0],t0=W[i].t0,t1=W[i+m-1].t1,wt=right.map(veSyl),sw=wt.reduce((a,b)=>a+b,0);let t=t0;
+   const nw=right.map((r,q)=>{const d=(t1-t0)*wt[q]/sw,o={w:(q==0?lead:'')+r+(q==right.length-1?tail:''),t0:+t.toFixed(3),t1:+(t+d).toFixed(3)};t+=d;return o});
+   if(nw.map(x=>x.w).join(' ')==W.slice(i,i+m).map(x=>x.w).join(' ')){i+=m-1;break}W.splice(i,m,...nw);i+=nw.length-1;n++;break}}return n}
+/* o texto corrido mudou: acha o que foi trocado/apagado/inserido e reaproveita o tempo das palavras */
+function veApplyText(txt){const nw=String(txt||'').split(/\s+/).filter(w=>/[\p{L}\p{N}]/u.test(w)),old=VE.words,a=old.map(w=>veNz(w.w)),b=nw.map(veNz),n=a.length,m=b.length;
+ const L=Array.from({length:n+1},()=>new Int32Array(m+1));for(let i=n-1;i>=0;i--)for(let j=m-1;j>=0;j--)L[i][j]=a[i]==b[j]?L[i+1][j+1]+1:Math.max(L[i+1][j],L[i][j+1]);
+ const ops=[];let i=0,j=0;while(i<n||j<m){if(i<n&&j<m&&a[i]==b[j]){ops.push(['=',i,j]);i++;j++}else if(i<n&&(j>=m||L[i+1][j]>=L[i][j+1])){ops.push(['-',i,j]);i++}else{ops.push(['+',i,j]);j++}}
+ const out=[],learn=[];let k=0,floor=0;
+ while(k<ops.length){if(ops[k][0]=='='){const o={...old[ops[k][1]],w:nw[ops[k][2]]};if(floor&&o.t0<floor){o.t0=+floor.toFixed(3);if(o.t1<o.t0+.05)o.t1=+(o.t0+.05).toFixed(3)}floor=0;out.push(o);k++;continue}
+  const dels=[],ins=[];while(k<ops.length&&ops[k][0]!='='){if(ops[k][0]=='-')dels.push(ops[k][1]);else ins.push(ops[k][2]);k++}
+  if(dels.length&&ins.length){const t0=old[dels[0]].t0,t1=old[dels[dels.length-1]].t1,ws=ins.map(q=>veSyl(nw[q])),sw=ws.reduce((x,y)=>x+y,0);let t=t0;ins.forEach((q,x)=>{const d=(t1-t0)*ws[x]/sw;out.push({w:nw[q],t0:+t.toFixed(3),t1:+(t+d).toFixed(3)});t+=d});learn.push([dels.map(q=>old[q].w),ins.map(q=>nw[q])])}
+  else if(ins.length){const pv=out[out.length-1],nxo=ops[k]&&ops[k][0]=='='?old[ops[k][1]]:null;let s0=pv?pv.t1:0,e0=nxo?nxo.t0:Math.max(VE.D,s0+.5);const need=.14*ins.length;
+   if(e0-s0<need){if(pv){const take=Math.min(need-(e0-s0),(pv.t1-pv.t0)*.5);pv.t1=+(pv.t1-take).toFixed(3);s0=pv.t1}e0=s0+need;if(nxo&&nxo.t0<e0)floor=e0}
+   const ws=ins.map(q=>veSyl(nw[q])),sw=ws.reduce((x,y)=>x+y,0);let t=s0;ins.forEach((q,x)=>{const d=(e0-s0)*ws[x]/sw;out.push({w:nw[q],t0:+t.toFixed(3),t1:+(t+d).toFixed(3)});t+=d})}}
+ VE.words=out;let ln=0;if(learn.length){const D=veDicGet();learn.forEach(([o,nn])=>{if(o.length>3||nn.length>4)return;const key=o.map(veNz).join(' '),val=nn.map(veKeepCase).join(' ');if(!key||!val)return;if(o.map(veKeepCase).join(' ')==val)return;D[key]=val;ln++});if(ln)veDicSet(D)}
+ const fx=veFixWords(VE.words);VE.script=VE.words.map(w=>w.w).join(' ');veSave();return{learn:ln,fix:fx}}
+/* ---------- picos do áudio (consoantes fortes: T, P, K, B…) ---------- */
+function veOnsets(){const A=VE.au;if(!A)return[];if(VE.onsA===A&&VE.ons)return VE.ons;const c=A.ch[0],sr=A.sr,fr=Math.max(1,Math.round(sr*.004)),nf=Math.floor(c.length/fr),e=new Float32Array(nf);
+ for(let i=0;i<nf;i++){let s=0;for(let j=i*fr+1;j<(i+1)*fr;j++){const d=c[j]-c[j-1];s+=d*d}e[i]=Math.sqrt(s/fr)}
+ const so=Float32Array.from(e).sort(),p90=so[Math.floor(nf*.9)]||0,o=[],W=8;
+ for(let i=W;i<nf-3;i++){let m=0;for(let k=i-W;k<i-1;k++)m+=e[k];m/=(W-1);const v=(e[i]+e[i+1])/2,r=v/(m+p90*.02+1e-6);if(r>2.2&&v>p90*.25){let pk=true;for(let k=Math.max(0,i-8);k<Math.min(nf,i+9);k++)if(e[k]>e[i]){pk=false;break}if(pk)o.push({t:i*fr/sr,s:r})}}
+ const q=[];o.forEach(x=>{const l=q[q.length-1];if(l&&x.t-l.t<.05){if(x.s>l.s)q[q.length-1]=x}else q.push(x)});VE.onsA=A;VE.ons=q;return q}
+/* ---------- cortes pelo tempo da fala, com ritmo (0 calmo … 100 acelerado) e picos do áudio ---------- */
+function veCutsPlat(lv,pace){if(!veNeedWords())return 0;pace=VEZ(0,100,+pace);const W=VE.words,I=ZMI[lv]||ZMI.normal,L1=1+.6*I,L2=1+I,L3=1+2*I,R=v=>+v.toFixed(3),ev=[],maxd=2.8-2*(pace/100),minSp=.95-.5*(pace/100),maxw=Math.round(5-3*(pace/100)),strong=VE.cut.strong!==0,ons=strong?veOnsets():[];
+ const thr=ons.length?(()=>{const s=ons.map(o=>o.s).sort((a,b)=>a-b);return s[Math.min(s.length-1,Math.floor(s.length*(.7-.4*pace/100)))]})():1e9,near=t0=>{let b=null,bd=.15;ons.forEach(o=>{const d=Math.abs(o.t-t0);if(d<bd&&o.s>=thr){bd=d;b=o}});return b};let cur=1;
+ VE.sc.forEach(c=>{const ws=W.filter(w=>w.t0>=c.t0-.03&&w.t0<c.t0+c.d-.03);if(!ws.length){ev.push({t:+c.t0.toFixed(2),z:1,k:'seco'});cur=1;return}
+  const cuts=[];let last=c.t0,cnt=0;
+  ws.forEach((w,wi)=>{let cut=false,tt=w.t0-.04;if(wi==0){cut=true;tt=c.t0}else{const el=w.t0-last,pv=ws[wi-1],pu=/[.!?…,;:]["”')]*$/.test(pv.w),on=strong?near(w.t0):null;if(el>=minSp&&(on||el>=maxd||cnt>=maxw||(pu&&el>=minSp*.9)))cut=true;if(cut&&on)tt=Math.max(c.t0,on.t-.02)}
+   if(!cut){cnt++;return}cuts.push({t:Math.max(c.t0,tt),imp:veCaps(w.w)||(ws[wi+1]&&veCaps(ws[wi+1].w)&&ws[wi+1].t0-w.t1<.2),first:wi==0});last=tt;cnt=1});
+  cuts.forEach((q,j)=>{const t=+q.t.toFixed(2),nx=cuts[j+1]?cuts[j+1].t:c.t0+c.d,d=Math.max(.3,+(nx-t).toFixed(2));let e;if(q.first)e={t,z:R(L1),k:'key',d};else if(q.imp)e={t,z:R(L3),k:'seco'};else e={t,z:R(cur>=L2-.001?1:L2),k:'seco'};cur=e.z;ev.push(e)})});
+ VE.zm=ev;return ev.length}
+function veCutPace(ev,pace){if(pace==null)return ev;if(pace<35){let c=0;ev=ev.filter((e,i)=>{if(e.k=='key')return true;return(c++)%2==0})}else if(pace>70){const o=[];ev.forEach((e,i)=>{o.push(e);const nx=ev[i+1];if(nx&&nx.t-e.t>1.7&&nx.k!='key'){o.push({t:+(e.t+(nx.t-e.t)/2).toFixed(2),z:e.z<1.04?+(1+(ZMI.normal)).toFixed(3):1,k:'seco'})}});ev=o}return ev}
+function veCutSide(){const o=VE.cut,rot=veHasRot(),P=o.pace==null?50:o.pace,pl=P<25?'calmo':P<60?'médio':P<85?'dinâmico':'acelerado';return`<div class=vesec><b>Cortes automáticos</b><small class=mu>Zoom suave (keyframe) e zoom seco no ritmo da fala. Você escolhe quem decide os cortes e o ritmo; depois ajusta tudo na linha do tempo.</small>
+ <div class=veg><label>Quem faz os cortes<select data-vo=who><option value=plat${o.who=='plat'?' selected':''}>🤖 Plataforma (pelo tempo da fala)</option><option value=rot${o.who=='rot'?' selected':''}${rot?'':' disabled'}>✍ Roteirista (marcas {zoom} do roteiro)${rot?'':' — sem marcas'}</option></select></label>
+ <label>Força do zoom<select data-vo=lv>${[['leve','Leve'],['normal','Normal'],['forte','Forte']].map(q=>`<option value=${q[0]}${o.lv==q[0]?' selected':''}>${q[1]}</option>`).join('')}</select></label></div>
+ <label class=vesl>Ritmo da edição: <b>${pl}</b><input type=range min=0 max=100 step=5 data-vo=pace value="${P}"><span class=vesl2><small>menos cortes</small><small>mais cortes</small></span></label>
+ ${o.who=='plat'?`<label class=veck><input type=checkbox data-vo=strong ${o.strong===0?'':'checked'}> cortar nas sílabas fortes (T, P, K, B…) que o painel acha no áudio</label>`:''}
+ <div class=row><button class=btn data-ve=cuts>✨ Aplicar os cortes</button><button class=chip data-ve=fitsc title="Põe a troca de cada tela exatamente na palavra em que ela começa">↔ Trocar as telas nas palavras certas</button></div>
+ <small class=mu>Refaz só os zooms (e, se pedir, as trocas de tela). As legendas e o áudio ficam como estão.</small></div>
+ <div class=vesec><b>Ajuste manual</b><small class=mu>Arraste a borda direita de uma cena para mudar onde ela troca. Duplo clique na faixa 🔍 cria um zoom. Selecione para ajustar abaixo.</small>
+ <div class=row><button class=chip data-ve=split>✂ Dividir cena no cursor</button><button class=chip data-ve=addzs>🔍 Zoom seco aqui</button><button class=chip data-ve=addzk>🔍 Zoom suave aqui</button><button class=chip data-ve=addz1>↺ Voltar a 1× aqui</button></div></div>`}
+/* ---------- aba Legendas: texto corrido no topo ---------- */
+function veLegSide(){const c=VE.cap,n=VE.words.length;
+ return`${n?`<div class=vesec><b>Texto das legendas</b><small class=mu>Corrija direto aqui: apague, troque ou acrescente palavras e o painel reaproveita o tempo de cada uma. Quando você troca uma palavra errada por uma certa, o painel aprende e corrige sozinho nas próximas vezes (e nas outras ocorrências deste vídeo).</small>
+ <textarea id=ve_cap rows=7>${esc(VE.words.map(w=>w.w).join(' '))}</textarea><div class=row><button class=chip data-ve=capok>✔ Aplicar o texto</button><small class=mu>${n} palavras${VE.alInfo?' · '+esc(VE.alInfo):''}${Object.keys(veDicGet()).length?' · '+Object.keys(veDicGet()).length+' correção(ões) aprendida(s)':''}</small>${Object.keys(veDicGet()).length?'<button class=chip data-ve=dicmd>📖 Ver correções</button>':''}</div></div>`:''}
+ <details class=vesec ${n?'':'open'}><summary><b>${n?'Refazer a partir de um roteiro':'Legendas'}</b></summary><small class=mu>Cole o roteiro da fala (o mesmo que foi para o ElevenLabs). O painel acha a fala no áudio e coloca cada palavra no tempo.</small>
+ <textarea id=ve_script rows=6 placeholder="Cole aqui o texto da narração…">${esc(VE.script)}</textarea>
+ <div class=row><button class=chip data-ve=usetxt>📝 Usar os textos das telas</button><button class=btn data-ve=align ${VE.au?'':'disabled'}>🎯 Alinhar ao áudio</button></div>
+ ${VE.au?'':'<small style="color:#ffb86b">Falta o áudio: volte à aba ① Áudio.</small>'}
+ <details><summary class=mu>sem roteiro? deixar o painel ouvir e escrever</summary><div class=veg><label>Modelo<select data-vo=asrm>${Object.keys(VEASR).map(k=>`<option value=${k}${(VE.asrm||'base')==k?' selected':''}>${VEASR[k][1]}</option>`).join('')}</select></label></div><button class=chip data-ve=asr ${VE.au&&!VE.busy?'':'disabled'}>🎤 Transcrever o áudio</button><small class=mu>Roda no seu aparelho, sem custo. Na 1ª vez baixa o modelo (precisa de internet). Pode errar nomes: corrija no texto acima.</small></details></details>
+ <div class=vesec><b>Aparência</b><label class=veck><input type=checkbox data-vc=on ${c.on?'checked':''}> mostrar as legendas no vídeo</label>
+ <div class=veg><label>Estilo pronto<select data-vc=pre><option value="">— escolher —</option>${Object.keys(VEPRE).map(k=>`<option value=${k}>${VEPRE[k].n}</option>`).join('')}</select></label>
+ <label>Fonte<select data-vc=font>${[...new Set([c.font].concat(FONTS.map(f=>f[0])))].map(f=>`<option${f==c.font?' selected':''}>${esc(f)}</option>`).join('')}</select></label>
+ <label>Tamanho<input type=range min=40 max=160 step=2 data-vc=size value="${c.size}"></label>
+ <label>Posição (altura)<input type=range min=.15 max=.9 step=.01 data-vc=y value="${c.y}"></label>
+ <label>Palavras por bloco<input type=number min=1 max=6 data-vc=grp value="${c.grp}"></label>
+ <label>Cor do texto<input type=color data-vc=col value="${c.col}"></label>
+ <label>${c.box?'Cor da caixa':'Cor da palavra falada'}<input type=color data-vc=hi value="${c.hi}"></label>
+ <label>Contorno (${c.sw})<input type=range min=0 max=24 step=1 data-vc=sw value="${c.sw}"></label></div>
+ <div class=row><label class=veck><input type=checkbox data-vc=up ${c.up?'checked':''}> CAIXA ALTA</label><label class=veck><input type=checkbox data-vc=pop ${c.pop?'checked':''}> efeito pop</label><label class=veck><input type=checkbox data-vc=act ${c.act===0?'':'checked'}> pintar a palavra falada</label></div>
+ <button class=chip data-ve=capti title="Usa a fonte e a cor do título da tela que está na prévia">🎨 Pegar fonte e cor do título da tela atual</button></div>`}
+/* ---------- eventos ---------- */
+function veCapApply(){const t=document.getElementById('ve_cap');if(!t)return;const r=veApplyText(t.value);veTL();veRender();veInspUp();stat('● texto das legendas atualizado'+(r.learn?' · aprendi '+r.learn+' correção(ões)':'')+(r.fix?' · '+r.fix+' palavra(s) corrigida(s) pelo que já sabia':''));veUI()}
+document.addEventListener('change',e=>{const t=e.target;if(t&&t.id=='ve_cap'&&t.closest('#ve'))veCapApply()},true);
+document.addEventListener('keydown',e=>{const t=e.target;if(t&&t.id=='ve_cap'&&(e.ctrlKey||e.metaKey)&&e.key=='Enter'){e.preventDefault();t.blur()}},true);
+document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('#ve [data-ve]');if(!a)return;const k=a.dataset.ve;
+ if(k=='capok'){veCapApply();return}
+ if(k=='dicmd'){const D=veDicGet(),ks=Object.keys(D);popAt({clientX:innerWidth/2,clientY:120},`<div class=estp id=vedp style="width:min(420px,94vw);display:grid;gap:6px"><div class=row><b>📖 Correções aprendidas</b><span style="flex:1"></span><button class=cmx data-act=estx aria-label="Fechar">✕</button></div><small class=mu>Quando a fala sair como o da esquerda, o painel escreve o da direita.</small>${ks.map(q=>`<div class=row style="gap:6px"><span style="flex:1">${esc(q)} → <b>${esc(D[q])}</b></span><button class=chip data-vdel="${esc(q)}">🗑</button></div>`).join('')||'<small class=mu>nenhuma</small>'}</div>`);const pp=document.getElementById('pop');if(pp)pp.style.zIndex=520;return}
+},true);
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-vdel]');if(!b||!VE.s)return;const D=veDicGet();delete D[b.dataset.vdel];veDicSet(D);b.parentNode.remove();veUI()},true);
+const VIDCAPMD='\n\n[LEGENDA DO VÍDEO] (obrigatório): este vídeo é narrado e o nosso programa desenha a LEGENDA falada por cima, palavra por palavra (2 a 4 palavras por vez, grande, com a palavra falada pintada). O layout e a legenda precisam se completar:\n- Reserve para a legenda uma FAIXA de largura total centrada em y≈1340 (cerca de 70% da altura), com ~280 px de altura. Dentro dela NÃO coloque texto, rosto, olhos do personagem nem objeto importante. Fundo, textura e formas podem passar por trás se o contraste ficar bom.\n- Faça o layout "conversar" com a legenda: use a mesma fonte da marca (ou uma que combine) e escolha a cor do texto e a cor de destaque (palavra falada) que contrastem com o fundo daquela faixa e venham da paleta. Pode criar uma faixa ou forma atrás dela (id "legenda_faixa") para dar contraste.\n- Os textos da tela (título e apoio) ficam FORA da faixa e NÃO repetem a fala: complementam (palavra-chave, número, pergunta).\n- Na raiz do JSON inclua: "legenda":{"font":"nome de fonte do Google Fonts","color":"#ffffff","highlight":"#hex da palavra falada","y":0.70,"size":84,"style":"karaoke|impacto|limpo|caixa","uppercase":false,"stroke":12}.';
+const vidCapMd=()=>{try{return STU&&STU.p&&(STU.p.type=='reels'||STU.p.type=='video'||veOn(STU))?VIDCAPMD:''}catch(e){return''}};
+function vecapFromJson(s,r){const o={},fx=v=>String(v||'').trim(),hx=v=>/^#[0-9a-f]{6}$/i.test(fx(v))?fx(v):/^#[0-9a-f]{3}$/i.test(fx(v))?'#'+fx(v).slice(1).split('').map(c=>c+c).join(''):'';const st=VEPRE[String(r.style||r.estilo||'').toLowerCase()];if(st){Object.assign(o,st);delete o.n}
+ const f=fx(r.font||r.fonte);if(f)o.font=f;const c=hx(r.color||r.cor);if(c)o.col=c;const h=hx(r.highlight||r.destaque);if(h)o.hi=h;let y=+r.y;if(isFinite(y)&&y>0){if(y>2)y=y/veH(s);o.y=VEZ(.15,.9,y)}const z=+r.size||+r.tamanho;if(z>0)o.size=VEZ(40,160,z);if(r.uppercase!=null||r.caixa_alta!=null)o.up=(r.uppercase||r.caixa_alta)?1:0;const sw=+r.stroke;if(isFinite(sw)&&r.stroke!=null)o.sw=VEZ(0,24,sw);
+ if(!Object.keys(o).length)return;s.S[0].ov=s.S[0].ov||{};s.S[0].ov.vecap={...(s.S[0].ov.vecap||{}),...o};if(s.S[0].ov.ve&&s.S[0].ov.ve.cap)Object.assign(s.S[0].ov.ve.cap,o);try{stjLogAdd(0,'Legenda do vídeo',['O JSON trouxe "legenda": '+JSON.stringify(r).slice(0,200)])}catch(e){}}
 /* ===== v158: selecionar vários posts no calendário (Ctrl/⌘ ou Shift + clique, ou arrastar um retângulo no vazio) e apagar com Delete ===== */
 const PSEL=new Set();
 function pselPaint(){document.querySelectorAll('#m [data-act=editp][data-id]').forEach(el=>el.classList.toggle('psel',PSEL.has(el.dataset.id)));let b=document.getElementById('pselbar');if(!PSEL.size){b&&b.remove();return}if(!b){b=document.createElement('div');b.id='pselbar';document.body.appendChild(b)}b.innerHTML=`<b>${PSEL.size} post${PSEL.size>1?'s':''} selecionado${PSEL.size>1?'s':''}</b><button type=button data-psel=del>🗑 Excluir (Delete)</button><button type=button data-psel=x>✕ Limpar (Esc)</button>`}
@@ -6022,6 +6074,8 @@ Paleta da empresa: ${P}.
 O painel confere sozinho e devolve em "avisos": contraste (mín. 4,5:1 no texto, 3:1 no título grande), tamanho mínimo (texto 36px, título 64px, @ 28px), tamanho pedido x renderizado (alerta se o texto encolher 15% ou mais), texto que vaza da caixa, margens laterais de 60px, zona do Instagram, itens quase alinhados, no máx. 3 fontes, título ≥ 1,35× o texto, excesso de texturas, art_slot escondido, decorativos quase invisíveis (opacidade baixa ou fora da tela), fundo pouco explorado, texto sem margem dentro do papel/etiqueta, texto e papel com rotações diferentes, quadro central (2+ papéis grandes), foto pequena, doodle sem target ou longe do alvo, emoji solto e campos ignorados. Texto que vaza do papel: o painel aumenta o papel sozinho e registra no log. Acerte isso já na primeira versão.
 Depois de montar, use "Copiar imagem + medidas" e cole aqui: eu olho o resultado, corrijo o que estiver colado, pálido ou sobreposto e devolvo o JSON ajustado, também como arquivo para download.${LC}${EX}${RT}
 
+${vidCapMd()}
+
 LEMBRETE FINAL: entregue cada tela como arquivo .json para download (com o nome e o "alvo" pedidos no roteiro), validado, sem colar o JSON no chat e sem gerar imagem.`}
 
 /* copia imagem renderizada (limpa + com caixas medidas) e as medidas; ou o pedido de fundo para o ChatGPT */
@@ -6293,7 +6347,7 @@ function stjFromStu(){const s=STU;return{telas:s.S.map((x,i)=>{const m=(s.lays||
 function stjParse(t){t=String(t||'');const m=t.match(/```json\s*([\s\S]*?)```/i)||t.match(/(\{[\s\S]*"telas"\s*:\s*\[[\s\S]*\})\s*$/)||t.match(/(\{[\s\S]*"layers"\s*:\s*\[[\s\S]*\})\s*$/);if(!m)return null;try{const j=stjNorm((x=>{try{return JSON.parse(x)}catch(e){return JSON.parse(x.replace(/\\\\|\\(.)/g,(q,c)=>c===undefined?q:('"\\/bfnrtu'.includes(c)?q:c)))}})(m[1]));return j&&Array.isArray(j.telas)&&j.telas.some(x=>x&&Array.isArray(x.elementos)&&x.elementos.length)?{j,rest:t.replace(m[0],'').trim()}:null}catch(e){return null}}
 /* v191: objeto desenhado em grupo anima inteiro (as partes não se desmancham) */
 function grpAnimFix(C){const G={};C.forEach(L=>{if(L&&L.grupo)(G[L.grupo]=G[L.grupo]||[]).push(L)});Object.values(G).forEach(M=>{if(M.length<2||M.some(L=>L.ganim))return;const isT=L=>/^(texto|titulo|arroba)$/.test(nrm(L.tipo||'')),part=L=>/^(revelar|desenhar)$/.test(nrm(String(L.anim||''))),A=M.filter(L=>!isT(L)&&L.anim&&!part(L));if(A.length<2)return;const f=A[0],ga={anim:f.anim,animDur:f.animDur,animDelay:Math.min(...A.map(L=>+L.animDelay||0)),...(f.loop?{loop:f.loop,loopP:f.loopP,loopA:f.loopA}:{})};A.forEach(L=>{delete L.anim;delete L.animDur;delete L.animDelay;delete L.loop;delete L.loopP;delete L.loopA});M.forEach(L=>L.ganim=ga)});return C}
-async function stjApply(j,off){const s=STU;j=stjNorm(j);if(!s||!j||!Array.isArray(j.telas))return;const cid=s.p.co,ROT=[];j.telas.forEach((t,i0)=>{const i=i0+(+off||0);if(!t||!Array.isArray(t.elementos)||!t.elementos.length)return;let x=s.S[i];if(!x){x={t:'',b:[],ov:{}};s.S.push(x)}const C=grpAnimFix(t.elementos.slice().sort((a,b)=>stjNum(a.z,0)-stjNum(b.z,0)).map(e=>stjEl2Cam(e,cid)));x.mod={fundo:t.fundo||'fundo',camadas:C};if(t._vd!=null){x.ov=x.ov||{};x.ov.sdur=Math.max(.8,Math.min(8,+t._vd||2.5));x.ov.str=t._vt||'fade';if(t._vseq)x.ov.vseq=1}s._src=s._src||{};if(t._src){s._src[i]=t._src;x.ov=x.ov||{};x.ov.jt=Date.now()}else delete s._src[i];s._ctx=s._ctx||{};s._ctx[i]=t._ctx||'';x.lay='mod';s.lays=s.lays||[];s.lays[i]='mod';x.extra=[];if(t._rot){x.t=t._rot.t;x.b=t._rot.b.slice();ROT.push([i,t._rot])}const tx=t.elementos.filter(e=>nrm(e.tipo||'')=='texto').sort((a,b)=>stjNum(a.y,0)-stjNum(b.y,0));if(!x.t&&tx[0])x.t=String(tx[0].texto||'').slice(0,80)});
+async function stjApply(j,off){const s=STU;const rawLg=(()=>{const f=o=>o&&typeof o=='object'&&!Array.isArray(o)&&(o.legenda||o.caption);let r=f(j);if(!r&&Array.isArray(j))r=j.map(f).find(Boolean);if(!r&&j&&Array.isArray(j.telas))r=j.telas.map(f).find(Boolean);return r&&typeof r=='object'?r:null})();if(rawLg&&s)vecapFromJson(s,rawLg);j=stjNorm(j);if(!s||!j||!Array.isArray(j.telas))return;const cid=s.p.co,ROT=[];j.telas.forEach((t,i0)=>{const i=i0+(+off||0);if(!t||!Array.isArray(t.elementos)||!t.elementos.length)return;let x=s.S[i];if(!x){x={t:'',b:[],ov:{}};s.S.push(x)}const C=grpAnimFix(t.elementos.slice().sort((a,b)=>stjNum(a.z,0)-stjNum(b.z,0)).map(e=>stjEl2Cam(e,cid)));x.mod={fundo:t.fundo||'fundo',camadas:C};if(t._vd!=null){x.ov=x.ov||{};x.ov.sdur=Math.max(.8,Math.min(8,+t._vd||2.5));x.ov.str=t._vt||'fade';if(t._vseq)x.ov.vseq=1}s._src=s._src||{};if(t._src){s._src[i]=t._src;x.ov=x.ov||{};x.ov.jt=Date.now()}else delete s._src[i];s._ctx=s._ctx||{};s._ctx[i]=t._ctx||'';x.lay='mod';s.lays=s.lays||[];s.lays[i]='mod';x.extra=[];if(t._rot){x.t=t._rot.t;x.b=t._rot.b.slice();ROT.push([i,t._rot])}const tx=t.elementos.filter(e=>nrm(e.tipo||'')=='texto').sort((a,b)=>stjNum(a.y,0)-stjNum(b.y,0));if(!x.t&&tx[0])x.t=String(tx[0].texto||'').slice(0,80)});
  if(j.telas.some(t=>t&&t._vseq)){const end=(+off||0)+j.telas.length;if(s.S.length>end){s.S.length=end;if(s.lays&&s.lays.length>end)s.lays.length=end}}
  if(ROT.length){let cap=($('#sttx')?$('#sttx').value:s.p.cap)||'';ROT.forEach(r=>{cap=stjCapSet(cap,r[0],r[1].t,r[1].b)});s.p.cap=cap;const ta=$('#sttx');if(ta)ta.value=cap;const mc=$('#mcap');if(mc){mc.value=cap;mc.dispatchEvent(new Event('input',{bubbles:true}))}}
  const IG=[...new Set(j.telas.flatMap(t=>(t&&t._ign)||[]))],AV=[...new Set(j.telas.flatMap(t=>(t&&t._av)||[]))],AVS=(IG.length?' ⚠ ignorei: '+IG.slice(0,8).join(', ')+(IG.length>8?' …':''):'')+(j.telas.some(t=>t&&t._rot!==undefined||t&&t._av)?' (carrossel lido, textos na caixa "Texto das telas"'+(AV.length?'; não consegui desenhar: '+AV.join(', '):'')+')':'');s.ign=IG;
