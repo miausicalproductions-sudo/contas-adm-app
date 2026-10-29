@@ -1017,7 +1017,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:206*/const PV=206;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:207*/const PV=207;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -4799,6 +4799,7 @@ function veLegSide(){const c=VE.cap,n=VE.words.length;
  <textarea id=ve_script rows=6 placeholder="Cole aqui o texto da narração…">${esc(VE.script)}</textarea>
  <div class=row><button class=chip data-ve=usetxt>📝 Usar os textos das telas</button><button class=btn data-ve=align ${VE.au?'':'disabled'}>🎯 Alinhar ao áudio</button></div>
  ${VE.au?'':'<small style="color:#ffb86b">Falta o áudio: volte à aba ① Áudio.</small>'}
+ <details><summary class=mu>sem roteiro? deixar o painel ouvir e escrever</summary><div class=veg><label>Modelo<select data-vo=asrm>${Object.keys(VEASR).map(k=>`<option value=${k}${(VE.asrm||'base')==k?' selected':''}>${VEASR[k][1]}</option>`).join('')}</select></label></div><button class=chip data-ve=asr ${VE.au&&!VE.busy?'':'disabled'}>🎤 Transcrever o áudio</button><small class=mu>Roda no seu aparelho, sem custo. Na 1ª vez baixa o modelo (precisa de internet). Pode errar nomes: corrija nas palavras da linha do tempo.</small></details>
  ${n?`<small class=mu>${n} palavras na linha do tempo${VE.alInfo?' · '+esc(VE.alInfo):''}. Clique numa palavra para corrigir o texto ou o tempo.</small>`:''}</div>
  <div class=vesec><b>Aparência</b><label class=veck><input type=checkbox data-vc=on ${c.on?'checked':''}> mostrar as legendas no vídeo</label>
  <div class=veg><label>Estilo pronto<select data-vc=pre><option value="">— escolher —</option>${Object.keys(VEPRE).map(k=>`<option value=${k}>${VEPRE[k].n}</option>`).join('')}</select></label>
@@ -4877,6 +4878,20 @@ document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest
 },true);
 document.addEventListener('change',e=>{const t=e.target;if(!t||!t.dataset||!t.dataset.vo||!t.closest('#ve'))return;const q=t.dataset.vo;VE.cut[q]=q=='maxd'?VEZ(.8,5,+String(t.value).replace(',','.')||1.6):t.value;veSave();if(q=='who')veUI()});
 
+/* ---------- v207: transcrição no navegador (Whisper via transformers.js), para quando não há roteiro ---------- */
+const VEASR={tiny:['Xenova/whisper-tiny','Rápido (~40 MB)'],base:['Xenova/whisper-base','Melhor (~80 MB)']};
+async function veMono16(A){const n=A.ch[0].length,m=new Float32Array(n);for(let c=0;c<A.ch.length;c++){const d=A.ch[c];for(let i=0;i<n;i++)m[i]+=d[i]/A.ch.length}
+ const ab=new AudioBuffer({length:n,sampleRate:A.sr,numberOfChannels:1});ab.copyToChannel(m,0);const oc=new OfflineAudioContext(1,Math.ceil(n/A.sr*16000),16000),src=oc.createBufferSource();src.buffer=ab;src.connect(oc.destination);src.start();return(await oc.startRendering()).getChannelData(0)}
+async function veTranscribe(){if(VE.busy)return;if(!VE.au){stat('⚠ carregue o áudio primeiro (aba ① Áudio)');return}VE.busy=1;const key=VE.asrm||'base',btn=()=>document.querySelector('#ve [data-ve=asr]'),say=t=>{stat(t);const b=btn();if(b)b.textContent=t};
+ try{say('🎤 preparando o reconhecimento de fala…');const imp=window.VE_IMPORT||(u=>import(u)),mod=await imp('https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2');try{mod.env.allowLocalModels=false}catch(e){}
+  if(!VE.asr||VE.asrk!=key){let last=0;VE.asr=await mod.pipeline('automatic-speech-recognition',VEASR[key][0],{progress_callback:p=>{if(p&&p.status=='progress'&&p.progress!=null){const q=Math.round(p.progress);if(q!=last){last=q;say('🎤 baixando o modelo… '+q+'%')}}}});VE.asrk=key}
+  say('🎤 ouvindo o áudio…');const au=await veMono16(VE.au),r=await VE.asr(au,{language:'portuguese',task:'transcribe',return_timestamps:'word',chunk_length_s:30,stride_length_s:5}),ch=(r&&r.chunks)||[];
+  const W=[];ch.forEach(c=>{const w=String(c.text||'').trim();if(!w||!/[\p{L}\p{N}]/u.test(w))return;const a=(c.timestamp&&c.timestamp[0])||0,b=(c.timestamp&&c.timestamp[1])||a+.3;W.push({w,t0:+a.toFixed(3),t1:+Math.max(a+.08,b).toFixed(3)})});
+  if(!W.length)throw new Error('não reconheci fala neste áudio');VE.words=W;VE.script=W.map(x=>x.w).join(' ');VE.alInfo='transcrito automaticamente: confira as palavras';veSave();stat('● '+W.length+' palavras reconhecidas: confira e corrija na linha do tempo')}
+ catch(e){console.warn(e);stat('⚠ a transcrição não funcionou: '+(e.message||e));alert('Não consegui transcrever ('+(e.message||e)+'). Precisa de internet na 1ª vez, para baixar o modelo. Você pode colar o roteiro e usar "Alinhar ao áudio".')}
+ VE.busy=0;veUI();veTL();veRender()}
+document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('#ve [data-ve=asr]');if(a)veTranscribe()},true);
+document.addEventListener('change',e=>{const t=e.target;if(t&&t.dataset&&t.dataset.vo=='asrm'&&t.closest('#ve'))VE.asrm=t.value},true);
 /* ===== v158: selecionar vários posts no calendário (Ctrl/⌘ ou Shift + clique, ou arrastar um retângulo no vazio) e apagar com Delete ===== */
 const PSEL=new Set();
 function pselPaint(){document.querySelectorAll('#m [data-act=editp][data-id]').forEach(el=>el.classList.toggle('psel',PSEL.has(el.dataset.id)));let b=document.getElementById('pselbar');if(!PSEL.size){b&&b.remove();return}if(!b){b=document.createElement('div');b.id='pselbar';document.body.appendChild(b)}b.innerHTML=`<b>${PSEL.size} post${PSEL.size>1?'s':''} selecionado${PSEL.size>1?'s':''}</b><button type=button data-psel=del>🗑 Excluir (Delete)</button><button type=button data-psel=x>✕ Limpar (Esc)</button>`}
