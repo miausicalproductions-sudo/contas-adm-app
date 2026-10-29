@@ -225,6 +225,7 @@ html.edmob,html.edmob body{overflow:hidden!important;overscroll-behavior:none}ht
 .pstxa{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px;max-height:220px;overflow:auto}.pstxc{display:grid;gap:4px;padding:6px;border:1px solid #2e2e2e;border-radius:4px}.pstxc.on{border-color:#2d7dd2}
 .pstxc input,.pstxc textarea{background:#2b2b2b;color:#eee;border:1px solid #1e1e1e;border-radius:3px;font:inherit;font-size:12px;padding:4px 6px;width:100%;box-sizing:border-box;resize:vertical}
 .psfile{position:relative}.psfb{background:none;border:0;color:#f0f0f0;font:inherit;font-size:12.5px;padding:4px 10px;border-radius:3px;cursor:pointer}.psfb:hover{background:#555}
+.psfdd details.psgp>summary{padding:7px 14px;cursor:pointer;font-size:12.5px;font-weight:600;list-style:none}.psfdd details.psgp>summary::-webkit-details-marker{display:none}.psfdd details.psgp>summary::after{content:" ▸";opacity:.5}.psfdd details.psgp[open]>summary::after{content:" ▾"}.psfdd details.psgp[open]{background:#0000000a;padding-bottom:4px}.psfdd details.psgp>button,.psfdd details.psgp>label{padding-left:26px}
 .psfdd{position:absolute;left:0;top:100%;z-index:20;background:#f3f3f3;color:#222;border:1px solid #999;box-shadow:0 8px 24px #0006;min-width:330px;padding:4px 0;display:grid;max-height:70vh;overflow:auto}.psfdd[hidden]{display:none}
 .psfdd button{background:none;border:0;text-align:left;font:inherit;font-size:12.5px;padding:6px 14px;cursor:pointer;display:flex;gap:10px;color:#222;align-items:center}.psfdd button:hover{background:#2d7dd2;color:#fff}.psfdd kbd{margin-left:auto;opacity:.6;font:inherit;font-size:11px}.psfdd small{padding:0 14px 5px 36px;opacity:.65;font-size:11px}.psfdd hr{border:0;border-top:1px solid #ccc;margin:4px 0;width:100%}
 .vrh{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.vrh h1{margin:0}.vrtb{display:flex;gap:4px;border-bottom:1px solid var(--ln);margin:6px 0 10px;flex-wrap:wrap}.vrtb button{border:0;background:none;padding:8px 12px;font:inherit;font-weight:700;color:var(--mut);cursor:pointer;border-bottom:2px solid transparent}.vrtb button.on{color:var(--ink);border-color:var(--ac)}
@@ -1001,7 +1002,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:202*/const PV=202;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:203*/const PV=203;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -4877,19 +4878,36 @@ async function edPsd(){const s=STU,i=EDX.i,x=s.S[i],W=1080,H=s.fmt=='st'?1920:13
   if(msg)alert('PSD gerado. '+msg)
  }catch(e){PSD_CAP=null;alert('Não consegui exportar o PSD: '+(e&&e.message||e))}
  finally{PSD_CAP=null;PSD_TXT=null;try{edDraw()}catch(e){}}}
-const edFileMenu=()=>{const s=STU,M=mdlList(s.p.co);return`<div class=psfile><button type=button class=psfb data-act=edfmenu>Arquivo ▾</button><div class=psfdd hidden>
- <button type=button data-act=edfile data-v=jguia title="Copia o guia com o roteiro: se este post é de um dia do Cronograma, vai o pedido do dia inteiro (todas as telas)">📋 Copiar ${STU.p.cron||STU._crp?'pedido do dia inteiro':'guia + roteiro'} para a IA</button>${STU.p.cron||STU._crp?'<button type=button data-act=edfile data-v=jguia1>📋 Copiar só esta tela</button>':''}<small>já vai com os textos das telas deste post e as lições da empresa; a IA devolve só o JSON das camadas</small>
- <button type=button data-act=edvis>🎨 Estilo visual deste post…<kbd>${esc(((visAll().find(z=>z.id==((STU.S[0].ov||{}).visual||(artCfg(STU.p.co)||{}).visual))||{}).n)||'livre')}</kbd></button><button type=button data-act=edlic>📝 Lições da empresa para a IA…</button><small>o que a IA aprendeu com os logs; vai em todo pedido de telas</small>
- <button type=button data-act=edfile data-v=jlog title="Copia o que o painel fez com o JSON (campos ignorados, avisos, tamanhos de texto) para mandar à IA">📜 Log do painel (copiar para a IA)</button><small>o que o painel fez com o JSON: ignorados, avisos, tamanhos de texto</small><hr>
- <button type=button data-act=edfile data-v=save>💾 Salvar projeto<kbd>Ctrl+S</kbd></button><small>guarda as telas, o layout e os textos no post, sem fechar${s.svd?' · último: '+s.svd:''}</small>
- <button type=button data-act=edfile data-v=arts>📤 Salvar as artes no post<kbd>Ctrl+Shift+S</kbd></button><small>gera as imagens, manda para o Drive e fecha o estúdio</small>
+const edFileMenu=()=>{const s=STU,M=mdlList(s.p.co),dia=!!(STU.p.cron||STU._crp);return`<div class=psfile><button type=button class=psfb data-act=edfmenu>Arquivo ▾</button><div class=psfdd hidden>
+ <button type=button data-act=edfile data-v=save>💾 Salvar projeto<kbd>Ctrl+S</kbd></button>
+ <button type=button data-act=edfile data-v=arts>📤 Salvar as artes no post<kbd>Ctrl+Shift+S</kbd></button>
  <button type=button data-act=edfile data-v=dl>⬇ Baixar as artes</button>
- <button type=button data-act=edfile data-v=psd>🎨 Exportar PSD (Photoshop)</button><small>cada camada vira uma camada do PSD, com a ordem e os grupos</small><hr>
- <button type=button data-act=edlaysave>💾 Salvar layout (esta tela)…</button><small>vira opção no seletor Layout desta empresa</small>
- <button type=button data-act=edfile data-v=jexp>🧾 Exportar JSON das telas</button> <button type=button data-act=edfile data-v=jmed title="Copia as medidas reais de cada camada e os avisos de sobreposição/zona do Instagram">📐 Copiar medidas</button> <button type=button data-act=edfile data-v=jimg title="Copia uma imagem (limpa + com as caixas medidas) junto com as medidas, para a IA ver o resultado e corrigir">🖼️ Copiar imagem + medidas</button> <button type=button data-act=edfile data-v=jgpt title="Copia a imagem de TODAS as telas + o contexto de cada uma, para o ChatGPT gerar os fundos um por vez, em ordem">🎨 Pedir fundos ao ChatGPT (todas as telas)</button> <button type=button data-act=edfile data-v=jgpt1 title="Copia só a tela aberta + um pedido pronto para o ChatGPT gerar só a arte de fundo, sem texto">🎨 Pedir fundo só desta tela</button> <button type=button data-act=edfile data-v=jex title="Guarda esta arte (o JSON da IA) como exemplo bom: ela entra no guia dos próximos pedidos">⭐ Salvar como exemplo bom</button> <button type=button data-act=edfile data-v=jexl title="Ver e apagar os exemplos aprovados deste cliente">📚 Exemplos aprovados</button>  <label class=psfjl>📂 Abrir JSON das telas<input type=file accept=".json,application/json" hidden id=stjf multiple></label>  <label class=psfjl>🖼 Importar PSD (esta tela)<input type=file accept=".psd" hidden id=stpsd></label><small>camadas viram elementos: texto vira texto, camada FOTO vira a foto do cliente, o resto vira figurinha</small><hr>
- <button type=button data-act=edfile data-v=mdlnew>🧩 Salvar como modelo novo…</button><small>o layout, as posições e as cores destas telas, para usar em outros posts</small>
+ <hr>
+ <details class=psgp><summary>🤖 IA e JSON</summary>
+ <button type=button data-act=edfile data-v=jguia title="Copia o guia com o roteiro: se este post é de um dia do Cronograma, vai o pedido do dia inteiro">📋 Copiar ${dia?'pedido do dia inteiro':'guia + roteiro'}</button>${dia?'<button type=button data-act=edfile data-v=jguia1>📋 Copiar só esta tela</button>':''}
+ <button type=button data-act=edfile data-v=jgpt title="Copia a imagem de TODAS as telas + o contexto de cada uma, para o ChatGPT gerar os fundos">🎨 Pedir fundos ao ChatGPT (todas)</button>
+ <button type=button data-act=edfile data-v=jgpt1 title="Copia só a tela aberta + um pedido pronto para o ChatGPT gerar só a arte de fundo, sem texto">🎨 Pedir fundo só desta tela</button>
+ <button type=button data-act=edfile data-v=jimg title="Copia uma imagem (limpa + com as caixas medidas) junto com as medidas, para a IA ver o resultado e corrigir">🖼️ Copiar imagem + medidas</button>
+ <button type=button data-act=edfile data-v=jmed title="Copia as medidas reais de cada camada e os avisos de sobreposição/zona do Instagram">📐 Copiar medidas</button>
+ <button type=button data-act=edfile data-v=jlog title="Copia o que o painel fez com o JSON (campos ignorados, avisos, edições manuais) para mandar à IA">📜 Log do painel</button>
+ <button type=button data-act=edvis>🎨 Estilo visual deste post…<kbd>${esc(((visAll().find(z=>z.id==((STU.S[0].ov||{}).visual||(artCfg(STU.p.co)||{}).visual))||{}).n)||'livre')}</kbd></button>
+ <button type=button data-act=edlic title="O que a IA aprendeu com os logs; vai em todo pedido de telas">📝 Lições da empresa para a IA…</button>
+ <button type=button data-act=edfile data-v=jex title="Guarda esta arte (o JSON da IA) como exemplo bom: ela entra no guia dos próximos pedidos">⭐ Salvar como exemplo bom</button>
+ <button type=button data-act=edfile data-v=jexl title="Ver e apagar os exemplos aprovados deste cliente">📚 Exemplos aprovados</button>
+ <button type=button data-act=edfile data-v=jexp>🧾 Exportar JSON das telas</button>
+ <label class=psfjl>📂 Abrir JSON das telas<input type=file accept=".json,application/json" hidden id=stjf multiple></label>
+ </details>
+ <details class=psgp><summary>🧩 Layout e modelos</summary>
+ <button type=button data-act=edlaysave title="Vira opção no seletor Layout desta empresa">💾 Salvar layout (esta tela)…</button>
+ <button type=button data-act=edfile data-v=mdlnew title="O layout, as posições e as cores destas telas, para usar em outros posts">🧩 Salvar como modelo novo…</button>
  ${s.mdl?`<button type=button data-act=edfile data-v=mdlren>✏️ Renomear o modelo “${esc(s.mdl)}”</button><button type=button data-act=edfile data-v=mdldup>⧉ Variação de “${esc(s.mdl)}”</button><button type=button data-act=edfile data-v=mdlsave>💾 Atualizar o modelo “${esc(s.mdl)}” com estas telas</button>`:''}
- ${M.length?`<hr><small style="padding-left:14px">Aplicar um modelo da empresa:</small>${M.map(m=>`<button type=button data-act=edfile data-v="mdl:${esc(m.n)}">${m.n==s.mdl?'✓ ':'　'}${esc(m.n)} <kbd>${m.S.length} tela${m.S.length>1?'s':''}</kbd></button>`).join('')}`:''}<hr>
+ ${M.length?`<small style="padding-left:14px">Aplicar um modelo da empresa:</small>${M.map(m=>`<button type=button data-act=edfile data-v="mdl:${esc(m.n)}">${m.n==s.mdl?'✓ ':'　'}${esc(m.n)} <kbd>${m.S.length} tela${m.S.length>1?'s':''}</kbd></button>`).join('')}`:''}
+ </details>
+ <details class=psgp><summary>📦 Photoshop (PSD)</summary>
+ <button type=button data-act=edfile data-v=psd title="Cada camada vira uma camada do PSD, com a ordem e os grupos">🎨 Exportar PSD</button>
+ <label class=psfjl title="Texto vira texto, camada FOTO vira a foto do cliente, o resto vira figurinha">🖼 Importar PSD (esta tela)<input type=file accept=".psd" hidden id=stpsd></label>
+ </details>
+ <hr>
  <button type=button data-act=edfile data-v=close>✕ Fechar o editor<kbd>Esc</kbd></button></div></div>`};
 function edSaveProj(){const s=STU;if(!s)return;try{stSyncText()}catch(e){}try{telaSave()}catch(e){console.warn(e)}
  if(MD){try{const p=collect();if(p.date){if(MD.isNew){S.posts.push(p);MD.isNew=false}touch('p',p)}}catch(e){console.warn(e)}}
