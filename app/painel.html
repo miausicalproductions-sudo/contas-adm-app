@@ -1020,7 +1020,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:216*/const PV=216;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:217*/const PV=217;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -5094,7 +5094,7 @@ document.addEventListener('click',async e=>{const a=e.target.closest&&e.target.c
 /* ===== v216: pedido para o ChatGPT criar as IMAGENS de todas as telas de uma vez (cenário ilustrado a partir do roteiro) ===== */
 function imgsPedido(s){const n=s.S.length,co=(s.c&&s.c.name)||'a empresa';let pal='';try{const q=palDef(artCfg(s.p.co));pal=`principal ${q.c1}, apoio ${q.c2}, destaque ${q.c3}, fundo ${q.bg}`}catch(e){}
  const tela=s.S.map((x,i)=>{const tx=[x.t].concat(x.b||[]).map(v=>String(v||'').replace(/\*/g,'').trim()).filter(Boolean).join(' / ');const fala=x.cortes?(typeof veScrTxt=='function'?veScrTxt(x).replace(/\*/g,''):''):'';return `TELA ${i+1}: ${tx||'(sem texto ainda)'}${fala&&fala!=tx?'\n   fala/roteiro: '+fala:''}`}).join('\n');
- return `TAREFA: gere ${n} IMAGENS (uma por tela), uma de cada vez, na ordem, cada uma em formato VERTICAL 9:16 (1080×1920). Depois de cada imagem pode responder só "ok, tela N". Gere TODAS, sem pedir confirmação.
+ return `TAREFA: gere ${n} IMAGENS (uma por tela), uma de cada vez, na ordem, cada uma em formato VERTICAL 9:16 (1080×1920). Depois de cada imagem pode responder só "ok, tela N". Gere EXATAMENTE ${n} imagens (nem mais, nem menos) e PARE depois da tela ${n}: não invente telas extras, não faça variações nem carrossel. Sem pedir confirmação.
 
 EMPRESA: ${co}${pal?'\nPALETA BASE (adapte ao clima de cada tela, sem perder a identidade): '+pal:''}
 TEMA/ASSUNTO: ${s.p.txt||'(siga o roteiro abaixo)'}
