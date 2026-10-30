@@ -1020,7 +1020,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:222*/const PV=222;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:223*/const PV=223;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -5409,7 +5409,9 @@ const edFileMenu=()=>{const s=STU,M=mdlList(s.p.co),dia=!!(STU.p.cron||STU._crp)
  <hr>
  <details class=psgp><summary>🤖 IA e JSON</summary>
  <button type=button data-act=edfile data-v=jguia title="Copia o guia com o roteiro: se este post é de um dia do Cronograma, vai o pedido do dia inteiro">📋 Copiar ${dia?'pedido do dia inteiro':'guia + roteiro'}</button>${dia?'<button type=button data-act=edfile data-v=jguia1>📋 Copiar só esta tela</button>':''}
+ <label class=psfjl>📂 Abrir JSON das telas<input type=file accept=".json,application/json" hidden id=stjf multiple></label>
  <button type=button data-act=edref title="Mostra a imagem original ao lado do JSON desenhado, com um mapa de diferenças, e copia um pedido de correção para a IA">🔍 Comparar com a imagem original…</button>
+ <details class=psgp><summary>⚙ Avançado (raramente)</summary>
  <button type=button data-act=edrefreq title="Copia a imagem original + um pedido para a IA reproduzi-la o mais fiel possível em JSON">🖼 Pedido: imagem → JSON</button>
  <button type=button data-act=edjfala title="O painel levanta as frases e os tempos da fala e pede à IA que decida quantas telas o vídeo precisa">🎙 Pedir as telas pela fala</button>
  <button type=button data-act=edfile data-v=jgpt title="Copia a imagem de TODAS as telas + o contexto de cada uma, para o ChatGPT gerar os fundos">🎨 Pedir fundos ao ChatGPT (todas)</button>
@@ -5422,7 +5424,7 @@ const edFileMenu=()=>{const s=STU,M=mdlList(s.p.co),dia=!!(STU.p.cron||STU._crp)
  <button type=button data-act=edfile data-v=jex title="Guarda esta arte (o JSON da IA) como exemplo bom: ela entra no guia dos próximos pedidos">⭐ Salvar como exemplo bom</button>
  <button type=button data-act=edfile data-v=jexl title="Ver e apagar os exemplos aprovados deste cliente">📚 Exemplos aprovados</button>
  <button type=button data-act=edfile data-v=jexp>🧾 Exportar JSON das telas</button>
- <label class=psfjl>📂 Abrir JSON das telas<input type=file accept=".json,application/json" hidden id=stjf multiple></label>
+ </details>
  </details>
  <details class=psgp><summary>🧩 Layout e modelos</summary>
  <button type=button data-act=edlaysave title="Vira opção no seletor Layout desta empresa">💾 Salvar layout (esta tela)…</button>
