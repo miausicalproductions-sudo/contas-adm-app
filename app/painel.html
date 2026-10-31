@@ -1020,7 +1020,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:234*/const PV=234;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:235*/const PV=235;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -1544,6 +1544,9 @@ async function igFetch(p){const d=await api({action:'storyData',id:p.id}),L=[];f
 async function igPrefetch(){if(!IGN())return;const now=Date.now(),lim=now+36*36e5;   /* as artes dos Stories das próximas 36 h ficam guardadas no celular */
  for(const p of live('posts').filter(p=>p.type=='stories'&&p.st!='postado'&&p.date&&p.time&&!['fila','publicando','ok'].includes(p.ig))){const[h,m]=String(p.time).split(':').map(Number),t=dt(p.date);t.setHours(h,m||0,0,0);if(t<now-36e5||t>lim||(IGF[p.id]&&IGF[p.id].length))continue;try{await igFetch(p)}catch(e){console.warn('arte',e)}}}
 if(IGN()){setTimeout(igPrefetch,20000);setInterval(igPrefetch,30*60000)}
+async function igGalAll(p){try{stat('baixando as telas…');const d=await api({action:'storyData',id:p.id}),L=(d.files||[]).filter(f=>/^(image|video)\//.test(f.mime));if(!L.length)return alert('Este post ainda não tem arte no Drive.');let n=0,err='';
+ for(const f of L){try{const r=await api({action:'fileGet',post:p.id,id:f.id});await igc('gallery',{name:(f.id+'_'+f.name).replace(/[^\w.-]+/g,'_'),data:r.b64,mime:f.mime,album:'Studios Miau'});n++}catch(x){err=String(x&&x.message||x)}}
+ if(n)stat('● '+n+' arquivo'+(n>1?'s':'')+' na galeria (Imagens/Studios Miau ou Filmes/Studios Miau)');if(err&&!n)alert('Não consegui salvar: '+err)}catch(x){alert('Não consegui baixar: '+(x&&x.message||x))}}
 async function igStory(p,quiet){   /* manda a arte para o editor de Stories do Instagram */
  if(IGN()){try{let L=IGF[p.id];if(!L||!L.length){stat('baixando a arte…');L=await igFetch(p)}if(!L.length){if(!quiet)alert('Este post ainda não tem arte no Drive.');return false}
    await igc('share',{path:L[0].path,type:L[0].mime||'image/*',appId:IGAPP});if(L.length>1)stat('● este Story tem '+L.length+' telas: depois de postar a 1ª, toque de novo para as próximas');return true}
@@ -3159,6 +3162,7 @@ document.addEventListener('click',async e=>{const g=e.target.closest('[data-go]'
  if(act=='upchk'){upCheck(true);return}if(act=='upgo'){location.reload();return}
  if(act&&act.startsWith('wa')&&WAA[act]){WAA[act](a,e);return}
  if(act&&AVA[act]){AVA[act](a,e);return}if(act&&RQA[act]){RQA[act](a,e);return}if(act&&ROA[act]){ROA[act](a,e);return}
+ if(act=='igdl'){if(!MD)return;const p=collect();igGalAll(p);return}
  if(act=='igst'){if(!MD)return;const p=collect();igStory(p);return}
  if(act=='aprsend'||act=='aprok'||act=='aprclr'){aprAct(act);return}
  if(act=='ntfask'){if(CAPN()){NTOK=null;NTS='';lnc('requestPermissions').then(()=>{NTOK=null;ntfSync();render()})}else if('Notification' in window)Notification.requestPermission().then(()=>render());return}
@@ -5938,7 +5942,7 @@ function igPostBox(p){const g=(S.ig||{})[p.co],mn=AVS&&AVS.min!==undefined?+AVS.
  const auto=p.ig=='fila',noAuto=!g?'conecte o Instagram da empresa para postar sozinho':p.fig?'tem figurinha: o Instagram não deixa postar sozinho':'',w=igWarn(p);
  return`<div class="igp${p.ig=='erro'?' err':''}"><span class=lb>Como vai ser postado</span>${p.ig=='erro'?`<b style="color:#C62F4A">Não publicou: ${esc(p.igerr||'erro desconhecido')}</b>`:''}
  <div class=pmode><button type=button data-act=pmode data-v=me class="${auto?'':'on'}"><b>📲 Eu posto</b><small>${av}, no celular: um toque e a arte abre no Instagram</small></button><button type=button data-act=pmode data-v=auto class="${auto?'on':''}"${noAuto?` disabled title="${esc(noAuto)}"`:''}><b>🤖 Posta sozinho</b><small>${noAuto?esc(noAuto):'no dia e horário do post'+(g?' no @'+esc(g.user):'')}</small></button></div>
- <input type=checkbox id=mig hidden${auto?' checked':''}>${g&&!p.fig?`<div class=row style="gap:6px"><button class=chip data-act=ignow title="Publica no Instagram agora, sem esperar o horário" style="font-size:12px">${IK.send} Postar agora</button>${w.length?`<span class=mu>Atenção: ${w.join(' e ')}.</span>`:''}</div>`:''}</div>`}
+ <input type=checkbox id=mig hidden${auto?' checked':''}>${IGN()&&p.type=='stories'&&!MD.isNew?`<div class=row style="gap:6px;flex-wrap:wrap"><button class=chip data-act=igst>📲 Abrir no Instagram</button><button class=chip data-act=igdl>⬇ Salvar telas na galeria</button></div>`:''}${g&&!p.fig?`<div class=row style="gap:6px"><button class=chip data-act=ignow title="Publica no Instagram agora, sem esperar o horário" style="font-size:12px">${IK.send} Postar agora</button>${w.length?`<span class=mu>Atenção: ${w.join(' e ')}.</span>`:''}</div>`:''}</div>`}
 async function igNowAct(){if(!MD)return;const p=collect(),g=(S.ig||{})[p.co];if(!p.date)return alert('Escolha a data.');const bad=p.fig?'Story com figurinha é postado à mão.':igWarn(p).join(' e ');if(bad)return alert('Ainda não dá para publicar: '+bad+'.');
  if(!confirm('Publicar agora no Instagram @'+(g?g.user:'')+'?\nIsso posta de verdade, na hora.'))return;snap();if(MD.isNew){S.posts.push(p);MD.isNew=false}if(p.ig=='fila')p.ig='';touch('p',p);closeMd();render();
  stat('publicando no Instagram…');prog('Publicando no Instagram…',35);const tS=Date.now()-60000;try{clearTimeout(tm);await push();if(P['p'+p.id])throw'Não consegui salvar o post na planilha antes de publicar. Confira a conexão e tente de novo.';const r=await api({action:'igNow',id:p.id});Object.assign(p,r);persist();render();

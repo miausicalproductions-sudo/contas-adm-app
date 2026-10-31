@@ -30,21 +30,29 @@ public class IgStoryPlugin extends Plugin {
         String data = call.getString("data"), name = clean(call.getString("name")), mime = call.getString("mime", "image/jpeg"), album = call.getString("album", "Studios Miau");
         if (data == null) { call.reject("faltou o arquivo"); return; }
         try {
+            boolean vid = mime.startsWith("video/");
+            if (android.os.Build.VERSION.SDK_INT < 29 && android.os.Build.VERSION.SDK_INT >= 23
+                    && getContext().checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                getActivity().requestPermissions(new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, 4711);
+                call.reject("Libere o acesso a arquivos na janela que abriu e toque em baixar de novo.");
+                return;
+            }
             byte[] bytes = Base64.decode(data, Base64.DEFAULT);
             android.net.Uri uri;
+            String root = vid ? android.os.Environment.DIRECTORY_MOVIES : android.os.Environment.DIRECTORY_PICTURES;
             if (android.os.Build.VERSION.SDK_INT >= 29) {
                 android.content.ContentValues v = new android.content.ContentValues();
                 v.put(android.provider.MediaStore.MediaColumns.DISPLAY_NAME, name);
                 v.put(android.provider.MediaStore.MediaColumns.MIME_TYPE, mime);
-                v.put(android.provider.MediaStore.MediaColumns.RELATIVE_PATH, android.os.Environment.DIRECTORY_PICTURES + "/" + album);
+                v.put(android.provider.MediaStore.MediaColumns.RELATIVE_PATH, root + "/" + album);
                 v.put(android.provider.MediaStore.MediaColumns.IS_PENDING, 1);
                 android.content.ContentResolver cr = getContext().getContentResolver();
-                uri = cr.insert(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, v);
+                uri = cr.insert(vid ? android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI : android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, v);
                 if (uri == null) throw new Exception("a galeria recusou o arquivo");
                 java.io.OutputStream o = cr.openOutputStream(uri); o.write(bytes); o.close();
                 v.clear(); v.put(android.provider.MediaStore.MediaColumns.IS_PENDING, 0); cr.update(uri, v, null, null);
             } else {
-                File d = new File(android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_PICTURES), album); d.mkdirs();
+                File d = new File(android.os.Environment.getExternalStoragePublicDirectory(root), album); d.mkdirs();
                 File f = new File(d, name); FileOutputStream o = new FileOutputStream(f); o.write(bytes); o.close();
                 android.media.MediaScannerConnection.scanFile(getContext(), new String[]{f.getAbsolutePath()}, new String[]{mime}, null);
                 uri = Uri.fromFile(f);
