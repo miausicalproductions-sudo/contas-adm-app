@@ -246,6 +246,10 @@ html.edmob,html.edmob body{overflow:hidden!important;overscroll-behavior:none}ht
 #ve textarea{width:100%;background:#23242c;color:#eee;border:1px solid #ffffff2a;border-radius:6px;padding:6px 8px;font:inherit;box-sizing:border-box}#ve input[type=color]{padding:0;height:30px;width:100%}
 .vesl{display:grid;gap:3px;font-size:12px;color:#c3c7d6}.vesl input{width:100%}.vesl2{display:flex;justify-content:space-between;opacity:.7}details.vesec>summary{cursor:pointer;padding:2px 0}details.vesec[open]{display:grid;gap:8px}
 .veprog{width:100%;display:grid;gap:3px}.vebar{height:8px;background:#ffffff1f;border-radius:6px;overflow:hidden;position:relative}.vebar i{display:block;height:100%;background:#5B4BDB;width:0;transition:width .3s}.vebar.ind i{width:35%!important;animation:vebar 1.1s ease-in-out infinite alternate}@keyframes vebar{from{margin-left:0}to{margin-left:65%}}
+.veovt{background:#0f1118}.veovb{position:absolute;top:5px;height:32px;border-radius:6px;background:#1f5d4a;border:1px solid #4fd3a3;font-size:11px;padding:2px 6px;overflow:hidden;white-space:nowrap;box-sizing:border-box;pointer-events:none;color:#eafff6}
+.vvph{max-height:200px;overflow:auto;display:grid;gap:3px;border:1px solid #ffffff22;border-radius:8px;padding:4px}.vvph label{display:flex;gap:6px;align-items:flex-start;font-size:12px;padding:3px 4px;border-radius:5px}.vvph label.hot{background:#3a2f12}.vvph small{opacity:.65;white-space:nowrap}
+.vvst{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.vvn{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#5B4BDB;color:#fff;font-size:11px;font-weight:700}
+.vvlib{display:flex;gap:6px;flex-wrap:wrap}.vvlib span{background:#2b2f3f;border-radius:8px;padding:3px 8px;font-size:12px;display:flex;gap:6px;align-items:center}.vvlib b{cursor:pointer;opacity:.7}
 .vesfx{background:#0f1118}.vesxb{position:absolute;top:5px;transform:translateX(-50%);background:#3b2f63;border:1px solid #9a7cf0;border-radius:6px;padding:2px 5px;cursor:grab;font-size:13px;display:flex;gap:3px;align-items:center;height:32px;box-sizing:border-box}.vesxb small{font-size:9px;opacity:.85}.vesxb.on{outline:2px solid #fff}
 .psfdd details.psgp>summary{padding:7px 14px;cursor:pointer;font-size:12.5px;font-weight:600;list-style:none}.psfdd details.psgp>summary::-webkit-details-marker{display:none}.psfdd details.psgp>summary::after{content:" ▸";opacity:.5}.psfdd details.psgp[open]>summary::after{content:" ▾"}.psfdd details.psgp[open]{background:#0000000a;padding-bottom:4px}.psfdd details.psgp>button,.psfdd details.psgp>label{padding-left:26px}
 .psfdd{position:absolute;left:0;top:100%;z-index:20;background:#f3f3f3;color:#222;border:1px solid #999;box-shadow:0 8px 24px #0006;min-width:330px;padding:4px 0;display:grid;max-height:70vh;overflow:auto}.psfdd[hidden]{display:none}
@@ -1025,7 +1029,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:244*/const PV=244;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:245*/const PV=245;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -4607,7 +4611,7 @@ function narCut(ab,o){
  const cs=[];let acc=0;R.forEach(r=>{cs.push(acc);acc+=r[1]-r[0]});
  const toOut=ix=>{if(ix<=R[0][0])return 0;for(let k=0;k<R.length;k++){if(ix<R[k][1])return ix>=R[k][0]?cs[k]+ix-R[k][0]:cs[k]}return acc},dur=tot/sr,cand=[];
  {let r0=-1;for(let i=0;i<=nf;i++){const q=i<nf&&db[i]<th;if(q&&r0<0)r0=i;else if(!q&&r0>=0){const g=(i-r0)/100;if(g>=.12){const t=toOut(Math.round((r0+i)/2*fr))/sr;if(t>.3&&t<dur-.3)cand.push({t,gap:g})}r0=-1}}}
- return{ch:out,sr,dur,orig:n/sr,cuts:R.length-1,th,cand}}
+ return{ch:out,sr,dur,orig:n/sr,cuts:R.length-1,th,cand,R}}
 /* 1 áudio para o Story inteiro: divide entre as telas pelo nº de palavras de cada uma, sempre numa pausa */
 function narSplit(K,words){const n=words.length,tot=Math.max(1,words.reduce((a,b)=>a+b,0)),B=[0],hard=[];let cw=0;
  for(let k=0;k<n-1;k++){cw+=words[k];const T=K.dur*cw/tot,prev=B[k],lim=K.dur-.8*(n-1-k),win=Math.max(1.5,K.dur/n*.6);let best=null,bs=1e9;
@@ -4677,8 +4681,8 @@ const veTm=t=>{t=Math.max(0,t||0);const m=Math.floor(t/60);return m+':'+(t-m*60)
 const VEZ=(a,b,v)=>Math.max(a,Math.min(b,v));
 function veLay(){let a=0,pv=null;VE.sc.forEach(c=>{c.t0=a;c.loc0=pv&&pv.i==c.i?pv.loc0+pv.d:0;a+=c.d;pv=c});VE.D=a}
 function veDef(s){return s.S.map((x,i)=>({i,d:seqD(x),tr:i?seqT(x):'corte'}))}
-function veLoad(s){const v=(s.S[0].ov||{}).ve||{};VE.s=s;VE.sc=(v.sc&&v.sc.length?v.sc:veDef(s)).map(c=>({i:Math.min(Math.max(0,c.i|0),s.S.length-1),d:Math.max(.3,+c.d||2),tr:c.tr||'fade'}));VE.zm=(v.zm||[]).map(e=>({...e}));VE.words=(v.words||[]).map(w=>({...w}));VE.cap=Object.assign(veCapDef(s),v.cap||{});VE.script=v.script||'';VE.sfx=(v.sfx||[]).map(e=>({...e}));VE.sfxo=Object.assign({lvl:50,vol:.6},v.sfxo||{});VE.sfxmap=v.sfxmap||'';VE.cut=Object.assign({who:veHasRot()?'rot':'plat',lv:'normal',maxd:1.6},v.cut||{});if(VE.cut.who=='rot'&&!veHasRot())VE.cut.who='plat';veLay()}
-function veSave(){const s=VE.s;if(!s)return;s.S[0].ov=s.S[0].ov||{};s.S[0].ov.ve={on:1,k:VE.au?veKey(s):'',sc:VE.sc.map(c=>({i:c.i,d:+c.d.toFixed(3),tr:c.tr})),zm:VE.zm.map(e=>({...e})),words:VE.words.map(w=>({...w})),cap:{...VE.cap},script:VE.script,cut:{...VE.cut},sfx:VE.sfx.map(e=>({...e})),sfxo:{...VE.sfxo},sfxmap:VE.sfxmap};try{telaSave()}catch(e){}}
+function veLoad(s){const v=(s.S[0].ov||{}).ve||{};VE.s=s;VE.sc=(v.sc&&v.sc.length?v.sc:veDef(s)).map(c=>({i:Math.min(Math.max(0,c.i|0),s.S.length-1),d:Math.max(.3,+c.d||2),tr:c.tr||'fade'}));VE.zm=(v.zm||[]).map(e=>({...e}));VE.words=(v.words||[]).map(w=>({...w}));VE.cap=Object.assign(veCapDef(s),v.cap||{});VE.script=v.script||'';VE.sfx=(v.sfx||[]).map(e=>({...e}));VE.sfxo=Object.assign({lvl:50,vol:.6},v.sfxo||{});VE.sfxmap=v.sfxmap||'';VE.cut=Object.assign({who:veHasRot()?'rot':'plat',lv:'normal',maxd:1.6},v.cut||{});if(VE.cut.who=='rot'&&!veHasRot())VE.cut.who='plat';VE.ov=(v.ov||[]).map(o=>({...o}));VE.lib=(v.lib||[]).map(o=>({...o}));VE.vbm=v.vb||null;VE.ovo=Object.assign({rate:8,dmin:1.2,dmax:2.6,lib:1,tela:0,zoom:1,sfx:1,seed:1},v.ovo||{});veLay()}
+function veSave(){const s=VE.s;if(!s)return;s.S[0].ov=s.S[0].ov||{};s.S[0].ov.ve={on:1,k:VE.au?veKey(s):'',sc:VE.sc.map(c=>({i:c.i,d:+c.d.toFixed(3),tr:c.tr})),zm:VE.zm.map(e=>({...e})),words:VE.words.map(w=>({...w})),cap:{...VE.cap},script:VE.script,cut:{...VE.cut},sfx:VE.sfx.map(e=>({...e})),sfxo:{...VE.sfxo},sfxmap:VE.sfxmap,ov:(VE.ov||[]).map(o=>({...o})),lib:(VE.lib||[]).map(l=>({id:l.id,n:l.n,kind:l.kind})),vb:VE.vb?{n:VE.vb.n,fx:VE.vb.fx==null?.5:VE.vb.fx,dur:VE.vb.dur,segs:VE.vb.segs.map(g=>({s0:+g.s0.toFixed(3),s1:+g.s1.toFixed(3)}))}:null,ovo:{...(VE.ovo||{})}};try{telaSave()}catch(e){}}
 let veSvT=0;const veSaveSoon=()=>{clearTimeout(veSvT);veSvT=setTimeout(veSave,500)};
 /* ---------- áudio ---------- */
 function vePeaks(){const A=VE.au;if(!A){VE.pk=null;return}const c=A.ch[0],n=Math.ceil(A.dur*50),pk=new Float32Array(n),st=Math.floor(A.sr/50);for(let i=0;i<n;i++){let m=0;const a=i*st,b=Math.min(c.length,a+st);for(let j=a;j<b;j+=4){const v=Math.abs(c[j]);if(v>m)m=v}pk[i]=m}VE.pk=pk}
@@ -4703,16 +4707,17 @@ function veFrame(ctx,T,tmp,P2){const PP=P2||VE.PP,W=ctx.canvas.width,H=ctx.canva
  zc.setTransform(1,0,0,1,0,0);zc.globalAlpha=1;zc.globalCompositeOperation='source-over';zc.filter='none';
  if(pv&&pv.i!=c.i&&t<SEQTR&&c.tr!='corte'){const e=AN_OUT(t/SEQTR),A=tmp[0],B=tmp[1],tr=c.tr;vidFrame(A.getContext('2d'),PP[pv.i],pv.loc0+pv.d);vidFrame(B.getContext('2d'),PP[c.i],L);
   if(tr=='fade'){zc.drawImage(A,0,0);zc.globalAlpha=e;zc.drawImage(B,0,0)}else if(tr=='esquerda'){zc.drawImage(A,-e*W,0);zc.drawImage(B,(1-e)*W,0)}else if(tr=='cima'){zc.drawImage(A,0,-e*H);zc.drawImage(B,0,(1-e)*H)}else if(tr=='zoom'){zc.drawImage(A,0,0);zc.globalAlpha=e;const z=1.18-.18*e;zc.drawImage(B,W*(1-z)/2,H*(1-z)/2,W*z,H*z)}else{zc.drawImage(A,0,0);zc.save();zc.beginPath();zc.rect(0,0,W*e,H);zc.clip();zc.drawImage(B,0,0);zc.restore()}zc.globalAlpha=1}
- else vidFrame(zc,PP[c.i],L);
+ else if(VE.vb&&VE.vb.el)veBaseDraw(zc,W,H);else vidFrame(zc,PP[c.i],L);
+ if(VE.ov&&VE.ov.length)veOvDraw(zc,T,W,H,PP,tmp);
  ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';ctx.filter='none';const q=veZoom(T);
  if(q.z!=1)ctx.setTransform(q.z,0,0,q.z,(1-q.z)*q.fx*W,(1-q.z)*q.fy*H);ctx.drawImage(Z,0,0);ctx.setTransform(1,0,0,1,0,0);
  veCap(ctx,T);return k}
 function veMk(){const H=veH(VE.s),m=()=>{const c=document.createElement('canvas');c.width=1080;c.height=H;return c};VE.big=m();VE.tmp=[m(),m(),m()]}
-function veRender(){const cv=document.getElementById('vecv');if(!cv||!VE.PP||!VE.big)return;const T=VEZ(0,Math.max(0,VE.D-.001),VE.T);veFrame(VE.big.getContext('2d'),T,VE.tmp);const g=cv.getContext('2d');g.clearRect(0,0,cv.width,cv.height);g.drawImage(VE.big,0,0,cv.width,cv.height);
+function veRender(){const cv=document.getElementById('vecv');if(!cv||!VE.PP||!VE.big)return;const T=VEZ(0,Math.max(0,VE.D-.001),VE.T);if(VE.vb||(VE.ov&&VE.ov.length))veBaseSync(T);veFrame(VE.big.getContext('2d'),T,VE.tmp);const g=cv.getContext('2d');g.clearRect(0,0,cv.width,cv.height);g.drawImage(VE.big,0,0,cv.width,cv.height);
  const tm=document.getElementById('vetm');if(tm)tm.textContent=veTm(T)+' / '+veTm(VE.D)+' · cena '+(veScene(T)+1)+' de '+VE.sc.length;
  const ph=document.getElementById('veph');if(ph){ph.style.left=(T*VE.pps)+'px';const w=document.getElementById('vetlw');if(w&&VE.pl){const x=T*VE.pps;if(x>w.scrollLeft+w.clientWidth-40||x<w.scrollLeft)w.scrollLeft=Math.max(0,x-60)}}}
 /* ---------- tocar ---------- */
-function veStop(){if(VE.pl){VE.pl.stop=1;try{VE.pl.au&&VE.pl.au.pause()}catch(e){}try{(VE.pl.src||[]).forEach(x=>{try{x.stop()}catch(e){}})}catch(e){}}VE.pl=null;const b=document.querySelector('#ve [data-ve=play]');if(b)b.textContent='▶'}
+function veStop(){if(VE.pl){VE.pl.stop=1;try{VE.pl.au&&VE.pl.au.pause()}catch(e){}try{(VE.pl.src||[]).forEach(x=>{try{x.stop()}catch(e){}})}catch(e){}}VE.pl=null;try{veVidPause()}catch(e){}const b=document.querySelector('#ve [data-ve=play]');if(b)b.textContent='▶'}
 function vePlay(){if(VE.pl)return veStop();if(!VE.PP||!VE.D)return;if(VE.T>=VE.D-.05)VE.T=0;const me=VE.pl={stop:0},t0=performance.now()-VE.T*1000;
  if(VE.url){const a=new Audio(VE.url);a.currentTime=Math.min(VE.T,(VE.au?VE.au.dur:0));me.au=a;a.play().catch(()=>{})}
  try{veSfxSched(me)}catch(e){}
@@ -4724,12 +4729,12 @@ function veWaveDraw(){const cv=document.getElementById('vewave');if(!cv)return;c
 function veTL(){const el=document.getElementById('vetl');if(!el)return;veLay();const P=VE.pps,W=Math.round(VE.D*P)+60;el.style.width=W+'px';let r='';const step=P>=100?.5:P>=50?1:2;for(let t=0;t<=VE.D+.01;t+=step)r+=`<span class=vetk style="left:${t*P}px">${Number.isInteger(t)?veTm(t).slice(0,-2):''}</span>`;
  const sc=VE.sc.map((c,k)=>`<div class="vesb${VE.sel&&VE.sel.t=='sc'&&VE.sel.k==k?' on':''}" data-vsc=${k} style="left:${c.t0*P}px;width:${Math.max(6,c.d*P-2)}px"><b>${k+1}</b> <small>Tela ${c.i+1}</small>${k?'':''}<i class=vehd data-vh=${k} title="Arraste para mudar a troca de cena"></i></div>`).join('');
  const zm=VE.zm.map((e,k)=>`<div class="vezb${VE.sel&&VE.sel.t=='zm'&&VE.sel.k==k?' on':''} ${e.k=='key'?'vesf':''}" data-vz=${k} style="left:${e.t*P}px" title="${e.k=='key'?'zoom suave':'zoom seco'} ${(+e.z).toFixed(2)}×">${e.z<1.005?'↺':'🔍'}<small>${(+e.z).toFixed(2)}</small></div>`).join('');
- el.innerHTML=`<div class=veruler>${r}</div><div class="vetr vesc">${sc}</div><div class="vetr vezm">${zm}</div>${veTLw()}<div class="vetr veau"><canvas id=vewave height=44></canvas></div><div id=veph class=veph></div>`;veWaveDraw()}
+ el.innerHTML=`<div class=veruler>${r}</div><div class="vetr vesc">${sc}</div><div class="vetr vezm">${zm}</div><div class="vetr veovt">${veOvTL(P)}</div>${veTLw()}<div class="vetr veau"><canvas id=vewave height=44></canvas></div><div id=veph class=veph></div>`;veWaveDraw()}
 function veInsp(){const s=VE.s,z=VE.sel;if(!z)return'<small class=mu>Clique numa cena, num zoom ou numa palavra da linha do tempo para ajustar.</small>';
  if(z.t=='sc'){const c=VE.sc[z.k];if(!c)return'';return`<b>Cena ${z.k+1}</b><div class=veg><label>Tela<select data-vf=sci>${s.S.map((x,i)=>`<option value=${i}${i==c.i?' selected':''}>Tela ${i+1} — ${esc(String(x.t||'').replace(/\*/g,'').slice(0,28))}</option>`).join('')}</select></label>${z.k?`<label>Entrada<select data-vf=sctr>${Object.keys(SEQT).map(k=>`<option value=${k}${c.tr==k?' selected':''}>${SEQT[k]}</option>`).join('')}</select></label>`:''}<label>Duração (s)<input type=number step=.1 min=.3 data-vf=scd value="${c.d.toFixed(2)}"></label></div><div class=row><button class=chip data-ve=split title="Corta esta cena em duas, onde está o cursor (o mesmo fundo continua)">✂ Dividir no cursor</button><button class=chip data-ve=delsc>🗑 Tirar a cena</button></div>`}
  if(z.t=='zm'){const e=VE.zm[z.k];if(!e)return'';return`<b>Zoom em ${veTm(e.t)}</b><div class=veg><label>Tipo<select data-vf=zk><option value=seco${e.k!='key'?' selected':''}>Seco (corte)</option><option value=key${e.k=='key'?' selected':''}>Suave (keyframe)</option></select></label><label>Força<input type=range min=1 max=1.8 step=.01 data-vf=zz value="${e.z}"><small>${(+e.z).toFixed(2)}×</small></label>${e.k=='key'?`<label>Dura (s)<input type=number step=.1 min=.1 data-vf=zd value="${e.d||1}"></label>`:''}<label>Início (s)<input type=number step=.05 min=0 data-vf=zt value="${e.t.toFixed(2)}"></label></div><div class=row><button class=chip data-ve=delzm>🗑 Apagar o zoom</button></div>`}
  return veInsp2(z)}
-const VETABS=[['aud','① Áudio'],['leg','② Legendas'],['cor','③ Cortes e zoom'],['sfx','④ Sons'],['exp','⑤ Exportar']];
+const VETABS=[['vid','🎞 Vídeo de terceiros'],['aud','① Áudio'],['leg','② Legendas'],['cor','③ Cortes e zoom'],['sfx','④ Sons'],['exp','⑤ Exportar']];
 function veSide(){const o=VE.o,s=VE.s;let h='';
  if(VE.tab=='aud')h=`<div class=vesec><b>Áudio da narração</b><small class=mu>Escolha o áudio (ElevenLabs, gravação…). O painel corta os silêncios e já distribui as telas pelo texto de cada uma, sempre numa pausa. Tudo no seu aparelho, sem IA e sem custo.</small>
   <div class=row><label class=chip style="cursor:pointer">📁 ${VE.file?'Trocar áudio':'Escolher áudio'}<input type=file accept="audio/*,video/*,.m4a,.mp3,.wav,.ogg,.opus,.aac,.mp4,.mov" hidden id=vefile></label><span class=mu>${VE.file?esc(VE.file.name):(VE.au?'áudio já carregado ('+narFmt(VE.au.dur)+')':'nenhum arquivo')}</span></div>
@@ -4738,6 +4743,7 @@ function veSide(){const o=VE.o,s=VE.s;let h='';
   <details><summary class=mu>ajustes finos</summary><div class=veg><label>Pausa mínima p/ cortar (s)<input type=number id=ve_min min=.1 max=2 step=.05 value="${o.minsil}"></label><label>Pausa que sobra (s)<input type=number id=ve_keep min=0 max=1 step=.02 value="${o.keep}"></label><label>Respiro no fim (s)<input type=number id=ve_tail min=0 max=3 step=.1 value="${o.tail}"></label></div></details>
   <button class=btn data-ve=audrun ${VE.file&&!VE.busy?'':'disabled'}>${VE.busy?'processando…':'✂ Cortar e ajustar as cenas'}</button>
   ${VE.info?`<small class=mu>${esc(VE.info)}</small>`:''}</div>`;
+ else if(VE.tab=='vid')h=veVidSide();
  else if(VE.tab=='leg')h=veLegSide();
  else if(VE.tab=='cor')h=veCutSide();
  else if(VE.tab=='sfx')h=veSfxSide();
@@ -4749,22 +4755,144 @@ function veInspUp(){const el=document.getElementById('veinsp');if(el)el.innerHTM
 function veBuild(){const s=VE.s,H=veH(s);document.getElementById('ve')?.remove();const d=document.createElement('div');d.id='ve';
  d.innerHTML=`<div class=vetop><b>🎬 Editor de vídeo</b><span class=mu id=vest>${esc(String(s.p.txt||'').slice(0,40))}</span><span style="flex:1"></span><button class=chip data-ve=exp>⬇ Baixar MP4</button><button class=chip data-ve=close>✕ Voltar</button></div>
  <div class=vemain><div class=vepv><canvas id=vecv width=360 height=${Math.round(360*H/1080)} style="aspect-ratio:1080/${H}"></canvas><div class=vectl><button class=chip data-ve=play>▶</button><span id=vetm class=mu></span></div><div id=veprog class=veprog hidden><div class=vebar><i></i></div><small class=mu></small></div></div><div class=veside id=veside></div></div>
- <div class=vetlbox><div class=vetlh><div class=vel1><button data-ve=zout title="Diminuir a linha do tempo">−</button><button data-ve=zin title="Ampliar a linha do tempo">+</button></div><div class=vel2>Cenas</div><div class=vel2>Zoom</div>${veLabw()}<div class=vel3>Áudio</div></div><div class=vetlw id=vetlw><div id=vetl class=vetl></div></div></div>`;
+ <div class=vetlbox><div class=vetlh><div class=vel1><button data-ve=zout title="Diminuir a linha do tempo">−</button><button data-ve=zin title="Ampliar a linha do tempo">+</button></div><div class=vel2>Cenas</div><div class=vel2>Zoom</div><div class=vel2>Extras</div>${veLabw()}<div class=vel3>Áudio</div></div><div class=vetlw id=vetlw><div id=vetl class=vetl></div></div></div>`;
  document.body.appendChild(d);veUI();veLay();veFit();veTL()}
-async function veOpen(){const s=STU;if(!s)return;veStop();if(EDX){try{stSyncText()}catch(e){}}veLoad(s);VE.tab=(s.S[0].ov||{}).ve&&(s.S[0].ov.ve.k)?'cor':'aud';VE.sel=null;VE.T=0;VE.file=null;VE.info='';VE.busy=0;stat('🎬 abrindo o editor de vídeo…');
- await veAudLoad();await veFonts();veMk();veBuild();try{await vePrep()}catch(e){console.warn(e)}veRender();stat('● editor de vídeo aberto')}
+async function veOpen(){const s=STU;if(!s)return;veStop();if(EDX){try{stSyncText()}catch(e){}}veLoad(s);VE.tab=(s.S[0].ov||{}).ve&&s.S[0].ov.ve.vb?'vid':(s.S[0].ov||{}).ve&&(s.S[0].ov.ve.k)?'cor':'aud';VE.sel=null;VE.T=0;VE.file=null;VE.info='';VE.busy=0;stat('🎬 abrindo o editor de vídeo…');
+ await veAudLoad();await veVidRestore();await veFonts();veMk();veBuild();try{await vePrep()}catch(e){console.warn(e)}veRender();stat('● editor de vídeo aberto')}
 function veClose(){veStop();veSave();document.getElementById('ve')?.remove();VE.PP=null;VE.big=null;VE.tmp=null}
-async function veEnsure(s){if(VE.s===s&&VE.PP&&document.getElementById('ve'))return;veLoad(s);await veFonts();veMk();await vePrep()}
+async function veEnsure(s){if(VE.s===s&&VE.PP&&document.getElementById('ve'))return;veLoad(s);await veFonts();veMk();await vePrep();await veVidRestore()}
 /* ---------- exportar ---------- */
 async function veExport(s,O){O=O||{};await veEnsure(s);const H=veH(s),cap=await vidCaps(H);if(!cap.v)throw new Error('sem codificador de vídeo');veLay();const W=1080,D=VE.D,fps=30,N=Math.round(D*fps);
  const mk=()=>{const c=document.createElement('canvas');c.width=W;c.height=H;return c},cv=mk(),tmp=[mk(),mk(),mk()],ctx=cv.getContext('2d'),V={w:W,h:H,mp4c:/^vp09/.test(cap.v)?'vp09':'avc1',samples:[],desc:null};let err=null,n=0;
  const enc=new VideoEncoder({output:(c,m)=>{const b=new Uint8Array(c.byteLength);c.copyTo(b);const idx=n++;V.samples.push({b,key:c.type=='key',cto:Math.round(c.timestamp*0.09)-idx*3000});if(m&&m.decoderConfig&&m.decoderConfig.description&&!V.desc){const d=m.decoderConfig.description;V.desc=new Uint8Array(d instanceof ArrayBuffer?d:d.buffer.slice(d.byteOffset,d.byteOffset+d.byteLength))}},error:e=>err=e});
  enc.configure({codec:cap.v,width:W,height:H,bitrate:9e6,framerate:fps,latencyMode:'quality',...(V.mp4c=='avc1'?{avc:{format:'avc'}}:{})});
- for(let f=0;f<N;f++){if(err)throw err;veFrame(ctx,Math.min(D-.001,f/fps),tmp);const vf=new VideoFrame(cv,{timestamp:Math.round(f*1e6/fps),duration:Math.round(1e6/fps)});enc.encode(vf,{keyFrame:f%60==0});vf.close();if(O.onp&&f%6==0)O.onp(f/N*.92);while(enc.encodeQueueSize>6)await new Promise(r=>setTimeout(r,4));if(f%10==9)await new Promise(r=>setTimeout(r,0))}
+ for(let f=0;f<N;f++){if(err)throw err;{const Tf=Math.min(D-.001,f/fps);if(VE.vb||(VE.ov&&VE.ov.length))await veSeekFrame(Tf);veFrame(ctx,Tf,tmp)}const vf=new VideoFrame(cv,{timestamp:Math.round(f*1e6/fps),duration:Math.round(1e6/fps)});enc.encode(vf,{keyFrame:f%60==0});vf.close();if(O.onp&&f%6==0)O.onp(f/N*.92);while(enc.encodeQueueSize>6)await new Promise(r=>setTimeout(r,4));if(f%10==9)await new Promise(r=>setTimeout(r,0))}
  await enc.flush();enc.close();if(err)throw err;if(V.mp4c=='avc1'&&!V.desc)throw new Error('o codificador não devolveu a configuração H.264');
  let A=null;if(cap.a){try{A=await veAudioMix(s,D,cap.a)}catch(e){console.warn(e);stat('⚠ o áudio não entrou ('+(e.message||e)+'): vídeo sem som')}}
  if(O.onp)O.onp(.98);const bin=mp4Build(V,A);return Object.assign(new File([bin],'video.mp4',{type:'video/mp4'}),{igOk:V.mp4c=='avc1'&&(!A||A.codec=='aac'),dur:D})}
 async function veDl(){const s=VE.s||STU;if(!s)return;try{veStop();prog('🎬 montando o vídeo…',2);const f=await veExport(s,{onp:p=>prog('🎬 montando o vídeo…',Math.round(2+p*96))});prog('🎬 vídeo pronto',100,1);const u=URL.createObjectURL(f),l=document.createElement('a');l.href=u;l.download=(String(s.p.txt||'video').replace(/[\\/:*?"<>|]/g,'').slice(0,40)||'video')+'.mp4';document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),6e4)}catch(x){prog('🎬 não deu: '+(x.message||x),100,1);alert('Não consegui montar o vídeo: '+(x.message||x))}}
+/* ===== v245: vídeo de terceiros (vídeo pronto como base, cortes, ganchos, cenas extras) ===== */
+const VELIB=new Map();
+function veMkVideo(blob){return new Promise((ok,no)=>{const v=document.createElement('video');v.muted=true;v.playsInline=true;v.preload='auto';const u=URL.createObjectURL(blob);v._u=u;v.onloadeddata=()=>{v.onloadeddata=null;v.onerror=null;ok(v)};v.onerror=()=>no(new Error('não consegui abrir este vídeo (formato não suportado?). Tente um .mp4 (H.264) ou .webm'));v.addEventListener('seeked',()=>{if(!VE.pl&&document.getElementById('ve'))try{veRender()}catch(e){}});v.src=u;setTimeout(()=>no(new Error('o vídeo demorou demais para abrir')),30000)})}
+function veSeekEl(v,t){return new Promise(ok=>{try{v.pause()}catch(e){}t=Math.max(0,Math.min((v.duration||1e9)-.04,t));if(Math.abs(v.currentTime-t)<.002&&v.readyState>=2)return ok();let d=0;const f=()=>{if(d)return;d=1;v.removeEventListener('seeked',f);ok()};v.addEventListener('seeked',f);v.currentTime=t;setTimeout(f,2000)})}
+function veSegsLay(S){let a=0;S.forEach(g=>{g.t0=a;a+=g.s1-g.s0});return a}
+function veVTo(S,T){let k=0;while(k<S.length-1&&T>=S[k].t0+(S[k].s1-S[k].s0))k++;const g=S[k];return g.s0+Math.max(0,Math.min(T-g.t0,g.s1-g.s0))}
+const veVT=T=>VE.vb?veVTo(VE.vb.segs,T):0;
+function veVidFree(){try{if(VE.vb){VE.vb.el.pause();URL.revokeObjectURL(VE.vb.el._u)}}catch(e){}VE.vb=null;VELIB.forEach(m=>{try{if(m.el){m.el.pause();URL.revokeObjectURL(m.el._u)}}catch(e){}});VELIB.clear()}
+function veVidPause(){try{if(VE.vb)VE.vb.el.pause();VELIB.forEach(m=>{if(m.el&&!m.el.paused)m.el.pause()})}catch(e){}}
+function veSyncEl(el,t,playing){if(!el)return;t=Math.max(0,Math.min((el.duration||1e9)-.05,t));if(playing){if(el.paused)el.play().catch(()=>{});if(Math.abs(el.currentTime-t)>.3)el.currentTime=t}else{if(!el.paused)el.pause();if(Math.abs(el.currentTime-t)>.03)el.currentTime=t}}
+function veOvAt(T){const L=VE.ov||[];for(const o of L)if(T>=o.t&&T<o.t+o.d)return o;return null}
+function veBaseSync(T){const pl=!!VE.pl;if(VE.vb)veSyncEl(VE.vb.el,veVT(T),pl);const o=veOvAt(T);VELIB.forEach((m,id)=>{if(m.kind!='vid')return;if(o&&o.k=='lib'&&o.ref==id)veSyncEl(m.el,(T-o.t)%(m.dur||1),pl);else if(!m.el.paused)m.el.pause()})}
+async function veSeekFrame(T){if(VE.vb)await veSeekEl(VE.vb.el,veVT(T));const o=veOvAt(T);if(o&&o.k=='lib'){const m=VELIB.get(o.ref);if(m&&m.kind=='vid')await veSeekEl(m.el,(T-o.t)%(m.dur||1))}}
+function veCover(ctx,src,sw,sh,W,H,sc,fx,fy){const k=Math.max(W/sw,H/sh)*(sc||1),w=sw*k,h=sh*k;ctx.drawImage(src,(W-w)*(fx==null?.5:fx),(H-h)*(fy==null?.5:fy),w,h)}
+function veBaseDraw(ctx,W,H){const v=VE.vb.el;ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';ctx.filter='none';ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);if(v.readyState>=2&&v.videoWidth)veCover(ctx,v,v.videoWidth,v.videoHeight,W,H,1,VE.vb.fx,.5)}
+function veOvDraw(zc,T,W,H,PP,tmp){const o=veOvAt(T);if(!o)return;const l=T-o.t,p=l/o.d,e=Math.min(1,l/.14),ee=1-Math.pow(1-e,3),xo=Math.min(1,Math.max(0,(o.d-l)/.12)),sc=(.93+.07*ee)*(1+.05*p);let src=null,sw=0,sh=0;
+ if(o.k=='tela'){const P=PP&&PP[o.ref];if(!P)return;const c=tmp[0],g=c.getContext('2d');g.setTransform(1,0,0,1,0,0);g.globalAlpha=1;g.globalCompositeOperation='source-over';g.filter='none';vidFrame(g,P,l);src=c;sw=c.width;sh=c.height}
+ else{const m=VELIB.get(o.ref);if(!m)return;src=m.el||m.img;sw=m.w;sh=m.h;if(m.kind=='vid'&&m.el.readyState<2)return}
+ zc.save();zc.setTransform(1,0,0,1,0,0);zc.globalAlpha=ee*xo;zc.translate(W/2,H/2);zc.scale(sc,sc);zc.translate(-W/2,-H/2);veCover(zc,src,sw,sh,W,H,1,.5,.5);zc.restore()}
+function veOvTL(P){return(VE.ov||[]).map(o=>{const nm=o.k=='tela'?'Tela '+((+o.ref||0)+1):((VE.lib||[]).find(l=>l.id==o.ref)||{}).n||'?';return`<div class=veovb style="left:${o.t*P}px;width:${Math.max(8,o.d*P-2)}px" title="${esc(nm)}">${o.k=='tela'?'🧩':'🖼'} ${esc(nm)}</div>`}).join('')}
+/* ---------- carregar o vídeo, cortar silêncios ---------- */
+const vvRead=()=>{const g=id=>document.getElementById(id),n=(id,d)=>{const e=g(id);if(!e)return d;const v=+String(e.value).replace(',','.');return isFinite(v)?v:d};const o=VE.o||{};return{cut:g('vv_cut')?g('vv_cut').checked:o.cut!==0,sens:g('vv_sens')?g('vv_sens').value:(o.sens||'normal'),minsil:n('vv_min',o.minsil||.3),keep:n('vv_keep',o.keep==null?.1:o.keep)}};
+async function veVidLoad(file){if(VE.busy||!file)return;const s=VE.s;VE.busy=1;veUI();
+ try{stat('🎞 abrindo o vídeo…');const el=await veMkVideo(file);if(!el.videoWidth)throw new Error('este arquivo não tem imagem');
+  stat('🎙 lendo o áudio do vídeo…');const ab=await narDecode(file);VE.orig=ab;const o=vvRead(),K=narCut(ab,{sens:o.sens,minsil:o.cut?o.minsil:30,keep:o.keep});
+  const segs=K.R&&K.R.length?K.R.map(r=>({s0:r[0]/K.sr,s1:r[1]/K.sr})):[{s0:0,s1:ab.length/ab.sampleRate}],wav=narWav(K.ch,K.sr);
+  await musPut({k:veKey(s),n:'🎬 Narração do vídeo',buf:wav,ts:Date.now()});veAudUse(K.ch,K.sr,wav);
+  stat('💾 guardando o vídeo no aparelho…');await musPut({k:veKey(s)+':vid',n:file.name,type:file.type||'video/mp4',buf:await file.arrayBuffer(),ts:Date.now()});
+  const keepL=[...VELIB.entries()];VE.vb&&(()=>{try{VE.vb.el.pause();URL.revokeObjectURL(VE.vb.el._u)}catch(e){}})();VE.vb={n:file.name,el,blob:file,segs,fx:.5,dur:el.duration};
+  veSegsLay(segs);VE.sc=[{i:0,d:Math.max(.5,K.dur),tr:'corte'}];VE.zm=[];VE.words=[];VE.sfx=[];VE.ov=[];VE.script='';veLay();VE.T=0;
+  VE.info='Vídeo de '+narFmt(K.orig)+(o.cut?' → '+narFmt(K.dur)+' (cortei '+narFmt(Math.max(0,K.orig-K.dur))+' em '+K.cuts+' pausa'+(K.cuts==1?'':'s')+')':'')+(K.mudo?' · ⚠ parece sem fala':'');veSave();stat('● vídeo pronto: '+narFmt(K.dur)+'. Próximo: transcrever')}
+ catch(e){console.warn(e);stat('⚠ '+(e.message||e));alert('Não consegui usar este vídeo ('+(e.message||e)+').')}
+ VE.busy=0;veUI();veFit();veTL();veRender()}
+async function veVidRestore(){veVidFree();const m=VE.vbm;if(m&&m.segs&&m.segs.length){try{const r=await musGet(veKey(VE.s)+':vid');if(!r||!r.buf){stat('⚠ o vídeo deste post não está mais neste aparelho: carregue de novo');}else{const blob=new Blob([r.buf],{type:r.type||'video/mp4'}),el=await veMkVideo(blob);VE.vb={n:m.n,el,blob,segs:m.segs.map(g=>({...g})),fx:m.fx==null?.5:m.fx,dur:el.duration};veSegsLay(VE.vb.segs)}}catch(e){console.warn(e);stat('⚠ não consegui reabrir o vídeo salvo: '+(e.message||e))}}
+ for(const l of (VE.lib||[])){try{const r=await musGet(veKey(VE.s)+':lib:'+l.id);if(r&&r.buf)VELIB.set(l.id,await veLibMake(new Blob([r.buf],{type:r.type||''}),l.kind))}catch(e){console.warn(e)}}}
+async function veLibMake(blob,kind){if(kind=='vid'){const el=await veMkVideo(blob);return{kind,el,w:el.videoWidth,h:el.videoHeight,dur:el.duration||2}}const im=await loadImg(URL.createObjectURL(blob));return{kind,img:im,w:im.naturalWidth||im.width,h:im.naturalHeight||im.height}}
+async function veLibAdd(files){VE.busy=1;veUI();for(const f of files){const kind=/^video\//.test(f.type)?'vid':/^image\//.test(f.type)?'img':null;if(!kind){stat('⚠ '+f.name+': só fotos e vídeos');continue}const id='l'+Date.now().toString(36)+Math.floor(Math.random()*1e4);try{stat('🖼 '+f.name+'…');const m=await veLibMake(f,kind);VELIB.set(id,m);await musPut({k:veKey(VE.s)+':lib:'+id,n:f.name,type:f.type,buf:await f.arrayBuffer(),ts:Date.now()});VE.lib.push({id,n:f.name,kind})}catch(e){stat('⚠ '+f.name+': '+(e.message||e))}}VE.busy=0;veSave();veUI();stat('● '+VE.lib.length+' item(ns) na biblioteca deste vídeo')}
+/* ---------- ganchos ---------- */
+const vvPh=()=>veFrases(VE.words||[]);
+function vvScore(f){const t=f.t,n=t.split(/\s+/).length;let p=0;if(/\?/.test(t))p+=2;if(/\d/.test(t))p+=1;if(/^(você|voce|sabia|já|ja|cuidado|pare|atenção|atencao|nunca|ninguém|ninguem|segredo|erro|todo|se você|se voce)/i.test(t))p+=2;if(/(erro|segredo|verdade|ninguém|ninguem|nunca|sempre|melhor|pior|dinheiro|grátis|gratis|resultado)/i.test(t))p+=1;if(n>=4&&n<=16)p+=1;return p}
+function vvGanchoPrompt(){const F=vvPh();if(!F.length)return'';const tema=String((VE.s&&VE.s.p&&VE.s.p.txt)||'').slice(0,200);
+ return`Você é editor de vídeos curtos (Reels). Abaixo está a transcrição de um vídeo falado, dividida em frases numeradas, com o tempo de cada uma em segundos (já sem as pausas).${tema?'\nTema do post: '+tema:''}
+
+TAREFA
+1) Escolha o melhor GANCHO: a frase, ou uma sequência curta de frases vizinhas (até uns 8 segundos), que mais prende a atenção nos primeiros segundos (pergunta, promessa, número, erro comum, resultado surpreendente). Ele será movido para o começo do vídeo.
+2) Liste até 2 alternativas de gancho.
+3) Liste as frases que devem ser CORTADAS (repetição, enrolação, erro de fala, apresentação longa, "então…", "ééé").
+Não reescreva as frases e não invente nada. Use só os números das frases.
+
+RESPONDA SOMENTE COM JSON, sem texto fora dele:
+{"gancho":{"de":N,"ate":N,"motivo":"…"},"alternativas":[{"de":N,"ate":N,"motivo":"…"}],"cortar":[N,N],"observacoes":"…"}
+
+FRASES
+${F.map((f,i)=>(i+1)+' ['+f.t0.toFixed(1)+'–'+f.t1.toFixed(1)+'s] '+f.t).join('\n')}`}
+function vvParse(txt){const a=String(txt||'').indexOf('{'),b=String(txt||'').lastIndexOf('}');if(a<0||b<a)return null;try{const j=JSON.parse(String(txt).slice(a,b+1)),F=vvPh().length,ok=v=>Number.isInteger(+v)&&+v>=1&&+v<=F,g=j.gancho&&ok(j.gancho.de)?{de:+j.gancho.de,ate:ok(j.gancho.ate)?Math.max(+j.gancho.de,+j.gancho.ate):+j.gancho.de,motivo:String(j.gancho.motivo||'')}:null;return{gancho:g,alt:(Array.isArray(j.alternativas)?j.alternativas:[]).filter(x=>x&&ok(x.de)).map(x=>({de:+x.de,ate:ok(x.ate)?Math.max(+x.de,+x.ate):+x.de,motivo:String(x.motivo||'')})).slice(0,3),cortar:(Array.isArray(j.cortar)?j.cortar:[]).map(Number).filter(ok),obs:String(j.observacoes||'')}}catch(e){return null}}
+function vePieces(ta,tb){const S=VE.vb.segs;veSegsLay(S);const out=[];S.forEach(g=>{const L=g.s1-g.s0,a=Math.max(ta,g.t0),b=Math.min(tb,g.t0+L);if(b-a>.02)out.push([g.s0+(a-g.t0),g.s0+(b-g.t0)])});return out}
+function veSub(S,P){const out=[];S.forEach(g=>{let fr=[[g.s0,g.s1]];P.forEach(([a,b])=>{const n=[];fr.forEach(([x,y])=>{if(b<=x||a>=y)n.push([x,y]);else{if(a>x)n.push([x,a]);if(b<y)n.push([b,y])}});fr=n});fr.forEach(([x,y])=>{if(y-x>.05)out.push({s0:x,s1:y})})});return out}
+function veMerge(L){const o=[];L.forEach(g=>{const l=o[o.length-1];if(l&&Math.abs(g.s0-l.s1)<.02)l.s1=g.s1;else o.push({s0:g.s0,s1:g.s1})});return o}
+async function veReseg(ns){if(!VE.vb)return;const old=VE.vb.segs.map(g=>({...g}));veSegsLay(old);const A=VE.orig||(VE.orig=await narDecode(VE.vb.blob)),sr=A.sampleRate,nc=Math.min(2,A.numberOfChannels),C=[];for(let c=0;c<nc;c++)C.push(A.getChannelData(c));
+ const R=ns.map(g=>[Math.max(0,Math.round(g.s0*sr)),Math.min(A.length,Math.round(g.s1*sr))]).filter(r=>r[1]-r[0]>sr*.05),tot=R.reduce((t,r)=>t+r[1]-r[0],0),out=C.map(()=>new Float32Array(tot)),fd=Math.round(sr*.006);let p=0;
+ R.forEach(r=>{const L=r[1]-r[0];for(let c=0;c<nc;c++){const d=out[c],s=C[c];for(let j=0;j<L;j++){let g=1;if(j<fd)g=j/fd;else if(L-j<=fd)g=(L-j)/fd;d[p+j]=s[r[0]+j]*g}}p+=L});
+ const nseg=R.map(r=>({s0:r[0]/sr,s1:r[1]/sr}));veSegsLay(nseg);const W2=[];
+ (VE.words||[]).forEach(w=>{const a=veVTo(old,w.t0),b=veVTo(old,w.t1),m=(a+b)/2;nseg.forEach(g=>{if(m>=g.s0-.001&&m<=g.s1+.001){const t0=g.t0+Math.max(0,a-g.s0);W2.push({...w,t0:+t0.toFixed(3),t1:+Math.max(t0+.08,g.t0+Math.min(b,g.s1)-g.s0).toFixed(3)})}})});W2.sort((x,y)=>x.t0-y.t0);
+ const wav=narWav(out,sr);await musPut({k:veKey(VE.s),n:'🎬 Narração do vídeo',buf:wav,ts:Date.now()});veAudUse(out,sr,wav);
+ VE.vb.segs=nseg;VE.sc=[{i:0,d:Math.max(.5,tot/sr),tr:'corte'}];VE.words=W2;VE.script=W2.map(x=>x.w).join(' ');const had=VE.zm.length+VE.sfx.length+(VE.ov||[]).length;VE.zm=[];VE.sfx=[];VE.ov=[];veLay();VE.T=0;veSave();veUI();veFit();veTL();veRender();
+ stat('● vídeo reorganizado: '+narFmt(tot/sr)+(had?' (zooms, sons e cenas extras foram limpos: refaça depois)':''))}
+async function vvApply(g,cort,modo){if(!VE.vb)return;const F=vvPh(),S0=VE.vb.segs;veSegsLay(S0);
+ const pcs=(a,b)=>{let o=[];for(let i=a;i<=b;i++){const f=F[i-1];if(f)o=o.concat(vePieces(Math.max(0,f.t0-.08),f.t1+.15))}return o},Hp=g?pcs(g.de,g.ate):[],Cp=[];(cort||[]).forEach(i=>{pcs(i,i).forEach(x=>Cp.push(x))});
+ const rest=veSub(S0,Cp.concat(modo=='mover'?Hp:[])),head=veMerge(Hp.map(p=>({s0:p[0],s1:p[1]})).filter(x=>!Cp.some(c=>c[0]<=x.s0&&c[1]>=x.s1)));
+ await veReseg(head.concat(rest))}
+/* ---------- cenas extras ---------- */
+function veOvAuto(){const o=VE.ovo,D=VE.D,pool=[];if(!D)return 0;if(o.lib)VE.lib.forEach(l=>{if(VELIB.has(l.id))pool.push({k:'lib',ref:l.id})});if(o.tela)VE.s.S.forEach((x,i)=>pool.push({k:'tela',ref:i}));
+ if(!pool.length){stat('⚠ escolha de onde vêm as cenas: coloque fotos/vídeos na biblioteca ou marque as telas do editor');return 0}
+ let sd=((+o.seed||1)*9301+49297)%233280;const R=()=>{sd=(sd*9301+49297)%233280;return sd/233280},dmin=Math.max(.6,+o.dmin||1.2),dmax=Math.max(dmin,+o.dmax||2.6),n=Math.max(1,Math.round(D/60*(+o.rate||8))),st=(VE.words||[]).map(w=>w.t0),L=[],t0=Math.min(3,D*.2);
+ for(let a=0;a<n*40&&L.length<n;a++){let t=t0+R()*Math.max(.1,D-t0-dmax-.8);if(st.length){let b=st[0],bd=1e9;st.forEach(x=>{const d=Math.abs(x-t);if(d<bd){bd=d;b=x}});if(bd<.7)t=Math.max(t0,b-.05)}const d=dmin+R()*(dmax-dmin);if(t+d>D-.4)continue;if(L.some(q=>t<q.t+q.d+1.6&&q.t<t+d+1.6))continue;L.push({t:+t.toFixed(2),d:+d.toFixed(2)})}
+ L.sort((a,b)=>a.t-b.t);const bag=[];L.forEach(q=>{if(!bag.length)pool.slice().sort(()=>R()-.5).forEach(x=>bag.push(x));const x=bag.shift();q.k=x.k;q.ref=x.ref});
+ VE.ov=L;VE.zm=VE.zm.filter(e=>e.a!=='ov');if(o.zoom)L.forEach(q=>{VE.zm.push({t:q.t,z:1.1,k:'key',d:.3,a:'ov'});VE.zm.push({t:+(q.t+q.d).toFixed(2),z:1,k:'seco',a:'ov'})});VE.zm.sort((x,y)=>x.t-y.t);
+ if(o.sfx){try{veSfxAuto()}catch(e){}}
+ veSave();veTL();veRender();return L.length}
+/* ---------- painel ---------- */
+function veVidSide(){const o=VE.o||{},vb=VE.vb,W=VE.words||[],F=W.length?vvPh():[],hot=new Set(F.map((f,i)=>[i,vvScore(f)]).filter(x=>x[1]>=3).sort((a,b)=>b[1]-a[1]).slice(0,3).map(x=>x[0])),ov=VE.ovo||{};
+ const st=(n,t)=>`<div class=vvst><span class=vvn>${n}</span><b>${t}</b></div>`;
+ return`<div class=vesec>${st(1,'Vídeo')}<small class=mu>Escolha o vídeo pronto (mp4, mov, webm). O painel guarda a imagem, corta as pausas e usa o áudio dele. A saída é vertical 9:16 (se o vídeo for horizontal, ele preenche a tela).</small>
+  <div class=row><label class=chip style="cursor:pointer">📁 ${vb?'Trocar vídeo':'Escolher vídeo'}<input type=file accept="video/*,.mp4,.mov,.webm,.m4v" hidden id=vvfile></label><span class=mu>${vb?esc(vb.n)+' · '+narFmt(vb.dur||0)+' → '+narFmt(VE.D):'nenhum vídeo'}</span></div>
+  <label class=veck><input type=checkbox id=vv_cut ${o.cut===0?'':'checked'}> cortar os silêncios</label>
+  <div class=veg><label>Sensibilidade<select id=vv_sens>${[['baixa','Baixa (corta menos)'],['normal','Normal'],['alta','Alta (corta mais)']].map(q=>`<option value=${q[0]}${(o.sens||'normal')==q[0]?' selected':''}>${q[1]}</option>`).join('')}</select></label><label>Pausa mínima (s)<input type=number id=vv_min min=.1 max=2 step=.05 value="${o.minsil||.3}"></label><label>Pausa que sobra (s)<input type=number id=vv_keep min=0 max=1 step=.02 value="${o.keep==null?.1:o.keep}"></label></div>
+  ${vb?`<label>Enquadramento (esquerda ↔ direita)<input type=range min=0 max=1 step=.02 id=vv_fx value="${vb.fx==null?.5:vb.fx}"></label>`:''}
+  ${VE.info?`<small class=mu>${esc(VE.info)}</small>`:''}</div>
+ <div class=vesec>${st(2,'Transcrição')}<small class=mu>Escreve o que ele fala (Whisper no seu aparelho, sem custo; precisa de internet só na 1ª vez).</small>
+  <button class=btn data-ve=asr ${vb&&!VE.busy?'':'disabled'}>🎤 ${W.length?'Transcrever de novo':'Transcrever o áudio'}</button>${W.length?`<small class=mu>${W.length} palavras · ${F.length} frases</small>`:''}</div>
+ <div class=vesec>${st(3,'Ganchos e organização')}<small class=mu>O gancho é a frase que prende nos primeiros segundos. Marque à mão, ou peça à IA e cole a resposta.</small>
+  ${F.length?`<div class=vvph id=vvph>${F.map((f,i)=>`<label class="${hot.has(i)?'hot':''}"><input type=checkbox data-vp=${i+1}> <span><small>${i+1} · ${f.t0.toFixed(1)}s</small> ${hot.has(i)?'🔥 ':''}${esc(f.t)}</span></label>`).join('')}</div>
+  <div class=row style="gap:6px;flex-wrap:wrap"><select id=vv_modo><option value=mover>mover o gancho para o início</option><option value=repetir>repetir no início (e manter onde estava)</option></select><button class=chip data-vv=hookmark>⭐ Usar as marcadas como gancho</button></div>
+  <div class=row style="gap:6px;flex-wrap:wrap"><button class=chip data-vv=hookai>📋 Copiar pedido para a IA</button></div>
+  <textarea id=vv_resp rows=3 placeholder="Cole aqui a resposta da IA (JSON)" style="width:100%"></textarea><button class=chip data-vv=hookgo>✔ Aplicar a resposta da IA</button><small class=mu id=vv_hkinfo></small>`:'<small class=mu>Faça a transcrição (passo 2) para ver as frases.</small>'}</div>
+ <div class=vesec>${st(4,'Cenas extras por cima')}<small class=mu>O vídeo dele continua rodando com o áudio; as cenas entram por alguns segundos, com zoom e som. Você escolhe o que entra:</small>
+  <label class=veck><input type=checkbox id=vo_lib ${ov.lib?'checked':''}> 🖼 fotos e vídeos da biblioteca deste vídeo</label>
+  <div class=vvlib>${(VE.lib||[]).map(l=>`<span>${l.kind=='vid'?'🎞':'🖼'} ${esc(l.n.slice(0,22))} <b data-vv=libdel data-id=${l.id} title="Tirar">✕</b></span>`).join('')}<label class=chip style="cursor:pointer">＋ Adicionar<input type=file accept="image/*,video/*" multiple hidden id=vvlib></label></div>
+  <label class=veck><input type=checkbox id=vo_tela ${ov.tela?'checked':''}> 🧩 telas do editor (as artes em JSON deste post)</label>
+  <small class=mu>As legendas animadas ficam na aba ② Legendas.</small>
+  <div class=veg><label>Cenas por minuto<input type=number id=vo_rate min=1 max=30 step=1 value="${ov.rate||8}"></label><label>Duração mín. (s)<input type=number id=vo_dmin min=.6 max=6 step=.1 value="${ov.dmin||1.2}"></label><label>Duração máx. (s)<input type=number id=vo_dmax min=.8 max=10 step=.1 value="${ov.dmax||2.6}"></label></div>
+  <label class=veck><input type=checkbox id=vo_zoom ${ov.zoom?'checked':''}> zoom na entrada de cada cena</label><label class=veck><input type=checkbox id=vo_sfx ${ov.sfx?'checked':''}> efeito sonoro na entrada</label>
+  <div class=row style="gap:6px"><button class=btn data-vv=ovauto ${vb&&!VE.busy?'':'disabled'}>🎲 Colocar ao acaso</button><button class=chip data-vv=ovclr>🗑 Limpar</button></div>
+  ${(VE.ov||[]).length?`<small class=mu>${VE.ov.length} cena(s) extra(s). Aperte 🎲 de novo para outra combinação.</small>`:''}</div>`}
+function vvReadOv(){const g=id=>document.getElementById(id),n=(id,d)=>{const e=g(id);if(!e)return d;const v=+String(e.value).replace(',','.');return isFinite(v)?v:d},o=VE.ovo||(VE.ovo={});if(g('vo_lib')){o.lib=g('vo_lib').checked?1:0;o.tela=g('vo_tela').checked?1:0;o.zoom=g('vo_zoom').checked?1:0;o.sfx=g('vo_sfx').checked?1:0;o.rate=n('vo_rate',8);o.dmin=n('vo_dmin',1.2);o.dmax=n('vo_dmax',2.6)}}
+document.addEventListener('change',async e=>{const t=e.target;if(!t||!t.closest||!t.closest('#ve'))return;
+ if(t.id=='vvfile'){const f=t.files[0];t.value='';if(f)await veVidLoad(f);return}
+ if(t.id=='vvlib'){const F=[...t.files];t.value='';if(F.length)await veLibAdd(F);return}
+ if(t.id=='vv_fx'&&VE.vb){VE.vb.fx=+t.value;veSave();veRender();return}
+ if(/^vo_/.test(t.id)){vvReadOv();veSave();return}
+ if(/^vv_(cut|sens|min|keep)$/.test(t.id)){const o=VE.o||(VE.o={}),r=vvRead();o.cut=r.cut?1:0;o.sens=r.sens;o.minsil=r.minsil;o.keep=r.keep}},true);
+document.addEventListener('input',e=>{const t=e.target;if(t&&t.id=='vv_fx'&&VE.vb){VE.vb.fx=+t.value;veRender()}},true);
+document.addEventListener('click',async e=>{const a=e.target.closest&&e.target.closest('#ve [data-vv]');if(!a)return;const k=a.dataset.vv;e.stopPropagation();
+ if(k=='hookai'){const t=vvGanchoPrompt();if(!t)return stat('⚠ faça a transcrição primeiro');try{await navigator.clipboard.writeText(t);bigToast('Pedido copiado: cole na IA')}catch(x){copyBox('Pedido para a IA',t)}return}
+ if(k=='hookgo'){const r=vvParse((document.getElementById('vv_resp')||{}).value);if(!r||(!r.gancho&&!r.cortar.length))return alert('Não entendi a resposta. Cole o JSON que a IA devolveu (com "gancho" e/ou "cortar").');
+  const F=vvPh(),modo=(document.getElementById('vv_modo')||{}).value||'mover',tx=(g)=>g?('frases '+g.de+(g.ate>g.de?'–'+g.ate:'')+': “'+F.slice(g.de-1,g.ate).map(f=>f.t).join(' ').slice(0,90)+'”'):'';
+  if(!confirm('Aplicar?\n\nGancho '+(r.gancho?tx(r.gancho):'(nenhum)')+(r.gancho&&r.gancho.motivo?'\n('+r.gancho.motivo+')':'')+'\n\nCortar '+r.cortar.length+' frase(s)'+(r.cortar.length?': '+r.cortar.join(', '):'')+'\n\nIsso refaz o vídeo e limpa zooms, sons e cenas extras já feitos.'))return;
+  VE.busy=1;veUI();try{await vvApply(r.gancho,r.cortar,modo)}catch(x){console.warn(x);alert('Não consegui reorganizar: '+(x.message||x))}VE.busy=0;veUI();return}
+ if(k=='hookmark'){const L=[...document.querySelectorAll('#vvph input[data-vp]:checked')].map(x=>+x.dataset.vp).sort((x,y)=>x-y);if(!L.length)return stat('⚠ marque uma ou mais frases do gancho');const modo=(document.getElementById('vv_modo')||{}).value||'mover';VE.busy=1;veUI();try{for(const grp of L.reduce((o,n)=>{const l=o[o.length-1];if(l&&n==l[l.length-1]+1)l.push(n);else o.push([n]);return o},[]).slice(0,1))await vvApply({de:grp[0],ate:grp[grp.length-1]},[],modo)}catch(x){alert('Não consegui reorganizar: '+(x.message||x))}VE.busy=0;veUI();return}
+ if(k=='ovauto'){vvReadOv();VE.ovo.seed=(+VE.ovo.seed||1)+1;const n=veOvAuto();if(n)stat('● '+n+' cena(s) extra(s) colocada(s)');veUI();return}
+ if(k=='ovclr'){VE.ov=[];VE.zm=VE.zm.filter(x=>x.a!=='ov');veSave();veUI();veTL();veRender();return}
+ if(k=='libdel'){const id=a.dataset.id;VE.lib=VE.lib.filter(l=>l.id!=id);VE.ov=(VE.ov||[]).filter(o=>!(o.k=='lib'&&o.ref==id));const m=VELIB.get(id);try{if(m&&m.el){m.el.pause();URL.revokeObjectURL(m.el._u)}}catch(x){}VELIB.delete(id);veSave();veUI();veTL();veRender();return}},true);
 /* ---------- eventos ---------- */
 document.addEventListener('click',async e=>{const tb=e.target.closest&&e.target.closest('#ve [data-vtab]');if(tb){VE.tab=tb.dataset.vtab;veUI();return}
  const a=e.target.closest&&e.target.closest('#ve [data-ve]');if(!a)return;const k=a.dataset.ve;e.stopPropagation();
@@ -5011,6 +5139,7 @@ const SFXC={};const sfxBuf=k=>SFXC[k]||(SFXC[k]=(SFXG[k]||SFXG.pop)());
 function veSfxParse(){const M=[];String(VE.sfxmap||'').split(/\n/).forEach(l=>{const m=l.split('=');if(m.length<2)return;const w=veNz(m[0]).length?String(m[0]).trim().split(/\s+/).map(veNz).filter(Boolean):[],k=SFXAL[veNz(m.slice(1).join('='))];if(w.length&&k)M.push([w,k])});return M}
 function veSfxAuto(){const o=VE.sfxo,lvl=o.lvl==null?50:o.lvl,E=[];
  if(o.swap!==0)VE.sc.forEach((c,k)=>{if(!k)return;const pv=VE.sc[k-1];if(pv.i==c.i&&c.tr=='corte')return;E.push({t:+Math.max(0,c.t0-.04).toFixed(2),k:c.tr=='corte'?'pop':'whoosh',v:.7,a:1,p:2})});
+ if(o.swap!==0)(VE.ov||[]).forEach(q=>E.push({t:+Math.max(0,q.t-.04).toFixed(2),k:'whoosh',v:.65,a:1,p:2}));
  if(o.zoom!==0)VE.zm.forEach((e,i)=>{if(e.k!='seco')return;const big=e.z>=1.17;if(e.z>1.01){if(big)E.push({t:+e.t.toFixed(2),k:'boom',v:.6,a:1,p:3});else if(lvl>=40&&(lvl>=70||i%3!=2))E.push({t:+e.t.toFixed(2),k:'tick',v:.45,a:1,p:1})}else if(lvl>=75)E.push({t:+e.t.toFixed(2),k:'tick',v:.3,a:1,p:0})});
  if(o.words!==0){const cus=veSfxParse(),lastK={};VE.words.forEach((w,i)=>{const n=veNz(w.w);let k=null;for(const [ws,kk] of cus){if(ws.every((x,j)=>VE.words[i+j]&&veNz(VE.words[i+j].w)==x)){k=kk;break}}if(!k)for(const [re,kk] of SFXKW){if(re.test(n)){k=kk;break}}if(!k)return;if(lastK[k]!=null&&w.t0-lastK[k]<1.2)return;lastK[k]=w.t0;E.push({t:+Math.max(0,w.t0-.02).toFixed(2),k,v:.85,a:1,p:5})})}
  E.sort((a,b)=>a.t-b.t);const R=[];E.forEach(e=>{const l=R[R.length-1];if(l&&e.t-l.t<.15){if(e.p>l.p)R[R.length-1]=e}else R.push(e)});R.forEach(e=>delete e.p);
