@@ -1025,7 +1025,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:239*/const PV=239;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:240*/const PV=240;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -1503,7 +1503,7 @@ async function upCheck(manual){UPL=Date.now();
   if(!t)try{const x=(await api({action:'painel'})).html||'';if(OK(x))t=x}catch(e){}const n=V(t);
   if(!t)return manual&&alert('Não consegui baixar o painel novo agora (sem conexão com o GitHub nem com o Apps Script). Tento de novo sozinho em 30 min.');
   if(n<=PV)return manual&&stat('● já está na versão mais nova (painel v'+PV+')');
-  try{localStorage.setItem('painelHtml',t)}catch(x){return manual&&alert('Sem espaço no aparelho para a versão nova.')}
+  try{localStorage.setItem('painelHtml',t)}catch(x){try{localStorage.removeItem('painelHtml');localStorage.setItem('painelHtml',t)}catch(x2){try{localStorage.removeItem('painelHtml')}catch(e){}const big=(()=>{try{return Object.keys(localStorage).map(k=>[k,(k.length+String(localStorage[k]).length)*2]).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,n])=>k+' '+(n/1048576).toFixed(1)+' MB').join(', ')}catch(e){return ''}})();return manual&&alert('A memória do app está cheia (não é o espaço do celular). A versão nova não coube.'+(big?'\nMaiores itens: '+big:'')+'\nO app continua funcionando na versão que já tem; me mande esta mensagem para eu liberar espaço.')}}
   document.getElementById('upbar')?.remove();const d=document.createElement('div');d.id='upbar';d.innerHTML=`<span>Versão nova do painel (v${n}) pronta</span><button data-act=upgo>Atualizar</button>`;document.body.appendChild(d)}
  catch(x){if(manual)alert('Sem conexão com o Apps Script agora.')}}
 if(window.Capacitor){setTimeout(()=>upCheck(),15000);setInterval(()=>upCheck(),30*60000);document.addEventListener('visibilitychange',()=>{if(!document.hidden&&Date.now()-UPL>10*60000)upCheck()})}
