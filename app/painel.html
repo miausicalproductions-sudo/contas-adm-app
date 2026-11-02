@@ -1030,7 +1030,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:253*/const PV=253;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:254*/const PV=254;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -3024,6 +3024,7 @@ document.addEventListener('click',async e=>{const g=e.target.closest('[data-go]'
   const st=v=='dado'?(EDX.anst||((visAll().find(z=>z.id==((STU.S[0].ov||{}).visual||(artCfg(STU.p.co)||{}).visual))||{}).an)||'divertido'):v=='surpresa'?(K=>K[Math.floor(Math.random()*K.length)])(Object.keys(ANST)):v;const n=edAutoAnim(st);edShow();edAnimPlay();stat('✨ '+n+' camadas animadas ('+(ANSTN[st]||st)+'). 🎲 sorteia outra variação');return}
  if(act=='exmain'&&STU){exMain(a.dataset.v);exListPop();return}
  if(act=='lgcp'&&STU){const t=STU._lg&&STU._lg[a.dataset.v];if(!t)return;try{await navigator.clipboard.writeText(t);stat('● log copiado ✓ cole na conversa com a IA')}catch(e){prompt('Copie o log:',t)}return}
+ if(act=='edpack'&&STU){await stjLogOpen(EDX?EDX.i:0);const z=document.querySelector('[data-act=lgzip]');if(z)z.click();return}
  if(act=='edfile'&&STU&&a.dataset.v=='jlog'){document.querySelector('#ste .psfdd')?.setAttribute('hidden','');await stjLogOpen(EDX?EDX.i:0);return}
  if(act=='exdel'&&STU){exDel(a.dataset.v);exListPop();return}
  if(act=='edfile'&&STU&&a.dataset.v=='jexl'){document.querySelector('#ste .psfdd')?.setAttribute('hidden','');exListPop();return}
@@ -7967,7 +7968,7 @@ function cvBuild(){const st=document.getElementById('ste');if(!st)return;
  /* barra de cima */
  menu.insertAdjacentHTML('afterbegin',`<button type=button class=cvhome data-act=edfile data-v=close title="Voltar ao estúdio (fecha o editor · Esc)">${SV.home}</button>`);
  const sp=menu.querySelector(':scope>.sp');
- const mid=`<i class=cvdiv></i><button type=button class=cvcloud data-act=edundo title="Desfazer (Ctrl+Z)">${A.I('<path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>')}</button><button type=button class=cvcloud data-act=edfile data-v=save title="Salvar projeto (Ctrl+S)${s.svd?' · último: '+s.svd:''}">${SV.cloud}</button>`;
+ const mid=`<i class=cvdiv></i><button type=button class=cvcloud data-act=edundo title="Desfazer (Ctrl+Z)">${A.I('<path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>')}</button><button type=button class=cvcloud data-act=edpack title="Pacote para a IA: baixa um .zip com as imagens de todas as telas + o log do painel (medidas, avisos, JSON original) e o pedido de correção">📦</button><button type=button class=cvcloud data-act=edfile data-v=save title="Salvar projeto (Ctrl+S)${s.svd?' · último: '+s.svd:''}">${SV.cloud}</button>`;
  if(sp){sp.insertAdjacentHTML('beforebegin',mid);sp.insertAdjacentHTML('afterend',`<b class=cvttl title="Tela ${i+1} de ${s.S.length}">${esc((s.c&&s.c.name)||'')} — ${esc(String(s.S[i].t||'').replace(/\*/g,'')||'Tela '+(i+1))} · ${s.fmt=='st'?'Stories 9:16':'Carrossel 4:5'}</b><button type=button class=cvav data-cvav style="background:${EUC()}" title="${esc(EUN()||'Quem é você?')} · preferências">${esc((EUN()||'?').split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase())}</button>`)}
  /* menu lateral */
  main.insertAdjacentHTML('afterbegin',`<div class=cvrail>${RAIL.map(([k,n,ic])=>`<button type=button class=cvri data-cvr=${k} title="${n}"><span class=cvic>${ic}</span>${n}</button>`).join('')}</div><button type=button class=cvhide data-cvclose title="Recolher o painel">${SV.back}</button>`);
