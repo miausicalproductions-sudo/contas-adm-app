@@ -850,7 +850,7 @@ body:not(.edbx-show) #ste .stebx:not(.on):not(.inner):not(.dropt):not(.tf):not(:
 #ste.cv[data-cvp=""] .psright{display:none!important}
 #ste.cv[data-cvp=""] .psmain{grid-template-columns:76px 0 minmax(0,1fr)!important}
 #ste.cv .psopt{grid-column:3!important;grid-row:1!important}
-#ste.cv .stew{grid-column:3!important;grid-row:2!important;background:var(--cvbg)!important;padding:58px 44px 84px!important;position:relative}
+#ste.cv .stew{grid-column:3!important;grid-row:2!important;background:var(--cvbg)!important;padding:50px 40px 60px!important;position:relative}
 #ste.cv .cvhide{position:absolute;top:50%;left:calc(76px + var(--cvpw,360px) - 1px);transform:translateY(-50%);z-index:6;width:28px;height:56px;border-radius:0 14px 14px 0;border:1px solid var(--cvln);border-left:0;background:#fff;box-shadow:2px 2px 8px #0d121614;cursor:pointer;color:var(--cvink);display:grid;place-items:center}
 #ste.cv[data-cvp=""] .cvhide{display:none}
 /* painéis */
@@ -1002,6 +1002,7 @@ body:not(.edbx-show) #ste .stebx:not(.on):not(.inner):not(.dropt):not(.tf):not(:
 #ste.cv .pstxc{border-color:var(--cvln)!important}
 #ste.cv .pstxc input,#ste.cv .pstxc textarea{background:#fff!important;color:var(--cvink)!important;border-color:#d5d8de!important}
 #ste.cv.cvnofilm .psfilm{display:none!important}
+@media(max-height:780px){#ste.cv .psopt{padding:3px 10px!important;gap:3px 6px!important}#ste.cv .psopt .chip,#ste.cv .psopt button{padding-top:4px!important;padding-bottom:4px!important}#ste.cv .psmenu{min-height:46px!important}}
 #ste.cv .cvbot{display:flex;align-items:center;gap:6px;height:46px;padding:0 14px 0 92px;background:var(--cvbg);border-top:1px solid #e6e8ec;color:#353b44;font:600 14px 'Plus Jakarta Sans',sans-serif}
 #ste.cv .cvbot button{display:inline-flex;align-items:center;gap:6px;background:none;border:0;border-radius:6px;padding:6px 8px;font:inherit;color:inherit;cursor:pointer}
 #ste.cv .cvbot button:hover,#ste.cv .cvbot button.on{background:#e3e5ea}
@@ -1029,7 +1030,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:248*/const PV=248;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:249*/const PV=249;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -7768,6 +7769,7 @@ if(window.__cvOK)return;window.__cvOK=1;
 const LSg=(k,d)=>{try{const v=localStorage.getItem(k);return v==null?d:v}catch(e){return d}},LSs=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
 const CV0={p:'el',open:true,sub:'',cat:'Todas',nofilm:false};
 let CVS=(()=>{try{return Object.assign({},CV0,JSON.parse(LSg('cvst','{}')))}catch(e){return{...CV0}}})();
+if(CVS.nfv!=2){CVS.nfv=2;if(innerHeight<800)CVS.nofilm=true;try{LSs('cvst',JSON.stringify(CVS))}catch(e){}}
 const cvSave=()=>LSs('cvst',JSON.stringify(CVS));
 const edVisOf=id=>{const u=EQ().find(x=>x.id==id);return u&&u.ed?u.ed:''};
 window.edVisual=()=>edVisOf(EU())||LSg('edvis','ps');
@@ -7969,7 +7971,7 @@ function cvBuild(){const st=document.getElementById('ste');if(!st)return;
 /* liga no editor: depois de desenhar, veste o visual Canva */
 const orig=edShow;edShow=function(){const r=orig.apply(this,arguments);try{cvBuild()}catch(e){console.error('visual canva',e)}if(A.cvOn())try{edFit()}catch(e){}return r};
 edShow.__keepScroll=1;
-const oFit=edFit;edFit=function(){const r=oFit.apply(this,arguments);if(A.cvOn()){const w=document.querySelector('#ste .stew'),c=document.querySelector('#ste .stecv');if(w&&c&&EDX){const ar=1080/H_(),base=Math.max(140,Math.min(w.clientHeight-150,(w.clientWidth-90)/ar));c.style.height=Math.round(base*(EDX.zoom||1))+'px';const zv=document.getElementById('cvzv'),zr=document.querySelector('#ste .cvzr');if(zv)zv.textContent=Math.round((EDX.zoom||1)*100)+'%';if(zr&&document.activeElement!==zr)zr.value=Math.round((EDX.zoom||1)*100);try{edBoxes()}catch(e){}}}return r};
+const oFit=edFit;edFit=function(){const r=oFit.apply(this,arguments);if(A.cvOn()){const w=document.querySelector('#ste .stew'),c=document.querySelector('#ste .stecv');if(w&&c&&EDX){const ar=1080/H_(),cs=getComputedStyle(w),pv=(parseFloat(cs.paddingTop)||0)+(parseFloat(cs.paddingBottom)||0),ph=(parseFloat(cs.paddingLeft)||0)+(parseFloat(cs.paddingRight)||0),base=Math.max(140,Math.min(w.clientHeight-pv-4,(w.clientWidth-ph-4)/ar));c.style.height=Math.round(base*(EDX.zoom||1))+'px';const zv=document.getElementById('cvzv'),zr=document.querySelector('#ste .cvzr');if(zv)zv.textContent=Math.round((EDX.zoom||1)*100)+'%';if(zr&&document.activeElement!==zr)zr.value=Math.round((EDX.zoom||1)*100);try{edBoxes()}catch(e){}}}return r};
 
 /* ações do visual Canva que não existiam como botão */
 function cvAdd(N,front,mod){if(mod&&!edNeedMod())return;const x=STU.S[EDX.i],m=isM();if(!m)x.extra=x.extra||[];const C=m?x.mod.camadas:x.extra,KP=m?'c':'x';edSnap();let at=C.length;if(!front&&m){const ti=C.findIndex(L=>['titulo','texto','selo','logo','pet'].includes(nrm((L&&L.tipo)||'')));if(ti>=0)at=ti}C.splice(at,0,N);EDX.sel=KP+at;EDX.ms=[EDX.sel];edShow();return EDX.sel}
