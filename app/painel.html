@@ -1030,7 +1030,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:256*/const PV=256;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:257*/const PV=257;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -5314,7 +5314,8 @@ DISTRIBUIÇÃO NA TELA (obrigatório; vale mais que o estilo e que a quantidade 
 5. FUNDO DISTRIBUÍDO na TELA TODA (y 0 a 1920, inclusive fora da zona segura): papel base com textura + pelo menos 4 elementos de fundo grandes espalhados pelos cantos e terços da tela (pedaços de papel rasgado, formas, pontilhado, fitas, rabiscos grandes) que sangram para fora da borda (x negativo ou além de 1080). Nada de fundo vazio no topo (0–250) nem no rodapé (1590–1920), e o fundo nunca fica agrupado no meio atrás do conteúdo.
 6. PARTES DO MESMO TÍTULO FICAM JUNTAS: a chamada, a palavra gigante e a pergunta de uma mesma frase formam UM bloco no HERÓI, com no máximo 30 px entre as linhas (não espalhe as partes pelas faixas; as faixas servem para blocos DIFERENTES: título, apoio, CTA). Nenhuma tela leva cabeçalho ou rodapé decorativo com nome da empresa, data ou número de página.
 7. ORDEM DE LEITURA = ORDEM DO ROTEIRO (obrigatório): lendo a tela de cima para baixo (e da esquerda para a direita na mesma linha), os textos aparecem EXATAMENTE na ordem em que estão no roteiro. Uma frase dividida em partes (ex.: etiqueta "Segunda de" + palavra gigante "feriado.") fica em partes vizinhas, uma logo acima da outra e na ordem certa, SEM nenhum outro texto no meio; a pergunta ou frase seguinte do roteiro (ex.: "Deu pra descansar hoje?") vem DEPOIS, nunca entre as partes. Antes de entregar, ordene os textos pelo y e leia em voz alta: se não soar como o roteiro, troque as posições.
-8. VARIE AS POSIÇÕES: as peças não formam uma coluna única alinhada; alterne esquerda, centro e direita, com 2 a 4° de rotação, mantendo a leitura de cima para baixo.`;
+8. DETALHES DE FUNDO × CONTEÚDO: papéis rasgados, fitas, rabiscos, pontilhados, texturas e manchas são DETALHES DE FUNDO: enriquecem a arte, podem passar pela zona segura e sangrar pelas bordas (x negativo ou além de 1080) e não contam como conteúdo. O painel só reorganiza o CONTEÚDO (textos, papel/etiqueta de trás do texto, foto, personagem, figurinha de interação) e deixa os detalhes de fundo onde você os colocou. Inclua no JSON de cada tela o campo "composicao": "poster" | "lista" | "numero" | "cta" | "comparacao" (o tipo da tela) para o painel escolher a receita de posição.
+9. VARIE AS POSIÇÕES: as peças não formam uma coluna única alinhada; alterne esquerda, centro e direita, com 2 a 4° de rotação, mantendo a leitura de cima para baixo.`;
 function crDayPromptDraw(Q,i){const D=Q.dias[i],N=D.stories.filter(x=>x.tipo!='reels'&&x.tipo!='carrossel').length;let t=crDayPrompt(Q,i,null,x=>x.tipo=='reels'||x.tipo=='carrossel');
  const A='UM ARQUIVO POR TELA com os nomes pedidos no roteiro (ex.: 2026-10-27_story1.json; se o roteiro não disser, tela1.json, tela2.json…)',A2='UM ÚNICO ARQUIVO .json com TODAS as telas';
  if(t.indexOf(A)>=0)t=t.replace(A,A2);
@@ -6803,14 +6804,23 @@ function orgItems(s,i){const CA=s.S[i].mod.camadas,{box,tx}=orgBoxes(s,i),H=1920
  const bb=it=>{let t=1e9,b=-1e9,x0=1e9,x1=-1e9;it.mem.forEach(q=>{const e=it.tx.includes(q)?tx(q):(()=>{const c=box(q);return{t:c.y,b:c.y+c.h,x:c.x,w:c.w}})();t=Math.min(t,e.t);b=Math.max(b,e.b);x0=Math.min(x0,e.x);x1=Math.max(x1,e.x+e.w)});it.t=t;it.b=b;it.x0=x0;it.x1=x1};
  items.forEach(bb);
  /* enfeites presos ao bloco (fita no canto do papel…) */
- const rest=[];CA.forEach((L,q)=>{if(!live(q)||used.has(q)||L.fixo||L.decor)return;const tp=TP(q);if(['textura','ondas','enfeites'].includes(tp)||['titulo','texto','arroba'].includes(tp))return;const b=box(q);if(full(b))return;let ok=false;for(const it of items){const cx=b.x+b.w/2,cy=b.y+b.h/2;if(cx>=it.x0-90&&cx<=it.x1+90&&cy>=it.t-90&&cy<=it.b+90){it.mem.push(q);it.at.push(q);used.add(q);ok=true;break}}if(!ok)rest.push(q)});
+ /* DETALHES DE FUNDO (textura, fita, rabisco, pincel, papel rasgado, bolinhas, tudo que encosta na borda ou é translúcido) enriquecem a arte: ficam onde a IA pôs, podem invadir a zona segura e nunca são movidos nem contados como conteúdo. Só fita/rabisco colados no canto de um bloco acompanham o bloco. */
+ const bgd=q=>{const L=CA[q],tp=TP(q),b=box(q),op=L.opac==null?1:+L.opac;return ['textura','ondas','enfeites','fita','rabisco','pincel'].includes(tp)||L.decor||L.fixo||(tp=='forma'&&(/rasgado|onda/.test(nrm(L.forma||''))||L.padrao||L.pattern||op<.6))||op<.5||b.x<=40||b.y<=40||b.x+b.w>=1040||b.y+b.h>=H-40};
+ const rest=[];CA.forEach((L,q)=>{if(!live(q)||used.has(q))return;const tp=TP(q);if(['titulo','texto','arroba'].includes(tp))return;const b=box(q);if(full(b))return;if(['fita','rabisco','pincel'].includes(tp)||(tp=='svg'&&b.w*b.h<60000)){for(const it of items){const cx=b.x+b.w/2,cy=b.y+b.h/2;if(cx>=it.x0-60&&cx<=it.x1+60&&cy>=it.t-60&&cy<=it.b+60){it.mem.push(q);it.at.push(q);used.add(q);break}}return}if(bgd(q))return;rest.push(q)});
  items.forEach(bb);
  /* massas visuais (personagem, foto, ilustração): grupos de camadas que se tocam */
  const P2=rest.map((_,k)=>k),f2=k=>P2[k]==k?k:(P2[k]=f2(P2[k])),B2=rest.map(q=>box(q));
  rest.forEach((_,a)=>rest.forEach((__,b)=>{if(b<=a)return;const A=B2[a],C=B2[b];if(Math.min(A.x+A.w,C.x+C.w)-Math.max(A.x,C.x)>-24&&Math.min(A.y+A.h,C.y+C.h)-Math.max(A.y,C.y)>-24)P2[f2(a)]=f2(b)}));
  const V={};rest.forEach((q,a)=>{(V[f2(a)]=V[f2(a)]||{k:'v',tx:[],mem:[],ho:new Set(),at:[]}).mem.push(q)});
- Object.values(V).forEach(it=>{bb(it);if((it.x1-it.x0)*(it.b-it.t)>=60000)items.push(it)});
+ Object.values(V).forEach(it=>{bb(it);const ar=(it.x1-it.x0)*(it.b-it.t),hero=it.mem.some(q=>['foto','figurinha','emoji','pet'].includes(TP(q)))||(ar>=90000&&it.mem.length>=2);if(hero&&ar>=40000)items.push(it)});
  return items.sort((a,b)=>a.t-b.t)}
+/* tipo de composição: o campo "composicao" do JSON (poster|lista|numero|cta|comparacao|enquete) ou, sem ele, detectado pelo texto */
+function orgComp(s,i,items){const src=(s._src&&s._src[i])||{},c=nrm(String(src.composicao||src.composition||'')).replace(/[^a-z]/g,'');if(['lista','numero','cta','comparacao','poster'].includes(c))return c;
+ const x=s.S[i],CA=x.mod.camadas,tx=[];(items||[]).forEach(it=>it.tx.forEach(q=>{const L=CA[q],t=nrm(L.tipo||'');tx.push(String(L.txt!=null&&L.txt!==''?L.txt:t=='titulo'?(x.t||''):(x.b||[]).join(' ')||'').replace(/\*/g,'').trim())}));
+ if((items||[]).filter(it=>it.k=='t').length>=3&&tx.filter(t=>/^(\d+[\.\)\-]|[•✔✓➜→-]\s)/.test(t)).length>=3)return'lista';
+ if(tx.some(t=>/^[R$ ]*\d[\d.,]{0,6}\s?(%|x|mil|k|reais|dias|horas)?[!.]?$/i.test(t)&&t.length<=9))return'numero';
+ if(i==s.S.length-1&&tx.some(t=>/\b(salve|compartilhe|comente|fale com|chame|clique|link|manda|mande|agende|siga)\b/i.test(t)))return'cta';
+ return''}
 function orgPlace(L,a,b,mode,anchor){const n=L.length;if(!n)return[];const th=L.reduce((t,e)=>t+(e.b-e.t),0),free=(b-a)-th;let g,st;
  if(free<0){g=n>1?Math.max(-70,free/(n-1)):0;st=a}
  else if(mode=='centro'){g=Math.min(64,n>1?free/(n-1):0);st=a+(free-g*(n-1))/2}
@@ -6824,16 +6834,16 @@ async function stjOrg(s,i,o){o=o||{};const x=s.S[i],M=x&&x.mod;if(s.fmt!='st'||!
  const fig=(s.p&&s.p.fig&&ORGFIG[s.p.fig])?s.p.fig:'',zc=fig?(+String(s.p.figpos||'50,60').split(',')[1]||60)/100*H:0,zh=fig?ORGFIG[fig]+48:0,Z=fig?{t:Math.max(SF.top,zc-zh/2),b:Math.min(SF.bot,zc+zh/2)}:null,log=[];
  /* hierarquia: tela vazia demais → o texto cresce */
  {const span=(SF.bot-SF.top)-(Z?Z.b-Z.t:0),th=items.reduce((t,it)=>t+(it.b-it.t),0),r=th/Math.max(1,span);
-  if(r<.5){const k=Math.min(1.35,Math.sqrt(.6/Math.max(.05,r)));if(k>1.08){const{tx}=orgBoxes(s,i),mg=[];items.forEach(it=>it.ho.forEach(p=>{const e=it.tx.map(q=>tx(q)),et=Math.min(...e.map(v=>v.t)),eb=Math.max(...e.map(v=>v.b)),b=orgBoxes(s,i).box(p);mg.push([p,it,et-b.y,b.y+b.h-eb])}));
+  const comp0=orgComp(s,i,items);if(r<.5||(comp0=='numero'&&r<.62)){const k=Math.min(comp0=='numero'?1.6:1.35,Math.sqrt((comp0=='numero'?.7:.6)/Math.max(.05,r)));if(k>1.08){const{tx}=orgBoxes(s,i),mg=[];items.forEach(it=>it.ho.forEach(p=>{const e=it.tx.map(q=>tx(q)),et=Math.min(...e.map(v=>v.t)),eb=Math.max(...e.map(v=>v.b)),b=orgBoxes(s,i).box(p);mg.push([p,it,et-b.y,b.y+b.h-eb])}));
    it0:for(const it of items){if(it.k!='t')continue;for(const q of it.tx){const L=CA[q],t=nrm(L.tipo||''),kk=t=='titulo'?k:t=='texto'?Math.pow(k,.75):1;if(kk>1)L.tam=+((+L.tam||(t=='titulo'?6:4))*kk).toFixed(2)}}
    try{await stjMedir(s,i)}catch(e){}
    const{tx:tx2}=orgBoxes(s,i);mg.forEach(([p,it,mt,mb])=>{const e=it.tx.map(q=>tx2(q)),et=Math.min(...e.map(v=>v.t)),eb=Math.max(...e.map(v=>v.b)),ny=et-mt,nh=eb+mb-ny;CA[p].y=+(ny/H*100).toFixed(2);CA[p].h=+(nh/H*100).toFixed(2)});
    items=orgItems(s,i);log.push('texto aumentado ×'+k.toFixed(2)+' (a tela estava vazia: ocupava '+Math.round(r*100)+'% da área útil)')}}}
  /* receita */
- const seed=String((s.p&&s.p.id)||'')+i;let hs=0;for(const c of seed)hs=(hs*31+c.charCodeAt(0))>>>0;const mode=ORGREC[hs%ORGREC.length];let tops=new Map();
+ const seed=String((s.p&&s.p.id)||'')+i;let hs=0;for(const c of seed)hs=(hs*31+c.charCodeAt(0))>>>0;const comp=orgComp(s,i,items);let mode=comp=='lista'?'ancorado':comp=='numero'?'centro':comp=='cta'?'ancorado':ORGREC[hs%ORGREC.length];let tops=new Map();
  if(Z){const zm=(Z.t+Z.b)/2;let up=items.filter(it=>(it.t+it.b)/2<zm),dn=items.filter(it=>(it.t+it.b)/2>=zm);if(!up.length&&dn.length){up=[dn.shift()]}
   orgPlace(up,SF.top,Z.t,'ancorado','topo').forEach((t,k)=>tops.set(up[k],t));orgPlace(dn,Z.b,SF.bot,'ancorado','base').forEach((t,k)=>tops.set(dn[k],t));log.push('receita: '+(FIG[fig]||fig)+' · faixa livre de y '+Math.round(Z.t)+' a '+Math.round(Z.b)+' para a figurinha')}
- else{orgPlace(items,SF.top,SF.bot,mode,'topo').forEach((t,k)=>tops.set(items[k],t));log.push('receita: '+mode)}
+ else{orgPlace(items,SF.top,SF.bot,mode,comp=='cta'?'base':'topo').forEach((t,k)=>tops.set(items[k],t));log.push('receita: '+(comp?comp+' · ':'')+mode)}
  let mv=0;items.forEach(it=>{const dy=tops.get(it)-it.t;if(Math.abs(dy)<2)return;mv++;it.mem.forEach(q=>{CA[q].y=+((+CA[q].y||0)+dy/H*100).toFixed(2)})});
  try{stjLogAdd(i,'Organização automática (modo ditador)',[...log,mv+' bloco(s) reposicionado(s) de '+items.length])}catch(e){}
  x.ov=x.ov||{};x.ov.org=mode;return{mode,moved:mv,blocks:items.length}}
