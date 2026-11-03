@@ -7,8 +7,12 @@
   const V = h => { const m = String(h).match(/PANELV:(\d+)/) || String(h).match(/const PV=(\d+)/); return m ? +m[1] : 0; };
   const OK = h => V(h) > 0 && String(h).length > 100000 && /<\/html>\s*$/i.test(String(h));
   const GH = 'https://raw.githubusercontent.com/miausicalproductions-sudo/contas-adm-app/main/app/painel.html';
+  /* v264: as atualizações ficam no IndexedDB (a memória comum do app, 10 MB, enchia com os dados) */
+  window.LDR2 = 1; try { localStorage.setItem('ldr2', '1'); } catch (e) {}
+  const kv = (m, k, v) => new Promise((ok, no) => { try { const r = indexedDB.open('miau', 1); r.onupgradeneeded = () => r.result.createObjectStore('kv'); r.onerror = () => no(r.error); r.onsuccess = () => { const db = r.result, tx = db.transaction('kv', m == 'get' ? 'readonly' : 'readwrite'), st = tx.objectStore('kv'), q = m == 'get' ? st.get(k) : st.put(v, k); tx.oncomplete = () => { db.close(); ok(q.result); }; tx.onerror = () => no(tx.error); }; } catch (e) { no(e); } });
   let h = await (await fetch('painel.html')).text();
   try { const c = localStorage.getItem('painelHtml'); if (c && OK(c) && V(c) > V(h)) h = c; } catch (e) {}
+  try { const c = await kv('get', 'painelHtml'); if (c && OK(c) && V(c) > V(h)) h = c; } catch (e) {}
   const upd = async () => {
     try {
       let t = '';
@@ -17,7 +21,7 @@
         const cfg = (JSON.parse(localStorage.getItem('adm2') || '{}').cfg || {}), u = cfg.url || '';
         if (/^https:\/\/script\.google\.com\/.+\/exec$/.test(u)) try { const j = JSON.parse(await (await fetch(u, { method: 'POST', body: JSON.stringify({ action: 'painel', key: cfg.key || '' }) })).text()); if (OK(j.html || '')) t = j.html; } catch (e) {}
       }
-      if (t && V(t) > V(h)) { localStorage.setItem('painelHtml', t); localStorage.setItem('painelNew', '1'); }
+      if (t && V(t) > V(h)) { try { await kv('set', 'painelHtml', t); try { localStorage.removeItem('painelHtml'); } catch (e) {} } catch (e) { localStorage.setItem('painelHtml', t); } localStorage.setItem('painelNew', '1'); }
     } catch (e) {}
   };
   document.open(); document.write(h); document.close();
