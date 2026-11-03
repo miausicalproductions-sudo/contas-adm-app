@@ -1030,7 +1030,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:261*/const PV=261;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:262*/const PV=262;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -2373,7 +2373,7 @@ function siteProc(it){const d=it.dados||{},ev=it.evento,ped=String(d.pedido||it.
   const t='💰 Pagamento: '+nm;siteNotif(t,(d.titulo||'')+(d.valor?' · '+d.valor:''));siteAtv(cc&&cc.id||'','pagamento confirmado'+(d.valor?' · '+d.valor:'')+(d.forma?' · '+d.forma:''));return}
  if(ev!='pedido')return;
  const ig=siteHandle(d.instagram),fone=String(d.whatsapp||'').trim(),mail=String(d.email||'').trim().toLowerCase(),contato=d.modo=='contato',val=siteNum(d.valor_num!=null?d.valor_num:d.valor_cobrado),
-  plano=(d.plano_nome||(d.plano_id?sitePret(d.plano_id):''))+(d.rede_extra?' + '+sitePret(d.rede_extra):''),per=d.periodo_nome||(d.periodo_id?sitePret(d.periodo_id):''),serv=d.servico_nome||(d.servico_id?sitePret(d.servico_id):''),nome=String(d.empresa||d.nome||'Novo cliente').trim(),mens=plano?(siteNum(d.valor_mensal)||Math.round(val/siteMeses(per)*100)/100):0;
+  plano=(d.plano_nome||(d.plano_id?sitePret(d.plano_id):''))+(d.rede_extra?' + '+sitePret(d.rede_extra):''),per=d.periodo_nome||(d.periodo_id?sitePret(d.periodo_id):''),serv=d.servico_nome||(d.servico_id?sitePret(d.servico_id):''),nome=String(d.empresa||d.nome||'Novo cliente').trim(),mens=plano?(siteNum(d.valor_mensal)||val):0;
  if(G_(lid))return;
  let c=null,nova=0;
  if(!contato){c=live('cos').find(x=>(ig&&String(x.ig||coUser(x.id)).toLowerCase()==ig.toLowerCase())||(siteDig(fone).length>=8&&siteDig(x.fone)==siteDig(fone))||(mail&&String(x.email||'').toLowerCase()==mail));
