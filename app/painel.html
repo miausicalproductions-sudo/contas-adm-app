@@ -1030,7 +1030,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:280*/const PV=280;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:281*/const PV=281;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -4854,7 +4854,7 @@ function veInsp(){const s=VE.s,z=VE.sel;if(!z)return'<small class=mu>Clique numa
  if(z.t=='sc'){const c=VE.sc[z.k];if(!c)return'';return`<b>Cena ${z.k+1}</b><div class=veg><label>Tela<select data-vf=sci>${s.S.map((x,i)=>`<option value=${i}${i==c.i?' selected':''}>Tela ${i+1} — ${esc(String(x.t||'').replace(/\*/g,'').slice(0,28))}</option>`).join('')}</select></label>${z.k?`<label>Entrada<select data-vf=sctr>${Object.keys(SEQT).map(k=>`<option value=${k}${c.tr==k?' selected':''}>${SEQT[k]}</option>`).join('')}</select></label>`:''}<label>Duração (s)<input type=number step=.1 min=.3 data-vf=scd value="${c.d.toFixed(2)}"></label></div><div class=row><button class=chip data-ve=split title="Corta esta cena em duas, onde está o cursor (o mesmo fundo continua)">✂ Dividir no cursor</button><button class=chip data-ve=delsc>🗑 Tirar a cena</button></div>`}
  if(z.t=='zm'){const e=VE.zm[z.k];if(!e)return'';return`<b>Zoom em ${veTm(e.t)}</b><div class=veg><label>Tipo<select data-vf=zk><option value=seco${e.k!='key'?' selected':''}>Seco (corte)</option><option value=key${e.k=='key'?' selected':''}>Suave (keyframe)</option></select></label><label>Força<input type=range min=1 max=1.8 step=.01 data-vf=zz value="${e.z}"><small>${(+e.z).toFixed(2)}×</small></label>${e.k=='key'?`<label>Dura (s)<input type=number step=.1 min=.1 data-vf=zd value="${e.d||1}"></label>`:''}<label>Início (s)<input type=number step=.05 min=0 data-vf=zt value="${e.t.toFixed(2)}"></label></div><div class=row><button class=chip data-ve=delzm>🗑 Apagar o zoom</button></div>`}
  return veInsp2(z)}
-const VETABS=[['vid','🎞 Vídeo de terceiros'],['aud','① Áudio'],['leg','② Legendas'],['cor','③ Cortes e zoom'],['sfx','④ Sons'],['exp','⑤ Exportar']];
+const VETABS=[['vid','🎞 Vídeo de terceiros'],['aud','① Áudio'],['leg','② Legendas'],['ban','🖼 Banco'],['cor','③ Cortes e zoom'],['sfx','④ Sons'],['exp','⑤ Exportar']];
 function veSide(){const o=VE.o,s=VE.s;let h='';
  if(VE.tab=='aud')h=`<div class=vesec><b>Áudio da narração</b><small class=mu>Escolha o áudio (ElevenLabs, gravação…). O painel corta os silêncios e já distribui as telas pelo texto de cada uma, sempre numa pausa. Tudo no seu aparelho, sem IA e sem custo.</small>
   <div class=row><label class=chip style="cursor:pointer">📁 ${VE.file?'Trocar áudio':'Escolher áudio'}<input type=file accept="audio/*,video/*,.m4a,.mp3,.wav,.ogg,.opus,.aac,.mp4,.mov" hidden id=vefile></label><span class=mu>${VE.file?esc(VE.file.name):(VE.au?'áudio já carregado ('+narFmt(VE.au.dur)+')':'nenhum arquivo')}</span></div>
@@ -4864,6 +4864,7 @@ function veSide(){const o=VE.o,s=VE.s;let h='';
   <button class=btn data-ve=audrun ${VE.file&&!VE.busy?'':'disabled'}>${VE.busy?'processando…':'✂ Cortar e ajustar as cenas'}</button>
   ${VE.info?`<small class=mu>${esc(VE.info)}</small>`:''}</div>`;
  else if(VE.tab=='vid')h=veVidSide();
+ else if(VE.tab=='ban')h=veBanco();
  else if(VE.tab=='leg')h=veLegSide();
  else if(VE.tab=='cor')h=veCutSide();
  else if(VE.tab=='sfx')h=veSfxSide();
@@ -4971,6 +4972,15 @@ function veOvAuto(){const o=VE.ovo,D=VE.D,pool=[];if(!D)return 0;if(o.lib)VE.lib
  if(o.sfx){try{veSfxAuto()}catch(e){}}
  veSave();veTL();veRender();return L.length}
 /* ---------- painel ---------- */
+function veBanco(){const ov=VE.ovo||{};return`<div class=vesec><b>Banco de imagens e cenas extras</b><small class=mu>Jogue aqui fotos, GIFs e vídeos de fundo (os vídeos entram mudos). As cenas entram por cima das telas do vídeo, por alguns segundos, com zoom e som. Desmarque "telas" para usar só o banco, ou desmarque o banco para usar só as telas. GIF entra parado (1º quadro).</small>
+  <label class=veck><input type=checkbox id=vo_lib ${ov.lib?'checked':''}> 🖼 fotos, GIFs e vídeos do banco</label>
+  <div class=vvlib>${(VE.lib||[]).map(l=>`<span>${l.kind=='vid'?'🎞':'🖼'} ${esc(l.n.slice(0,22))} <b data-vv=libdel data-id=${l.id} title="Tirar">✕</b></span>`).join('')}<label class=chip style="cursor:pointer">＋ Adicionar<input type=file accept="image/*,video/*" multiple hidden id=vvlib></label></div>
+  <label class=veck><input type=checkbox id=vo_tela ${ov.tela?'checked':''}> 🧩 telas do editor (as artes em JSON deste post)</label>
+  <small class=mu>As legendas animadas ficam na aba ② Legendas.</small>
+  <div class=veg><label>Cenas por minuto<input type=number id=vo_rate min=1 max=30 step=1 value="${ov.rate||8}"></label><label>Duração mín. (s)<input type=number id=vo_dmin min=.6 max=6 step=.1 value="${ov.dmin||1.2}"></label><label>Duração máx. (s)<input type=number id=vo_dmax min=.8 max=10 step=.1 value="${ov.dmax||2.6}"></label></div>
+  <label class=veck><input type=checkbox id=vo_zoom ${ov.zoom?'checked':''}> zoom na entrada de cada cena</label><label class=veck><input type=checkbox id=vo_sfx ${ov.sfx?'checked':''}> efeito sonoro na entrada</label>
+  <div class=row style="gap:6px"><button class=btn data-vv=ovauto ${VE.D&&!VE.busy?'':'disabled'}>🎲 Colocar ao acaso</button><button class=chip data-vv=ovclr>🗑 Limpar</button></div>
+  ${(VE.ov||[]).length?`<small class=mu>${VE.ov.length} cena(s) extra(s). Aperte 🎲 de novo para outra combinação.</small>`:''}</div>`}
 function veVidSide(){const o=VE.o||{},vb=VE.vb,W=VE.words||[],F=W.length?vvPh():[],hot=new Set(F.map((f,i)=>[i,vvScore(f)]).filter(x=>x[1]>=3).sort((a,b)=>b[1]-a[1]).slice(0,3).map(x=>x[0])),ov=VE.ovo||{};
  const st=(n,t)=>`<div class=vvst><span class=vvn>${n}</span><b>${t}</b></div>`;
  return`<div class=vesec>${st(1,'Vídeo')}<small class=mu>Escolha o vídeo pronto (mp4, mov, webm). O painel guarda a imagem, corta as pausas e usa o áudio dele. A saída é vertical 9:16 (se o vídeo for horizontal, ele preenche a tela).</small>
