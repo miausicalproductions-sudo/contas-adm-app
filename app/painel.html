@@ -1030,7 +1030,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:291*/const PV=291;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:292*/const PV=292;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -1876,6 +1876,11 @@ document.addEventListener('error',e=>{const t=e.target;if(t&&t.tagName=='IMG'&&!
 if(IS_APP)new MutationObserver(ms=>{for(const m of ms){if(m.type=='attributes'){if(m.target.tagName=='IMG')thWant(m.target)}else m.addedNodes.forEach(n=>{if(n.nodeType!=1)return;if(n.tagName=='IMG')thWant(n);else if(n.querySelectorAll)n.querySelectorAll('img[src^="https://drive.google.com/thumbnail"]').forEach(thWant)})}}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['src']});
 function appGate2(){if(!IS_APP||GAS||(S.cfg.url&&S.cfg.key))return;const d=document.createElement('div');d.id='lock';d.innerHTML=`<div class=lkb style="width:min(420px,92vw)"><img class=lkl src="${BR().logo}" alt=""><b>${esc(BR().ag||'Studios Miau')}</b><p class=mu style="text-align:center">Primeira vez neste aparelho. No PC que já usa o painel, abra Config e copie os dois campos.</p><label style="width:100%;font-size:12.5px;font-weight:600">Endereço do Apps Script (/exec)<input id=g2u autocomplete=off spellcheck=false value="${esc(S.cfg.url||'')}" style="font-size:14px;letter-spacing:0;text-align:left"></label><label style="width:100%;font-size:12.5px;font-weight:600">Chave de acesso<input id=g2k autocomplete=off spellcheck=false style="font-size:14px;letter-spacing:0;text-align:left"></label><button class=btn data-act=g2ok style="width:100%">Entrar</button><small id=lkmsg></small></div>`;document.body.appendChild(d)}
 setTimeout(appGate2,0);
+/* v292: depois de uma atualização (o painel recarrega), volta sozinho para o vídeo que estava aberto */
+(function(){let n=0;const iv=setInterval(async()=>{if(++n>60){clearInterval(iv);return}let r=null;try{r=JSON.parse(localStorage.veResume||'null')}catch(e){}if(!r){clearInterval(iv);return}
+ if(Date.now()-r.at>864e5){try{localStorage.removeItem('veResume')}catch(e){}clearInterval(iv);return}
+ const p=typeof S!='undefined'&&S.posts&&S.posts.find(x=>x.id==r.id&&!x.del);if(!p||typeof openMd!='function'||typeof stOpen!='function')return;clearInterval(iv);
+ try{sel=r.co;view='week';render();openMd(p,false);stOpen().catch(x=>console.warn(x));for(let i=0;i<100&&!(STU&&STU.p&&STU.p.id==p.id);i++)await new Promise(q=>setTimeout(q,100));if(!STU)return;if(typeof edOpen=='function'&&!EDX)edOpen(0);await veOpen();stat('● voltei para o vídeo que você estava editando')}catch(e){console.warn(e)}},500)})();
 try{if(localStorage.painelNew){localStorage.removeItem('painelNew');setTimeout(()=>stat('● painel atualizado para a versão nova'),800)}}catch(e){}
 /* ---------- informações da empresa no visual novo (abas) ---------- */
 let CTAB='perfil';
@@ -4935,8 +4940,8 @@ function veBuild(){const s=VE.s,H=veH(s);document.getElementById('ve')?.remove()
  <div class=vetlbox><div class=vetlh><div class=vel1><button data-ve=zout title="Diminuir a linha do tempo">−</button><button data-ve=zin title="Ampliar a linha do tempo">+</button></div><div class=vel2>Cenas</div><div class=vel2>Zoom</div><div class=vel2>Extras</div>${veLabw()}<div class=vel3>Áudio</div></div><div class=vetlw id=vetlw><div id=vetl class=vetl></div></div></div>`;
  document.body.appendChild(d);veUI();veLay();veFit();veTL()}
 async function veOpen(){const s=STU;if(!s)return;veStop();if(EDX){try{stSyncText()}catch(e){}}veLoad(s);VE.tab='flx';VE.sel=null;VE.T=0;VE.file=null;VE.info='';VE.busy=0;stat('🎬 abrindo o editor de vídeo…');
- await veAudLoad();await veVidRestore();await veFonts();veMk();veBuild();try{await vePrep()}catch(e){console.warn(e)}veRender();stat('● editor de vídeo aberto')}
-function veClose(){veStop();veSave();document.getElementById('ve')?.remove();VE.PP=null;VE.big=null;VE.tmp=null}
+ await veAudLoad();await veVidRestore();await veFonts();veMk();veBuild();try{await vePrep()}catch(e){console.warn(e)}veRender();stat('● editor de vídeo aberto');try{localStorage.veResume=JSON.stringify({id:s.p.id,co:s.p.co,at:Date.now()})}catch(e){}}
+function veClose(){try{localStorage.removeItem('veResume')}catch(e){}veStop();veSave();document.getElementById('ve')?.remove();VE.PP=null;VE.big=null;VE.tmp=null}
 async function veEnsure(s){if(VE.s===s&&VE.PP&&document.getElementById('ve'))return;veLoad(s);await veFonts();veMk();await vePrep();await veVidRestore()}
 /* ---------- exportar ---------- */
 async function veExport(s,O){O=O||{};await veEnsure(s);const H=veH(s),cap=await vidCaps(H);if(!cap.v)throw new Error('sem codificador de vídeo');veLay();const W=1080,D=VE.D,fps=30,N=Math.round(D*fps);
