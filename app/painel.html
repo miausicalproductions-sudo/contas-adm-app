@@ -207,6 +207,8 @@ html.edmob,html.edmob body{overflow:hidden!important;overscroll-behavior:none}ht
 .pssh::after{content:'';position:absolute;left:50%;top:3px;width:36px;height:3px;margin-left:-18px;border-radius:2px;background:#8a8a8a}
 .pssh:hover,.pssh:active{background:#31a8ff44}
 .stehd,.sth2{touch-action:none}
+#ste .psfi.msel,#ste .cvpg.msel{outline:3px solid #7c4dff!important;outline-offset:1px;background:#7c4dff22!important}#ste .psfs,#ste .cvpgs{user-select:none;-webkit-user-select:none}
+#msbar{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:99986;display:flex;gap:10px;align-items:center;background:#fff;color:#1b1b28;border-radius:99px;padding:8px 14px;box-shadow:0 8px 30px #0005,0 0 0 1px #0001;font:600 13px 'Plus Jakarta Sans',sans-serif}
 #edtb{position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:99985;display:flex;gap:14px;align-items:center;background:#fff;color:#1b1b28;border-radius:99px;padding:8px 16px;box-shadow:0 8px 30px #0004,0 0 0 1px #0001;font:600 12.5px 'Plus Jakarta Sans',sans-serif;flex-wrap:wrap;max-width:96vw}
 #edtb label{display:flex;gap:6px;align-items:center}#edtb input[type=range]{width:110px}#edtb output{min-width:28px;text-align:center;color:#555}#edtb small{color:#777;font-weight:500}
 #cpkp{position:fixed;z-index:99990;width:272px;max-height:80vh;overflow:auto;background:#fff;color:#1b1b28;border-radius:14px;padding:12px;box-shadow:0 12px 40px #0004,0 0 0 1px #0001;font:500 12px 'Plus Jakarta Sans',sans-serif}
@@ -1042,7 +1044,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:312*/const PV=312;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:313*/const PV=313;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -6005,6 +6007,33 @@ const ERA={esp:70,dur:35};try{Object.assign(ERA,JSON.parse(localStorage.edera||'
   const er=!!EDX.era,key=(er?'e':'b')+(er?ERA.esp+'/'+ERA.dur:VEBR.esp);if(bar&&bar.dataset.k0==(er?'e':'b'))return;if(bar)bar.remove();
   bar=document.createElement('div');bar.id='edtb';bar.dataset.k0=er?'e':'b';bar.innerHTML=`<b>${er?'🧽 Borracha':'🖌 Pincel'}</b><label>Tamanho <output>${er?ERA.esp:VEBR.esp}</output><input type=range data-tb=esp min=${er?10:4} max=${er?300:60} step=${er?5:2} value=${er?ERA.esp:VEBR.esp}></label>${er?`<label>Borda <small>suave</small><input type=range data-tb=dur min=0 max=100 step=5 value=${ERA.dur}><small>forte</small> <output>${ERA.dur<30?'suave':ERA.dur>70?'forte':'média'}</output></label>`:''}<button type=button class=chip data-act=${er?'edera':'edbrush'}>Sair</button>`;document.body.appendChild(bar)}
  setInterval(tick,300);window.edTick=tick})();
+/* v313: selecionar várias telas (arrastar um retângulo, Ctrl/Shift + clique) e apagar de uma vez, nos dois editores */
+(function(){const MS=new Set();let D=null,box=null,sup=0;
+ const sel='#ste .psfi[data-act=edgo2],#ste .cvpg[data-act=edgo2]',idx=b=>+b.dataset.v;
+ const sync=()=>{const st=document.getElementById('ste');let bar=document.getElementById('msbar');if(!st||!EDX||!STU){MS.clear();if(bar)bar.remove();return}
+  [...MS].forEach(i=>{if(i>=STU.S.length)MS.delete(i)});
+  st.querySelectorAll(sel).forEach(b=>b.classList.toggle('msel',MS.has(idx(b))));
+  if(!MS.size){if(bar)bar.remove();return}
+  const t=MS.size+(MS.size==1?' tela selecionada':' telas selecionadas');
+  if(bar){bar.querySelector('b').textContent=t;return}
+  bar=document.createElement('div');bar.id='msbar';bar.innerHTML='<b>'+t+'</b><button type=button class=chip data-ms=sel>Selecionar todas</button><button type=button class=chip data-ms=del style="background:#d32f4a;color:#fff;border-color:#d32f4a">🗑 Apagar</button><button type=button class=chip data-ms=clr>Cancelar</button>';document.body.appendChild(bar)};
+ const del=()=>{if(!MS.size||!STU||!EDX)return;const L=[...MS].sort((a,b)=>b-a);if(L.length>=STU.S.length){stat('● Não dá para apagar todas as telas: sobra pelo menos uma');return}
+  if(!confirm('Apagar '+L.length+(L.length==1?' tela':' telas')+'? (as outras continuam como estão)'))return;
+  L.forEach(i=>{STU.S.splice(i,1);if(STU.lays)STU.lays.splice(i,1)});MS.clear();STU.sel=Math.max(0,Math.min(STU.sel||0,STU.S.length-1));EDX.i=Math.max(0,Math.min(EDX.i,STU.S.length-1));EDX.hist=[];EDX.sel='t';try{stSyncText()}catch(e){}stRender();edShow();stat('● '+L.length+' telas apagadas')};
+ document.addEventListener('pointerdown',e=>{if(e.button||!EDX)return;const b=e.target.closest&&e.target.closest(sel);const cont=e.target.closest&&e.target.closest('#ste .psfs,#ste .cvpgs');if(!b&&!cont)return;D={x:e.clientX,y:e.clientY,on:0,b,cont:(cont||b.parentNode)}},true);
+ document.addEventListener('pointermove',e=>{if(!D)return;if(!D.on){if(Math.hypot(e.clientX-D.x,e.clientY-D.y)<7)return;D.on=1;box=document.createElement('div');box.id='msbox';document.body.appendChild(box);if(!e.ctrlKey&&!e.shiftKey&&!e.metaKey)MS.clear()}
+  const x0=Math.min(D.x,e.clientX),y0=Math.min(D.y,e.clientY),x1=Math.max(D.x,e.clientX),y1=Math.max(D.y,e.clientY);box.style.cssText='position:fixed;z-index:99986;pointer-events:none;border:1.5px solid #7c4dff;background:#7c4dff22;border-radius:4px;left:'+x0+'px;top:'+y0+'px;width:'+(x1-x0)+'px;height:'+(y1-y0)+'px';
+  document.querySelectorAll(sel).forEach(b=>{const r=b.getBoundingClientRect();if(r.right>=x0&&r.left<=x1&&r.bottom>=y0&&r.top<=y1)MS.add(idx(b));else if(!(e.ctrlKey||e.shiftKey||e.metaKey))MS.delete(idx(b))});sync();e.preventDefault()},true);
+ document.addEventListener('pointerup',e=>{if(!D)return;if(D.on){sup=Date.now();if(box){box.remove();box=null}}D=null},true);
+ document.addEventListener('click',e=>{
+  const m=e.target.closest&&e.target.closest('[data-ms]');if(m){e.stopImmediatePropagation();e.preventDefault();if(m.dataset.ms=='del')del();else if(m.dataset.ms=='clr'){MS.clear();sync()}else{STU.S.forEach((_,i)=>MS.add(i));sync()}return}
+  const b=e.target.closest&&e.target.closest(sel);if(!b)return;
+  if(Date.now()-sup<250){e.stopImmediatePropagation();e.preventDefault();return}
+  if(e.ctrlKey||e.shiftKey||e.metaKey){e.stopImmediatePropagation();e.preventDefault();const i=idx(b);if(MS.has(i))MS.delete(i);else{if(!MS.size&&EDX&&EDX.i!=null)MS.add(EDX.i);MS.add(i)}sync();return}
+  if(MS.size){MS.clear();setTimeout(sync,0)}},true);
+ document.addEventListener('keydown',e=>{if(!MS.size||!document.getElementById('ste'))return;const t=e.target;if(t&&(/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)||t.isContentEditable))return;
+  if(e.key=='Delete'||e.key=='Backspace'){e.stopImmediatePropagation();e.preventDefault();del()}else if(e.key=='Escape'){e.stopImmediatePropagation();MS.clear();sync()}},true);
+ setInterval(sync,300)})();
 function edDragT(e,k,h){if(h&&h.length==1&&h!='rot'&&!e.altKey&&!(e.ctrlKey||e.metaKey)&&(edCropDrag(e,k,h)||edFrameDrag(e,k,h)))return;if(h&&h.length==2&&(e.ctrlKey||e.metaKey)&&/^[cx]\d+$/.test(k)){const L=edLayer(k);if(!L)return;const ci={nw:0,ne:1,se:2,sw:3}[h];if(ci==null)return;const cv=document.getElementById('stecv'),sc=cv.clientWidth/cv.width,W=cv.width,H=cv.height,sx=e.clientX,sy=e.clientY,bw=Math.max(1,(L.w==null?100:+L.w)/100*W),bh=Math.max(1,(L.h==null?10:+L.h)/100*H);L.dist=Array.isArray(L.dist)&&L.dist.length==8?L.dist.map(v=>+v||0):[0,0,0,0,0,0,0,0];const d0=L.dist.slice();
   const mv=ev=>{const dx=(ev.clientX-sx)/sc/bw,dy=(ev.clientY-sy)/sc/bh;L.dist[2*ci]=+(d0[2*ci]+dx).toFixed(4);L.dist[2*ci+1]=+(d0[2*ci+1]+dy).toFixed(4);stat('⬚ deformando (Ctrl) · clique direito na camada → Tirar a deformação');edRAF()};
   const up=()=>{removeEventListener('pointermove',mv);removeEventListener('pointerup',up);if(!distOn(L))delete L.dist;edShow()};addEventListener('pointermove',mv);addEventListener('pointerup',up);return}
