@@ -1030,7 +1030,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:297*/const PV=297;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:298*/const PV=298;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -1059,8 +1059,15 @@ async function api(b,again){if(GAS){const body=JSON.stringify({...b,key:S.cfg.ke
  if(!j)throw NERR('O Google não entregou a resposta do Apps Script ao '+(ACTN[b.action]||b.action)+' ("'+pg(x)+'"). Se repetir, use Config → Testar conexão.');
  if(j.error)throw j.error;if(j.ver)S.ver=j.ver;return j}
 function sched(){clearTimeout(tm);stat('salvando…');tm=setTimeout(push,700)}
+/* v298: o Google Sheets não aceita célula com mais de 50 mil caracteres: encolhe o que for maior (primeiro o que o painel sabe refazer) antes de enviar */
+function celFit(o){let n=0;for(const f in o){const v=o[f];if(typeof v!='string'||v.length<=48000)continue;n++;
+  if(f=='ref'&&o.kind=='telas'){try{const j=JSON.parse(v),ve=()=>(j.S||[]).map(x=>x&&x.ov&&x.ov.ve).filter(Boolean),ok=()=>JSON.stringify(j).length<=48000;
+   for(const key of ['sfx','sfxmap','ov','cut','sfxo','ovo','story','script','words'])if(!ok())ve().forEach(q=>{delete q[key]});
+   if(!ok())delete j.sj;if(!ok())(j.S||[]).forEach(x=>{if(x){delete x.mod;delete x.extra}});if(!ok())j.cap=String(j.cap||'').slice(0,8000);
+   o[f]=JSON.stringify(j);if(o[f].length>48000)o[f]=JSON.stringify({cap:'',S:(j.S||[]).map(x=>({lay:x.lay,src:x.src}))})}catch(e){o[f]=''}}
+  else o[f]=v.slice(0,48000)}return n}
 async function push(){if(!Object.keys(P).length)return stat(S.cfg.url?'● sincronizado':'○ offline');const pay={action:'push'},sent=[];
- for(const k in K){pay[k]=S[k].filter(o=>P[K[k]+o.id]);pay[k].forEach(o=>sent.push([K[k]+o.id,o.ts,k,o.id]))}
+ for(const k in K){pay[k]=S[k].filter(o=>P[K[k]+o.id]);pay[k].forEach(o=>{try{celFit(o)}catch(e){}});pay[k].forEach(o=>sent.push([K[k]+o.id,o.ts,k,o.id]))}
  try{const r=await api(pay);(r.posts||[]).forEach(x=>{const o=Po(x.id);if(o)o.eid=x.eid});sent.forEach(([key,ts,k,id])=>{const o=S[k].find(x=>x.id==id);if(!o||o.ts==ts)delete P[key]});persist();stat('● sincronizado')}catch(e){stat('⚠ '+e);tm=setTimeout(push,15000)}}
 let PF=0;async function pull(){if(!S.cfg.url||(GAS&&!S.cfg.key))return stat('○ offline');try{const r=await api({action:'pull',ugcSince:Math.max(0,...S.ugc.map(u=>u.ts||0))});
  for(const k in K)(r[k]||[]).forEach(x=>{if(P[K[k]+x.id])return;const l=S[k].find(o=>o.id==x.id);if(!l)S[k].push(x);else if(x.ts>l.ts)Object.assign(l,x)});
