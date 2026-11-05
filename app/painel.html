@@ -1044,7 +1044,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:317*/const PV=317;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:318*/const PV=318;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -8231,7 +8231,7 @@ async function zipToPost(fs,opt){const p=collect();if(!p.date)return alert('Esco
   const r=await miauCard('Descompactei '+I.length+' imagem'+(I.length>1?'ns':'')+'. Mandar cada uma para o seu Story?','Este dia tem <b>'+sib.length+' Stories</b>. A arte que já estava em cada Story é <b>trocada</b> pela nova.<div style="margin:8px 0;padding:8px;background:#f2f7f3;border-radius:8px;max-height:220px;overflow:auto">'+rows+'</div>'+(I.length>sib.length?'<small>⚠ Sobram '+(I.length-sib.length)+' imagens, que não serão enviadas.</small>':''),[['go','✅ Distribuir pelos Stories do dia',1],['here','Colocar todas neste post'],['no','Cancelar']]);
   if(r=='no')return;if(r=='go'){let k=0;for(let i=0;i<n;i++){const t=sib[i];k++;stat('💾 '+k+'/'+n+': Story das '+(t.time||'')+'…');try{if(t.id==p.id){snap();touch('p',p);await upPost(p,[ren(I[i],0)],{arts:1})}else{touch('p',t);await upPost(t,[ren(I[i],0)],{arts:1})}}catch(er){stat('⚠ falhou o Story das '+(t.time||'')+': '+(er.message||er))}}render();stat('● '+n+' Stories atualizados com as suas imagens');return}}
  snap();if(MD&&MD.isNew){S.posts.push(p);MD.isNew=false}touch('p',p);await upPost(p,I.map(ren),Object.assign({},opt,{arts:1}));stat('● '+I.length+' imagens do .zip colocadas neste post')}
-window.zipToPost=zipToPost;window.zipExpand=zipExpand;
+window.zipToPost=zipToPost;window.zipExpand=zipExpand;window.zipNum=zipNum;
 function crTarget(P,name,j0){const a=j0&&typeof j0=='object'&&!Array.isArray(j0)&&(j0.alvo||j0.target);let d='',n=0;if(a){d=nd(a.data||a.date)||'';n=+(a.story||a.n||a.tela)||0}
  if(!d||!n){const nm=String(name||'');let m=nm.match(/(\d{4}-\d{2}-\d{2})\D*?(?:story|tela|s)?[\s_-]*(\d{1,2})(?:\D[^\/]*)?\.json$/i);if(m){d=d||m[1];n=n||+m[2]}else if(m=nm.match(/(\d{1,2})[-_.](\d{1,2})\D*?(?:story|tela)[\s_-]*(\d{1,2})/i)){d=d||(P.ini.slice(0,4)+'-'+pad(+m[2])+'-'+pad(+m[1]));n=n||+m[3]}}
  const i=P.dias.findIndex(x=>x.data==d),s0=i>=0&&P.dias[i].stories[n-1];return s0&&s0.tipo!='reels'?{i,j:n-1}:null}
@@ -8355,14 +8355,37 @@ document.addEventListener('paste',e=>{const t=e.target;if(!t||!t.matches||!t.mat
 
 function lookMedia(id){if(!id)return;const m=pvSrc(id);
  modal('Story no ar',m.vid&&m.local?`<video src="${m.src}" controls autoplay playsinline style="width:100%;max-height:75vh;border-radius:12px;background:#000"></video>`:`<iframe src="https://drive.google.com/file/d/${encodeURIComponent(id)}/preview" allow="autoplay" style="width:100%;height:72vh;border:0;border-radius:12px;background:#000"></iframe>`)}
-async function crUp(fs,A){fs=[...fs].filter(f=>/^(image|video)\//.test(f.type));if(!fs.length||!A)return;const Q=plan(A.p);if(!Q)return;const D=Q.dias[A.i],s=D&&D.stories[A.j];if(!s)return;
+async function crUp(fs,A,opt){fs=[...fs].filter(f=>/^(image|video)\//.test(f.type));if(!fs.length||!A)return;const Q=plan(A.p);if(!Q)return;const D=Q.dias[A.i],s=D&&D.stories[A.j];if(!s)return;
   let o=postOf(D,s);if(!o)o=crMakeS(Q,A.i,A.j);
   const antes=new Set(pvIds(o));stat('⬆ enviando '+fs.length+(fs.length>1?' arquivos':' arquivo')+' para o Drive…');
-  try{await upPost(o,fs)}catch(e){stat('⚠ '+(e&&e.message||e))}
+  try{await upPost(o,fs,opt)}catch(e){stat('⚠ '+(e&&e.message||e))}
   const novos=pvIds(o).filter(x=>!antes.has(x));
   if(novos.length){s.fid=novos[0];Q.ts=Date.now();persist();crSched();stat('● '+(s.tipo=='reels'?'Reels':'Story '+(A.j+1))+': arquivo colocado na grade e no cronograma')}
   if(o.id==s.post){if(s.tipo!='reels'&&!(s.sid&&s.vinc))crRegS(Q.id,A.i,A.j)}else if(!(D.sid&&D.vinc))crReg(Q.id,A.i);render()}
 
+/* v318: soltar um .zip ou várias imagens no cronograma: menu rápido para ajustar a sequência e mandar cada tela ao seu Story (sobe para o Drive e troca a arte antiga) */
+async function crSeqOpen(files,A){let I=(await window.zipExpand(files)).filter(f=>/^image\//.test(f.type||''));if(!I.length)return stat('⚠ não achei imagens para montar a sequência');const Q=plan(A.p);if(!Q)return;
+ const nums=I.map(window.zipNum);if(nums.every(n=>n!=null)&&new Set(nums).size==nums.length)I=I.map((f,k)=>({f,n:nums[k]})).sort((a,b)=>a.n-b.n).map(x=>x.f);
+ const R={i:Math.max(0,+A.i||0),st:0,it:I.map(f=>({f,url:URL.createObjectURL(f),dest:'skip'}))};
+ const val=D=>D.stories.map((x,j)=>j).filter(j=>D.stories[j].tipo!='reels');
+ const lab=(D,j)=>{const x=D.stories[j],o=postOf(D,x),has=o&&pvIds(o).length;return 'Story '+(j+1)+(x.quadro?' · '+x.quadro:'')+(x.texto?' · '+String(x.texto).slice(0,28):'')+(has?' (já tem arte: será trocada)':'')};
+ const assign=()=>{const D=Q.dias[R.i],V=val(D);R.it.forEach((z,k)=>{const j=V[R.st+k];z.dest=j!=null?String(j):'new'})};
+ if(A.j!=null&&!isNaN(A.j)){const V=val(Q.dias[R.i]);R.st=Math.max(0,V.indexOf(+A.j))}assign();
+ const d=document.createElement('div');d.id='crsq';d.style.cssText='position:fixed;inset:0;z-index:99996;background:#000a;display:flex;align-items:center;justify-content:center;padding:14px';document.body.appendChild(d);
+ const draw=()=>{const D=Q.dias[R.i],V=val(D);d.innerHTML='<div style="background:#fff;color:#1b1b28;border-radius:16px;padding:18px;width:min(560px,96vw);max-height:92vh;overflow:auto;display:grid;gap:10px;font:14px/1.4 \'Plus Jakarta Sans\',system-ui"><b style="font-size:17px">📦 '+R.it.length+' tela'+(R.it.length>1?'s':'')+' para a grade</b><div class=mu>Confira a ordem e o Story de cada uma. Ao confirmar, elas sobem para o Drive e <b>trocam a arte que já estava no post</b>.</div>'+
+  '<div style="display:flex;gap:10px;flex-wrap:wrap"><label style="display:grid;gap:3px;flex:1 1 180px"><small>Dia</small><select data-q=dia>'+Q.dias.map((x,k)=>'<option value='+k+(k==R.i?' selected':'')+'>'+esc(DIAF[dt(x.data).getDay()])+' '+pad(dt(x.data).getDate())+'/'+pad(dt(x.data).getMonth()+1)+(x.tema?' · '+esc(String(x.tema).slice(0,24)):'')+'</option>').join('')+'</select></label><label style="display:grid;gap:3px;flex:1 1 220px"><small>A 1ª tela vai no</small><select data-q=ini>'+V.map((j,k)=>'<option value='+k+(k==R.st?' selected':'')+'>'+esc(lab(D,j))+'</option>').join('')+'</select></label></div>'+
+  '<div style="display:grid;gap:6px">'+R.it.map((z,k)=>'<div style="display:flex;gap:8px;align-items:center;padding:6px;border:1px solid #0002;border-radius:10px"><img src="'+z.url+'" style="width:42px;height:74px;object-fit:cover;border-radius:6px"><span style="flex:1;min-width:0"><b style="font-size:12px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(k+1)+'. '+esc(z.f.name)+'</b><select data-q=dest data-k='+k+' style="width:100%;margin-top:3px">'+V.map(j=>'<option value='+j+(z.dest==String(j)?' selected':'')+'>'+esc(lab(D,j))+'</option>').join('')+'<option value=new'+(z.dest=='new'?' selected':'')+'>＋ Criar um Story novo no fim do dia</option><option value=skip'+(z.dest=='skip'?' selected':'')+'>— não usar —</option></select></span><span style="display:grid;gap:2px"><button type=button data-q=up data-k='+k+' '+(k?'':'disabled')+'>▲</button><button type=button data-q=dn data-k='+k+' '+(k<R.it.length-1?'':'disabled')+'>▼</button></span></div>').join('')+'</div>'+
+  '<div style="display:grid;gap:8px"><button type=button data-q=go style="padding:11px;border-radius:10px;border:0;background:#1f9d55;color:#fff;font:inherit;font-weight:700;cursor:pointer">✅ Subir para a grade e o Drive</button><button type=button data-q=no style="padding:11px;border-radius:10px;border:1px solid #bbb;background:#fff;font:inherit;cursor:pointer">Cancelar</button></div></div>'};
+ draw();
+ d.addEventListener('change',e=>{const t=e.target,q=t.dataset.q;if(q=='dia'){R.i=+t.value;R.st=0;assign();draw()}else if(q=='ini'){R.st=+t.value;assign();draw()}else if(q=='dest'){R.it[+t.dataset.k].dest=t.value}});
+ d.addEventListener('click',async e=>{const b=e.target.closest('[data-q]');if(!b){if(e.target===d){R.it.forEach(z=>URL.revokeObjectURL(z.url));d.remove()}return}const q=b.dataset.q,k=+b.dataset.k;
+  if(q=='no'){R.it.forEach(z=>URL.revokeObjectURL(z.url));d.remove()}
+  else if(q=='up'||q=='dn'){const o=q=='up'?k-1:k+1;if(o<0||o>=R.it.length)return;const a=R.it[k].f,u=R.it[k].url;R.it[k].f=R.it[o].f;R.it[k].url=R.it[o].url;R.it[o].f=a;R.it[o].url=u;draw()}
+  else if(q=='go'){const L=R.it.filter(z=>z.dest!='skip');if(!L.length){d.remove();return}const D=Q.dias[R.i];d.remove();let n=0,k2=0;
+   for(const z of L){k2++;let j;if(z.dest=='new'){D.stories.push({quadro:'',texto:'',tipo:'story',visual:''});j=D.stories.length-1}else j=+z.dest;stat('⬆ '+k2+'/'+L.length+': Story '+(j+1)+'…');const ex=(z.f.name.match(/\.\w+$/)||['.png'])[0];try{await crUp([new File([z.f],'tela '+pad(1)+ex,{type:z.f.type})],{p:Q.id,i:R.i,j},{arts:1});n++}catch(er){stat('⚠ falhou o Story '+(j+1)+': '+(er&&er.message||er))}}
+   R.it.forEach(z=>URL.revokeObjectURL(z.url));Q.ts=Date.now();persist();crSched();render();stat('● '+n+' tela'+(n>1?'s':'')+' na grade e no Drive')}})}
+document.addEventListener('dragover',e=>{if(e.target.closest&&e.target.closest('[data-crplan]')&&e.dataTransfer&&[...e.dataTransfer.types].includes('Files'))e.preventDefault()},true);
+document.addEventListener('drop',e=>{const sec=e.target.closest&&e.target.closest('[data-crplan]');if(!sec||!e.dataTransfer||!e.dataTransfer.files.length)return;const F=[...e.dataTransfer.files],z=F.some(f=>/\.zip$/i.test(f.name||'')),im=F.filter(f=>/^image\//.test(f.type||'')).length;if(!z&&im<2)return;e.preventDefault();e.stopImmediatePropagation();const c=e.target.closest('.crcl'),dd=e.target.closest('[data-crd]');crSeqOpen(F,{p:sec.dataset.crplan,i:dd?+dd.dataset.crd:0,j:c&&c.dataset.crs!=null?+c.dataset.crs:null})},true);
 (function(){const fi=document.createElement('input');fi.type='file';fi.id='crfile';fi.accept='image/*,video/*';fi.multiple=true;fi.hidden=true;document.body.appendChild(fi);
  fi.addEventListener('change',()=>{const fs=[...fi.files],A=CR.att;fi.value='';crUp(fs,A)});
  const cl=e=>{const c=e.target.closest&&e.target.closest('.crcl');return c&&c.closest('[data-crplan]')?c:null};
