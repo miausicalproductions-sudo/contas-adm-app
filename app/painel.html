@@ -1034,7 +1034,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:300*/const PV=300;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:301*/const PV=301;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -7759,7 +7759,7 @@ function crPrompt(o){const c=co(o.co);let ctx='';try{ctx=String(empMd(o.co)||'')
 const hasAPI=()=>!!(S.cfg.url||(typeof GAS!='undefined'&&GAS));
 function crChip(){const e=document.getElementById('crsync');if(!e)return;const m={ok:['● salvo na planilha',''],pend:['salvando…',''],err:['⚠ só neste aparelho','bad'],off:['○ só neste aparelho','']}[CR.sync]||['',''];e.textContent=m[0];e.className='crsync '+m[1];e.title=CR.err||''}
 function crSched(){clearTimeout(CR.tm);CR.sync=hasAPI()?'pend':'off';crChip();if(hasAPI())CR.tm=setTimeout(crPush,900)}
-async function crPush(){if(CR.pushing){CR.again=1;return}const pend=[...S.crono,...S.cart].filter(p=>!p.sv||p.sv<p.ts);if(!pend.length||!hasAPI())return;CR.pushing=1;const snap=pend.map(p=>[p,p.ts]);
+async function crPush(){if(CR.pushing){CR.again=1;return}try{await crPull(1)}catch(e){}const pend=[...S.crono,...S.cart].filter(p=>!p.sv||p.sv<p.ts);if(!pend.length||!hasAPI())return;CR.pushing=1;const snap=pend.map(p=>[p,p.ts]);
  try{await api({action:'cronoSave',plans:pend.map(p=>({...p,sv:undefined}))});snap.forEach(([p,t])=>{p.sv=Math.max(p.sv||0,t)});persist();CR.sync='ok';CR.err=''}
  catch(e){CR.sync='err';CR.err=String(e&&e.message||e);clearTimeout(CR.tm);CR.tm=setTimeout(crPush,30000)}
  CR.pushing=0;if(CR.again){CR.again=0;crSched()}crChip();crNote()}
@@ -7768,9 +7768,9 @@ function crNote(){const e=document.getElementById('crnote');if(e)e.innerHTML=not
 const editing=()=>{const a=document.activeElement;return a&&(/INPUT|SELECT|TEXTAREA/.test(a.tagName)||a.isContentEditable)||document.getElementById('crmd')};
 const inCron=()=>view=='week'&&cv=='cron';
 async function crPull(force){if(CR.busy||!hasAPI()||(GAS&&!S.cfg.key))return;if(!force&&Date.now()-CR.t<60000)return;CR.busy=1;CR.t=Date.now();let ch=0;
- try{const r=await api({action:'cronoList'});(r.plans||[]).forEach(x=>{const A=x.arte?S.cart:S.crono,i=A.findIndex(q=>q.id==x.id);if(i<0){A.push({...x,sv:x.ts});ch=1}else{const l=A[i];if((x.ts||0)>(l.ts||0)&&(l.sv||0)>=l.ts){A[i]={...x,sv:x.ts};ch=1}}});persist();CR.sync=[...S.crono,...S.cart].some(p=>!p.sv||p.sv<p.ts)?'pend':'ok';CR.err='';if(CR.sync=='pend')crSched()}
+ try{const r=await api({action:'cronoList'});(r.plans||[]).forEach(x=>{const A=x.arte?S.cart:S.crono,i=A.findIndex(q=>q.id==x.id);if(i<0){A.push({...x,sv:x.ts});ch=1}else{const l=A[i];if((x.ts||0)>(l.ts||0)){A[i]={...x,sv:x.ts};ch=1}else if((x.ts||0)==(l.ts||0)&&(l.sv||0)<l.ts){l.sv=l.ts}}});persist();CR.sync=[...S.crono,...S.cart].some(p=>!p.sv||p.sv<p.ts)?'pend':'ok';CR.err='';if(CR.sync=='pend')crSched()}
  catch(e){CR.sync='err';CR.err=String(e&&e.message||e)}
- CR.busy=0;crChip();crNote();if((ch||force)&&inCron()&&!editing())render()}
+ CR.busy=0;crChip();crNote();if((ch||force===true)&&inCron()&&!editing())render()}
 
 /* ---------- Story na grade da semana + registro de origem ---------- */
 function crFill(o,p,i){const d=p.dias[i],L=[];let fig='',figtx='';
