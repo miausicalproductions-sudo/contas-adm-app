@@ -1045,7 +1045,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:335*/const PV=335;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:336*/const PV=336;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -6341,6 +6341,8 @@ REGRAS (para o painel conseguir editar cada peça):
 - Sem animações nem filtros pesados.
 - NADA de fundo liso: crie camadas de fundo como elementos separados e editáveis, atrás dos textos: formas decorativas (círculos, blobs, faixas, ondas, cantos arredondados), degradês (linear-gradient) e padrões simples (pontos, listras, grade) com opacidade baixa. Cada uma com data-nome="deco-..." (ex.: data-nome="deco-circulo-1").
 - ILUSTRAÇÕES EM SVG DO NICHO: desenhe 3 a 6 ilustrações/ícones SVG inline (<svg viewBox=...> com <path>, <circle>, <rect>, <polygon>; sem imagem externa, sem filtros nem máscaras) ligados ao ramo da empresa e ao assunto da tela (ex.: contabilidade → calculadora, moedas, gráfico de barras, pasta com documento, cofrinho; pet → patinha, osso, coleira; café → xícara com vapor). Cada SVG com data-nome="svg-..." e position:absolute, espalhados com direção (cantos, perto do título, conduzindo ao botão), alguns grandes e semitransparentes no fundo, outros pequenos e nítidos. Use fill/stroke com as cores da paleta. Não use só retângulos: misture formas orgânicas, linhas curvas, círculos e ícones.
+- PROFUNDIDADE EM CAMADAS (obrigatório): fundo com 3 planos: (1) manchas grandes desfocadas atrás de tudo (círculos/blobs com filter:blur(30px a 80px) e opacidade 0.2–0.5); (2) formas e SVGs médios nítidos; (3) detalhes pequenos na frente. Inclua RABISCOS À MÃO como SVG: setas curvas, sublinhados ondulados, círculos irregulares em volta da palavra-chave, estrelinhas, espirais e linhas pontilhadas (<path> com stroke, stroke-linecap:round, sem fill, curvas imperfeitas), todos com data-nome="rabisco-...". Cada tela com pelo menos 8 elementos decorativos separados, sem cobrir os textos.
+${(()=>{try{return visGuia((HTE.ctx||{}).co)}catch(x){return ''}})()}
 - TEXTOS: cada bloco de texto (mesmo com 2 ou 3 linhas) é UM elemento só, com <br> entre as linhas, largura fixa e altura suficiente. Nunca ponha dois textos um embaixo do outro com pouco espaço: se uma frase pode quebrar em duas linhas, deixe espaço para as duas.
 
 CORES: principal ${b.c1} · apoio ${b.c2} · destaque ${b.c3} · fundo ${b.bg} · texto ${b.ink}
@@ -6367,6 +6369,8 @@ REGRAS (para o painel conseguir editar cada peça):
 - Sem animações nem filtros pesados.
 - NADA de fundo liso: crie camadas de fundo como elementos separados e editáveis, atrás dos textos: formas decorativas (círculos, blobs, faixas, ondas, cantos arredondados), degradês (linear-gradient) e padrões simples (pontos, listras, grade) com opacidade baixa. Cada uma com data-nome="deco-..." (ex.: data-nome="deco-circulo-1").
 - ILUSTRAÇÕES EM SVG DO NICHO: desenhe 3 a 6 ilustrações/ícones SVG inline (<svg viewBox=...> com <path>, <circle>, <rect>, <polygon>; sem imagem externa, sem filtros nem máscaras) ligados ao ramo da empresa e ao assunto da tela (ex.: contabilidade → calculadora, moedas, gráfico de barras, pasta com documento, cofrinho; pet → patinha, osso, coleira; café → xícara com vapor). Cada SVG com data-nome="svg-..." e position:absolute, espalhados com direção (cantos, perto do título, conduzindo ao botão), alguns grandes e semitransparentes no fundo, outros pequenos e nítidos. Use fill/stroke com as cores da paleta. Não use só retângulos: misture formas orgânicas, linhas curvas, círculos e ícones.
+- PROFUNDIDADE EM CAMADAS (obrigatório): fundo com 3 planos: (1) manchas grandes desfocadas atrás de tudo (círculos/blobs com filter:blur(30px a 80px) e opacidade 0.2–0.5); (2) formas e SVGs médios nítidos; (3) detalhes pequenos na frente. Inclua RABISCOS À MÃO como SVG: setas curvas, sublinhados ondulados, círculos irregulares em volta da palavra-chave, estrelinhas, espirais e linhas pontilhadas (<path> com stroke, stroke-linecap:round, sem fill, curvas imperfeitas), todos com data-nome="rabisco-...". Cada tela com pelo menos 8 elementos decorativos separados, sem cobrir os textos.
+${(()=>{try{return visGuia(Q.co)}catch(x){return ''}})()}
 - TEXTOS: cada bloco de texto (mesmo com 2 ou 3 linhas) é UM elemento só, com <br> entre as linhas, largura fixa e altura suficiente. Nunca ponha dois textos um embaixo do outro com pouco espaço: se uma frase pode quebrar em duas linhas, deixe espaço para as duas.
 
 CORES: principal ${b.c1} · apoio ${b.c2} · destaque ${b.c3} · fundo ${b.bg} · texto ${b.ink}
@@ -6465,7 +6469,7 @@ function hteToJson(){const d=hteDoc(),w=d.defaultView,W=HTE.W,H=HTE.H,L=[];let n
   else if(tag=='img'){const f={type:'image',id:nm(el,'imagem-'+(++n)),...base,photo:1,fit:cs.objectFit=='contain'?'contain':'cover'};const rd=num(cs.borderTopLeftRadius);if(rd)f.radius=rd;add(f,z,o);skip++}
   else if(fl||(bw>0&&bc)||sh){const br=cs.borderTopLeftRadius,rp=/%/.test(br)?num(br)/100*Math.min(ow,oh):num(br);let t='rect',extra={};
    if(rp>=Math.min(ow,oh)/2-1&&Math.abs(ow-oh)<3)t='circle';else if(rp>=Math.min(ow,oh)/2-1&&Math.min(ow,oh)>0&&/%/.test(br))t='ellipse';else if(rp>0)extra.radius=r1(rp);
-   const f={type:t,id:nm(el,'forma-'+(++n)),...base,...extra};if(fl)f.fill=fl;else f.fill='rgba(0,0,0,0)';if(bw>0&&bc)f.stroke={color:bc,width:bw};if(sh)f.shadow=sh;if(cs.mixBlendMode&&cs.mixBlendMode!='normal')f.blend=cs.mixBlendMode;add(f,z,o)}
+   const f={type:t,id:nm(el,'forma-'+(++n)),...base,...extra};if(fl)f.fill=fl;else f.fill='rgba(0,0,0,0)';if(bw>0&&bc)f.stroke={color:bc,width:bw};if(sh)f.shadow=sh;{const bm=String(cs.filter||'').match(/blur\(([\d.]+)px\)/);if(bm&&+bm[1]>0)f.blur=+bm[1]}if(cs.mixBlendMode&&cs.mixBlendMode!='normal')f.blend=cs.mixBlendMode;add(f,z,o)}
   else if(hasUrl)skip++;
   const direct=[...el.childNodes].filter(c=>c.nodeType==3&&c.textContent.trim());
   if(direct.length&&!el.children.length||direct.length&&[...el.children].every(c=>/^(br|b|strong|i|em|span|u|mark|small)$/i.test(c.tagName))){
@@ -6483,7 +6487,7 @@ function hteToJson(){const d=hteDoc(),w=d.defaultView,W=HTE.W,H=HTE.H,L=[];let n
    const closed=/^(rect|circle|ellipse|polygon)$/i.test(sh.tagName)||(sh.tagName=='path'&&/z\s*$/i.test(sh.getAttribute('d')||''));let dd='M'+pts.map(p=>p.join(' ')).join(' L');if(closed)dd+=' Z';
    const sw=num(cs.strokeWidth)*Math.sqrt(Math.abs(m.a*m.d-m.b*m.c));const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]),x0=Math.min(...xs),y0=Math.min(...ys);
    const P={type:'path',id:sid+'-'+(++k),d:dd,x:x0,y:y0,width:r1(Math.max(...xs)-x0),height:r1(Math.max(...ys)-y0)};if(fill&&(closed||sh.tagName=='path'))P.fill=fill;else P.fill='none';if(stroke)P.stroke={color:stroke,width:Math.max(1,r1(sw)),cap:cs.strokeLinecap||'round',join:cs.strokeLinejoin||'round'};
-   const oo=op*(fill&&!stroke?fo:stroke&&!fill?so:1);if(oo<.99)P.opacity=Math.round(oo*100)/100;add(P,z,o+k/1000)});};
+   {const bm=String(w.getComputedStyle(sv).filter||'').match(/blur\(([\d.]+)px\)/);if(bm&&+bm[1]>0)P.blur=+bm[1]}const oo=op*(fill&&!stroke?fo:stroke&&!fill?so:1);if(oo<.99)P.opacity=Math.round(oo*100)/100;add(P,z,o+k/1000)});};
  [...d.body.children].forEach(walk);
  L.sort((a,b)=>a._z-b._z||a._o-b._o);L.forEach(l=>{delete l._z;delete l._o});
  const hx=t=>t.replace(/rgb\(\s*(\d+),\s*(\d+),\s*(\d+)\s*\)/g,(m,a,b,c)=>'#'+[a,b,c].map(v=>(+v).toString(16).padStart(2,'0')).join(''));
