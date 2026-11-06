@@ -1045,7 +1045,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:338*/const PV=338;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:339*/const PV=339;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -6491,7 +6491,7 @@ function hteToJson(){const d=hteDoc(),w=d.defaultView,W=HTE.W,H=HTE.H,L=[];let n
    let txt=lineTxt(el,num(cs.fontSize));
    if(/uppercase/.test(cs.textTransform))txt=txt.toUpperCase();
    if(txt){const sz=num(cs.fontSize),lh=cs.lineHeight=='normal'?1.2:num(cs.lineHeight)/sz,pl=num(cs.paddingLeft),pr=num(cs.paddingRight),pt=num(cs.paddingTop),pb=num(cs.paddingBottom),ff=(cs.fontFamily||'').split(',')[0].replace(/["']/g,'').trim(),al=/center/.test(cs.textAlign)?'center':/right|end/.test(cs.textAlign)?'right':'left',ls=cs.letterSpacing=='normal'?0:num(cs.letterSpacing)/sz;
-    const tw=ow-pl-pr,ex=Math.max(14,tw*.1+sz*.2),tx0=cx-ow/2+pl-(al=='center'?ex/2:al=='right'?ex:0);const T={type:'text',id:nm(el,'texto-'+(++n)),x:r1(tx0),y:r1(cy-oh/2+pt),width:r1(Math.max(tw,Math.min(tw+ex,W+20-tx0))),height:r1(oh-pt-pb+sz*.1),text:txt,size:Math.round(sz),font:ff,color:colr(cs.color)||'#000000',align:al,lineHeight:Math.round(lh*100)/100,verticalAlign:'top',autoShrink:false};
+    const tw=ow-pl-pr,ex=Math.max(14,tw*.1+sz*.2),tx0=cx-ow/2+pl-(al=='center'?ex/2:al=='right'?ex:0);const T={type:'text',id:nm(el,'texto-'+(++n)),x:r1(tx0),y:r1(cy-oh/2+pt),width:r1(Math.max(tw,Math.min(tw+ex,W+20-tx0))),height:r1(oh-pt-pb+sz*.1),text:txt,size:Math.round(sz),font:ff,color:colr(cs.color)||'#000000',align:al,lineHeight:Math.round(lh*100)/100,verticalAlign:'top'};
     if(ls)T.letterSpacing=Math.round(ls*1000)/1000;if(Math.abs(rot)>.2)T.rotation=r1(rot);if(op<.99)T.opacity=Math.round(op*100)/100;const bold=num(cs.fontWeight)>=700||cs.fontWeight=='bold';if(bold)T.style='bold';
     const ts=String(cs.textShadow||'').match(/(rgba?\([^)]*\)|#[0-9a-f]{3,8})\s+(-?[\d.]+)px\s+(-?[\d.]+)px\s+([\d.]+)px/i);if(ts)T.shadow={color:ts[1],x:+ts[2],y:+ts[3],blur:+ts[4],opacity:1};add(T,z,o+.5)}}
   else [...el.children].forEach(walk)};
