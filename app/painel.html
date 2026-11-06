@@ -1045,7 +1045,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:330*/const PV=330;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:331*/const PV=331;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -6292,16 +6292,17 @@ function edSaveProj(){const s=STU;if(!s)return;try{stSyncText()}catch(e){}try{te
  const t=new Date().toTimeString().slice(0,5);s.svd=t;const b=document.getElementById('stsvd');if(b)b.textContent='💾 salvo às '+t;stat('💾 projeto salvo às '+t+': telas, layout e textos guardados no post')}
 function stSaveArts(){if(EDX)edClose();document.querySelector('#stu [data-act=stsave]')?.click()}
 /* v330: Tela em HTML — a IA entrega um HTML; o painel edita o próprio HTML (texto, cor, tamanho, mover, trocar imagem) e exporta PNG */
-const HTE={W:1080,H:1920,fmt:'st',sel:null,sc:1,hist:[],gid:'',co:'',nm:'',lay:[],drag:null};
+const HTE={W:1080,H:1920,fmt:'st',sel:null,sc:1,hist:[],gid:'',co:'',nm:'',lay:[],drag:null,T:[],cur:-1};
 const HTEF={st:['Stories 1080×1920',1080,1920],fd:['Carrossel 1080×1350',1080,1350],sq:['Quadrado 1080×1080',1080,1080]};
 const hteBase=()=>`html,body{margin:0;padding:0}body{width:${HTE.W}px;height:${HTE.H}px;overflow:hidden;position:relative}`;
 const hteHex=c=>{const m=String(c||'').match(/[\d.]+/g);if(!m||m.length<3)return'#000000';if(m.length>3&&+m[3]===0)return'#ffffff';return'#'+m.slice(0,3).map(v=>Math.round(+v).toString(16).padStart(2,'0')).join('')};
 function hteDoc(){const f=document.getElementById('htef');return f&&f.contentDocument&&f.contentDocument.body?f.contentDocument:null}
-function hteClean(h){const d=new DOMParser().parseFromString(String(h||''),'text/html');
+function hteParse(h){const m=String(h||'').match(/name=["']?hte-fmt["']?\s+content=["']?(\w+)/),d=new DOMParser().parseFromString(String(h||''),'text/html');
  d.querySelectorAll('script,iframe,object,embed,base,form,meta[http-equiv]').forEach(x=>x.remove());
  d.querySelectorAll('*').forEach(x=>{[...x.attributes].forEach(a=>{if(/^on/i.test(a.name)||/^\s*javascript:/i.test(a.value))x.removeAttribute(a.name)})});
- const head=[...d.head.querySelectorAll('style,link[rel=stylesheet]')].filter(x=>x.tagName!='LINK'||/^https:\/\/(fonts\.googleapis\.com|fonts\.gstatic\.com|cdnjs\.cloudflare\.com)\//.test(x.getAttribute('href')||'')).map(x=>x.outerHTML).join('');
- return{head,body:d.body.innerHTML,bcls:d.body.className||'',bst:d.body.getAttribute('style')||''}}
+ const head=[...d.head.querySelectorAll('style,link[rel=stylesheet]')].filter(x=>x.tagName!='LINK'||/^https:\/\/(fonts\.googleapis\.com|fonts\.gstatic\.com|cdnjs\.cloudflare\.com)\//.test(x.getAttribute('href')||'')).map(x=>x.outerHTML).join(''),bcls=d.body.className||'',bst=d.body.getAttribute('style')||'';
+ let secs=[...d.body.querySelectorAll('[data-tela],section.tela,.tela')];secs=secs.filter(x=>!secs.some(y=>y!==x&&y.contains(x)));
+ const T=secs.length?secs.map(x=>({head,body:x.outerHTML,bcls,bst})):(d.body.innerHTML.trim()?[{head,body:d.body.innerHTML,bcls,bst}]:[]);return{T,fmt:m&&HTEF[m[1]]?m[1]:''}}
 function hteCss(){if(document.getElementById('htecss'))return;const s=document.createElement('style');s.id='htecss';s.textContent=`
 #hte{position:fixed;inset:0;z-index:95;background:#1d1b2cf5;display:flex;flex-direction:column;color:#222;font:13px/1.35 "Plus Jakarta Sans",system-ui,sans-serif}
 #hte .hth{display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:8px 12px;background:#fff;border-bottom:1px solid #e3e0ee}
@@ -6326,14 +6327,14 @@ function hteCss(){if(document.getElementById('htecss'))return;const s=document.c
 #htepaste[hidden]{display:none}#htepaste textarea{flex:1;font:12px ui-monospace,monospace;border:1px solid #d6d2e6;border-radius:10px;padding:8px;resize:none}
 @media(max-width:760px){#hte .htm{flex-direction:column}#htep{width:auto;max-height:44%;border-left:0;border-top:1px solid #e3e0ee}}`;document.head.appendChild(s)}
 function hteBrand(){const s=STU,cf=(s&&artCfg(s.p.co))||{};const pd=(typeof palDef=='function'?palDef(cf):{})||{};return{c1:cf.c1||pd.c1||'#e8336d',c2:cf.c2||pd.c2||'#2b1b4a',c3:cf.c3||pd.c3||'#ffc83d',bg:cf.bg||pd.bg||'#fff7f0',ink:cf.ink||pd.ink||'#2b1b4a',font:(typeof fontName=='function'?fontName(cf.font):cf.font)||'Bricolage Grotesque'}}
-function htePrompt(){const s=STU,b=hteBrand(),F=HTEF[HTE.fmt],tx=(document.getElementById('sttx')?document.getElementById('sttx').value:(s&&s.p&&s.p.cap))||'';
- return`Crie UMA tela de ${HTE.fmt=='st'?'Stories':HTE.fmt=='fd'?'carrossel':'post quadrado'} em HTML para a empresa "${(s&&s.c&&s.c.name)||''}".
+function htePrompt(){const s=STU,b=hteBrand(),F=HTEF[HTE.fmt],tx=(document.getElementById('sttx')?document.getElementById('sttx').value:(s&&s.p&&s.p.cap))||'',n=new Set((tx.match(/TELA\s*\d+/gi)||[]).map(x=>x.replace(/\D/g,''))).size||1,tp=HTE.fmt=='st'?'Stories':HTE.fmt=='fd'?'carrossel':'post quadrado';
+ return`Crie ${n>1?'as '+n+' telas':'a tela'} de ${tp} em HTML para a empresa "${(s&&s.c&&s.c.name)||''}", todas no MESMO estilo visual.
 
-FORMATO: ${F[1]}×${F[2]} px. Entregue UM arquivo HTML completo (<!doctype html>), com todo o CSS dentro de <style> no <head>. Sem JavaScript.
+ENTREGA: UM único arquivo HTML completo (<!doctype html>), com todo o CSS dentro de <style> no <head>. Sem JavaScript.
+Dentro do <body>, cada tela é um <section class="tela" data-tela="1"> (2, 3…), filho direto do <body>, com ${F[1]}px de largura, ${F[2]}px de altura, position:relative e overflow:hidden. As telas ficam uma abaixo da outra. (O painel separa cada tela e abre uma por aba.)
 
 REGRAS (para o painel conseguir editar cada peça):
-- A tela inteira é o <body>, com ${F[1]}px de largura e ${F[2]}px de altura (overflow:hidden).
-- Cada texto, imagem e forma é um elemento separado (div, h1, p, span, img), com position:absolute (left, top, width) e um data-nome curto (ex.: data-nome="titulo", data-nome="foto").
+- Dentro de cada tela, cada texto, imagem e forma é um elemento separado (div, h1, p, span, img), com position:absolute (left, top, width) e um data-nome curto (ex.: data-nome="titulo", data-nome="foto").
 - Cada texto fica sozinho no seu elemento, sem outros elementos dentro dele.
 - Fontes só do Google Fonts, via <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=...">.
 - Fotos: use <img> (se não tiver foto, deixe um retângulo de cor com data-nome="foto").
@@ -6342,10 +6343,10 @@ REGRAS (para o painel conseguir editar cada peça):
 CORES: principal ${b.c1} · apoio ${b.c2} · destaque ${b.c3} · fundo ${b.bg} · texto ${b.ink}
 FONTE DOS TÍTULOS: ${b.font}
 
-TEXTO DA TELA:
-${tx.trim()||'(escreva aqui o título e o texto)'}
+TEXTO DAS TELAS:
+${tx.trim()||'(escreva aqui o título e o texto de cada tela)'}
 
-Estilo: visual moderno e limpo, texto grande e legível no celular, boa hierarquia (título forte, apoio menor). Responda só com o HTML.`}
+Estilo: visual moderno e limpo, texto grande e legível no celular, boa hierarquia (título forte, apoio menor), com variação de layout entre as telas sem perder a identidade. Responda só com o HTML.`}
 function hteSample(){const b=hteBrand(),f=encodeURIComponent(b.font).replace(/%20/g,'+');return`<!doctype html><html><head><meta charset=utf-8><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=${f}:wght@700;800&display=swap"><style>
 body{margin:0;width:${HTE.W}px;height:${HTE.H}px;overflow:hidden;position:relative;background:${b.bg};font-family:'${b.font}',sans-serif}
 .f{position:absolute;left:0;top:0;width:${HTE.W}px;height:${Math.round(HTE.H*.42)}px;background:${b.c1}}
@@ -6354,19 +6355,31 @@ body{margin:0;width:${HTE.W}px;height:${HTE.H}px;overflow:hidden;position:relati
 .b{position:absolute;left:80px;top:${Math.round(HTE.H*.78)}px;padding:30px 54px;border-radius:60px;background:${b.c3};color:${b.c2};font-size:48px;font-weight:800}
 </style></head><body><div class=f data-nome=faixa></div><h1 class=t data-nome=titulo style="margin:0">Título da tela vai aqui</h1><p class=p data-nome=texto style="margin:0">Clique num elemento para editar. Dê dois cliques no texto para escrever direto na tela e arraste para mover.</p><div class=b data-nome=botao>Fale com a gente</div></body></html>`}
 function hteOpen(){if(!STU){alert('Abra primeiro o estúdio de telas de um post.');return}hteCss();document.getElementById('hte')?.remove();
- HTE.co=STU.p.co;HTE.sel=null;HTE.hist=[];HTE.gid='';HTE.nm='';HTE.fmt=STU.fmt=='st'?'st':'fd';HTE.W=HTEF[HTE.fmt][1];HTE.H=HTEF[HTE.fmt][2];
+ HTE.co=STU.p.co;HTE.sel=null;HTE.hist=[];HTE.T=[];HTE.cur=-1;HTE.gid='';HTE.nm='';HTE.fmt=STU.fmt=='st'?'st':'fd';HTE.W=HTEF[HTE.fmt][1];HTE.H=HTEF[HTE.fmt][2];
  const d=document.createElement('div');d.id='hte';
  d.innerHTML=`<div class=hth><b>🧩 Tela em HTML</b><span class=mu>${esc(STU.c.name)}</span><select data-hs=fmt title="Formato">${Object.entries(HTEF).map(([k,v])=>`<option value=${k}${k==HTE.fmt?' selected':''}>${v[0]}</option>`).join('')}</select><span style="flex:1"></span>
  <button class=chip data-act=htepr title="Copia o pedido padrão para colar na IA (Claude, ChatGPT…)">📋 Pedido para a IA</button><button class=chip data-act=htepaste>📥 Colar o HTML</button><button class=chip data-act=htesamp>🧪 Exemplo</button><button class=chip data-act=hteundo>↶ Desfazer</button>
  <input type=text id=htename placeholder="Nome (para salvar)"><select data-hs=saved title="Telas salvas"></select><button class=chip data-act=htesave>💾 Salvar</button><button class=btn data-act=htepng>⬇ Baixar PNG</button><button class=chip data-act=htex>Fechar</button></div>
- <div class=htm><div id=htest><div id=htew><iframe id=htef sandbox="allow-same-origin" title="tela"></iframe><div id=htesel hidden><i data-hr=1></i></div></div>
- <div id=htepaste><b>Cole aqui o HTML que a IA entregou</b><textarea id=htetx placeholder="<!doctype html> …"></textarea><div class=row style="gap:8px"><button class=btn data-act=hteapply>Abrir no editor</button><button class=chip data-act=htepaste>Cancelar</button><span class=mu>Scripts e links perigosos são removidos. Só o desenho entra.</span></div></div></div>
+ <div class=htm><div style="flex:1;display:flex;flex-direction:column;min-width:0"><div id=htetabs></div><div id=htest><div id=htew><iframe id=htef sandbox="allow-same-origin" title="tela"></iframe><div id=htesel hidden><i data-hr=1></i></div></div>
+ <div id=htepaste><b>Cole aqui o HTML que a IA entregou</b><textarea id=htetx placeholder="<!doctype html> …"></textarea><div class=row style="gap:8px"><button class=btn data-act=hteapply>Abrir no editor</button><button class=chip data-act=htepaste>Cancelar</button><span class=mu>Scripts e links perigosos são removidos. Só o desenho entra.</span></div></div></div></div>
  <div id=htep></div></div>`;
  document.body.appendChild(d);hteSavedFill();hteLoad(hteSample());document.getElementById('htepaste').hidden=true;window.addEventListener('resize',hteLayout)}
 function hteSavedFill(){const s=document.querySelector('#hte [data-hs=saved]');if(!s)return;const L=S.grid.filter(g=>g.kind=='thtml'&&!g.del&&g.co==HTE.co);s.innerHTML='<option value="">📂 Salvas ('+L.length+')</option>'+L.map(g=>`<option value="${esc(g.id)}"${g.id==HTE.gid?' selected':''}>${esc(g.name||'sem nome')}</option>`).join('')}
 function hteSrc(c){return`<!doctype html><html><head><meta charset=utf-8>${c.head}<style id=hte-base>${hteBase()}</style></head><body class="${esc(c.bcls)}" style="${esc(c.bst)}">${c.body}</body></html>`}
-function hteLoad(html){const f=document.getElementById('htef');if(!f)return;const m=String(html).match(/name=["']?hte-fmt["']?\s+content=["']?(\w+)/);if(m&&HTEF[m[1]]){HTE.fmt=m[1];HTE.W=HTEF[m[1]][1];HTE.H=HTEF[m[1]][2];const sf=document.querySelector('#hte [data-hs=fmt]');if(sf)sf.value=m[1]}
- const c=hteClean(html);if(!c.body.trim()){alert('Não achei nenhuma tela nesse HTML.');return}HTE.hist=[];HTE.sel=null;f.onload=()=>{hteAttach();hteLayout();hteInsp()};f.srcdoc=hteSrc(c)}
+function hteStash(){const d=hteDoc();if(d&&HTE.T[HTE.cur])HTE.T[HTE.cur].body=d.body.innerHTML}
+function hteShow(i){hteStash();HTE.cur=i;HTE.hist=[];HTE.sel=null;const f=document.getElementById('htef');if(!f||!HTE.T[i])return Promise.resolve();return new Promise(ok=>{f.onload=()=>{hteAttach();hteLayout();hteInsp();hteTabs();ok()};f.srcdoc=hteSrc(HTE.T[i])})}
+function hteTabs(){const t=document.getElementById('htetabs');if(!t)return;const n=HTE.T.length;t.innerHTML=`<div class=hth style="padding:6px 12px;gap:5px">${HTE.T.map((x,i)=>`<button class="chip${i==HTE.cur?' on':''}" data-act=hteshow data-i=${i}>Tela ${i+1}</button>`).join('')}<label class=chip style="cursor:pointer" title="Vários .html de uma vez, ou um .zip com as telas">📁 Abrir arquivos / ZIP<input type=file multiple accept=".html,.htm,.zip" hidden data-hf=1></label>${n>1?'<button class=chip data-act=hteall title="Gera um PNG de cada tela e baixa tudo junto">⬇ Baixar todas (ZIP)</button>':''}</div>`}
+function hteLoad(html,more){const r=hteParse(html);if(!r.T.length){alert('Não achei nenhuma tela nesse HTML.');return Promise.resolve()}
+ if(r.fmt&&!more){HTE.fmt=r.fmt;HTE.W=HTEF[r.fmt][1];HTE.H=HTEF[r.fmt][2];const sf=document.querySelector('#hte [data-hs=fmt]');if(sf)sf.value=r.fmt}
+ if(more&&HTE.T.length){hteStash();const k=HTE.T.length;HTE.T=HTE.T.concat(r.T);return hteShow(k)}HTE.T=r.T;HTE.cur=-1;return hteShow(0)}
+async function hteUnzip(buf){const u=new Uint8Array(buf),dv=new DataView(buf);let e=-1;for(let i=u.length-22;i>=Math.max(0,u.length-70000);i--)if(dv.getUint32(i,true)==0x06054b50){e=i;break}if(e<0)throw new Error('esse ZIP não parece válido');
+ const n=dv.getUint16(e+10,true);let p=dv.getUint32(e+16,true);const out=[];
+ for(let k=0;k<n;k++){if(dv.getUint32(p,true)!=0x02014b50)break;const meth=dv.getUint16(p+10,true),csz=dv.getUint32(p+20,true),nl=dv.getUint16(p+28,true),xl=dv.getUint16(p+30,true),cl=dv.getUint16(p+32,true),off=dv.getUint32(p+42,true),name=new TextDecoder().decode(u.subarray(p+46,p+46+nl));p+=46+nl+xl+cl;
+  if(!/\.html?$/i.test(name)||/(^|\/)__MACOSX\//.test(name))continue;const ln=dv.getUint16(off+26,true),lx=dv.getUint16(off+28,true),ds=off+30+ln+lx,raw=u.subarray(ds,ds+csz);let txt;
+  if(meth==0)txt=new TextDecoder().decode(raw);else if(meth==8){txt=await new Response(new Blob([raw]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).text()}else continue;out.push({name,txt})}return out}
+async function hteFiles(fl){try{const L=[];for(const f of [...fl]){if(/\.zip$/i.test(f.name))L.push(...await hteUnzip(await f.arrayBuffer()));else if(/\.html?$/i.test(f.name))L.push({name:f.name,txt:await f.text()});else if(/\.rar$/i.test(f.name)){alert('RAR o navegador não abre. Salve como ZIP (ou mande os .html separados).');return}}
+  if(!L.length){alert('Não achei nenhum arquivo HTML.');return}L.sort((a,b)=>a.name.localeCompare(b.name,'pt',{numeric:true}));let first=true;for(const x of L){await hteLoad(x.txt,!first);first=false}stat('● '+HTE.T.length+' tela(s) abertas')}catch(x){alert('Não consegui abrir: '+(x&&x.message||x))}}
+async function hteAll(){try{const n=HTE.T.length,keep=HTE.cur,fs=[];for(let i=0;i<n;i++){stat('gerando a tela '+(i+1)+' de '+n+'…');await hteShow(i);const b=await hteBlob();fs.push(new File([b],'tela '+(i+1)+'.png',{type:'image/png'}))}await hteShow(keep);await dlZip(fs)}catch(x){alert('Não consegui gerar todas as telas: '+(x&&x.message||x))}}
 function hteLayout(){const st=document.getElementById('htest'),w=document.getElementById('htew'),f=document.getElementById('htef');if(!st||!w||!f)return;HTE.sc=Math.max(.1,Math.min((st.clientWidth-28)/HTE.W,(st.clientHeight-28)/HTE.H,1));w.style.width=HTE.W*HTE.sc+'px';w.style.height=HTE.H*HTE.sc+'px';f.style.cssText=`width:${HTE.W}px;height:${HTE.H}px;transform:scale(${HTE.sc});transform-origin:0 0`;const d=hteDoc();if(d){const s=d.getElementById('hte-base');if(s)s.textContent=hteBase()}hteBox()}
 function hteAttach(){const d=hteDoc();if(!d)return;d.addEventListener('pointerdown',hteDown,true);d.addEventListener('dblclick',hteDbl,true);d.addEventListener('keydown',hteKey,true);d.addEventListener('click',e=>{e.preventDefault()},true);d.addEventListener('dragstart',e=>e.preventDefault(),true)}
 function hteSnap(){const d=hteDoc();if(!d)return;HTE.hist.push(d.body.innerHTML);if(HTE.hist.length>40)HTE.hist.shift()}
@@ -6401,15 +6414,14 @@ function hteInsp(){const p=document.getElementById('htep');if(!p)return;const el
   h+=`<div class=hr><button class=chip data-act=htedup>Duplicar</button><button class=chip data-act=hteup>Subir</button><button class=chip data-act=htedn>Descer</button><button class=chip data-act=htepar>Selecionar o pai</button><button class=chip data-act=htereset>Voltar à posição</button><button class=chip data-act=htedel style="color:#c0264d">Apagar</button></div>`}
  else h+='<p class=mu style="margin:0">Clique num elemento da tela para editar. Arraste para mover, dê dois cliques no texto para escrever direto, use as setas para ajustar de 1 em 1 px (Shift = 10) e Ctrl+Z para desfazer.</p>';
  h+=`<div class=htl><b style="font-size:12px">Camadas</b>${lay.map((x,i)=>`<button class="htlb${x===el?' on':''}" data-act=htesel data-i=${i} style="padding-left:${8+dep(x)*10}px">${esc(lb(x))}</button>`).join('')}</div>`;p.innerHTML=h}
-function hteFont(n){const d=hteDoc();if(!d||!n)return;const u='https://fonts.googleapis.com/css2?family='+encodeURIComponent(n).replace(/%20/g,'+')+':wght@400;500;600;700;800;900&display=swap';if([...d.head.querySelectorAll('link')].some(l=>l.href==u))return;const l=d.createElement('link');l.rel='stylesheet';l.href=u;d.head.appendChild(l)}
+function hteFont(n){const d=hteDoc();if(!d||!n)return;const u='https://fonts.googleapis.com/css2?family='+encodeURIComponent(n).replace(/%20/g,'+')+':wght@400;500;600;700;800;900&display=swap';if([...d.head.querySelectorAll('link')].some(l=>l.href==u))return;const l=d.createElement('link');l.rel='stylesheet';l.href=u;d.head.appendChild(l);const t=HTE.T[HTE.cur];if(t&&t.head.indexOf(u)<0)t.head+=`<link rel="stylesheet" href="${u}">`}
 function hteApply(t){const el=HTE.sel;if(!el||!el.isConnected)return;const k=t.dataset.hp,v=t.value;
  if(k=='txt')el.textContent=v;else if(k=='col')el.style.color=v;else if(k=='bg')el.style.backgroundColor=v;else if(k=='fs')el.style.fontSize=(+v||16)+'px';else if(k=='fw')el.style.fontWeight=v;
  else if(k=='ff'){if(v){hteFont(v);el.style.fontFamily=`'${v}',sans-serif`}else el.style.fontFamily=''}
  else if(k=='w')el.style.width=(+v||0)+'px';else if(k=='h')el.style.height=(+v||0)+'px';else if(k=='op')el.style.opacity=(+v)/100;else if(k=='rad')el.style.borderRadius=(+v||0)+'px';
  else if(k=='img'&&t.files&&t.files[0]){const fr=new FileReader();fr.onload=()=>{hteSnap();if(el.tagName=='IMG')el.src=fr.result;else{el.style.backgroundImage=`url(${fr.result})`;el.style.backgroundSize='cover';el.style.backgroundPosition='center'}hteBox()};fr.readAsDataURL(t.files[0]);return}
  hteBox()}
-function hteExport(){const d=hteDoc();if(!d)return'';const heads=[...d.head.querySelectorAll('style:not(#hte-base),link[rel=stylesheet]')].map(x=>x.outerHTML).join('');const b=d.body.cloneNode(true);b.querySelectorAll('[contenteditable]').forEach(x=>x.removeAttribute('contenteditable'));
- return`<!doctype html><html><head><meta charset=utf-8><meta name="hte-fmt" content="${HTE.fmt}">${heads}<style>${hteBase()}</style></head><body class="${esc(b.className)}" style="${esc(b.getAttribute('style')||'')}">${b.innerHTML}</body></html>`}
+function hteExport(){hteStash();if(!HTE.T.length)return'';const hs=[...new Set(HTE.T.map(t=>t.head))].join(''),t0=HTE.T[0];return`<!doctype html><html><head><meta charset=utf-8><meta name="hte-fmt" content="${HTE.fmt}">${hs}<style>${hteBase()}</style></head><body class="${esc(t0.bcls)}" style="${esc(t0.bst)}">${HTE.T.map(t=>t.body).join('\n')}</body></html>`}
 async function hteLib(){if(window.html2canvas)return;await new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';s.onload=ok;s.onerror=()=>no(new Error('não consegui carregar a biblioteca de imagem (sem internet?)'));document.head.appendChild(s)})}
 async function hteBlob(){const d=hteDoc();if(!d)throw new Error('nenhuma tela aberta');hteSelect(null);await hteLib();try{await d.fonts.ready}catch(x){}
  const bg=d.defaultView.getComputedStyle(d.body).backgroundColor,none=/rgba\(0,\s*0,\s*0,\s*0\)|transparent/.test(bg);
@@ -6427,6 +6439,8 @@ function hteAct(a,b){try{const el=HTE.sel;
  if(a=='htepaste'){const p=document.getElementById('htepaste');p.hidden=!p.hidden;if(!p.hidden)document.getElementById('htetx').focus();return}
  if(a=='hteapply'){const v=document.getElementById('htetx').value;if(!v.trim())return;hteLoad(v);document.getElementById('htepaste').hidden=true;return}
  if(a=='htesamp')return hteLoad(hteSample());
+ if(a=='hteshow')return hteShow(+b.dataset.i);
+ if(a=='hteall')return hteAll();
  if(a=='hteundo')return hteUndo();
  if(a=='htepng')return hteDownload();
  if(a=='htesave')return hteSave();
@@ -6442,7 +6456,7 @@ function hteAct(a,b){try{const el=HTE.sel;
  }catch(x){console.warn(x);alert('Algo deu errado no editor: '+(x&&x.message||x))}}
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act^=hte]');if(!b||(!b.closest('#hte')&&b.dataset.act!='hted'))return;e.stopImmediatePropagation();hteAct(b.dataset.act,b)},true);
 document.addEventListener('input',e=>{const t=e.target;if(t&&t.dataset&&t.dataset.hp&&t.closest('#hte')&&t.dataset.hp!='img')hteApply(t)},true);
-document.addEventListener('change',e=>{const t=e.target;if(!t||!t.closest||!t.closest('#hte'))return;if(t.dataset.hp=='img')hteApply(t);
+document.addEventListener('change',e=>{const t=e.target;if(!t||!t.closest||!t.closest('#hte'))return;if(t.dataset.hf){const fl=[...t.files];t.value='';hteFiles(fl);return}if(t.dataset.hp=='img')hteApply(t);
  else if(t.dataset.hs=='fmt'){hteSnap();HTE.fmt=t.value;HTE.W=HTEF[t.value][1];HTE.H=HTEF[t.value][2];hteLayout()}
  else if(t.dataset.hs=='saved'&&t.value){const g=S.grid.find(x=>x.id==t.value);if(g){HTE.gid=g.id;document.getElementById('htename').value=g.name||'';hteLoad(g.ref)}}},true);
 document.addEventListener('focusin',e=>{const t=e.target;if(t&&t.dataset&&t.dataset.hp&&t.closest&&t.closest('#hte')&&t.dataset.hp!='img')hteSnap()},true);
