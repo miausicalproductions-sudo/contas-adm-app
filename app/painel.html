@@ -1044,7 +1044,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:326*/const PV=326;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:327*/const PV=327;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -2473,6 +2473,10 @@ function siteProc(it){const d=it.dados||{},ev=it.evento,ped=String(d.pedido||it.
    L=vNovo({id:'ld_sid_'+sid,nome:nm,emp:d.empresa||'',ig:siteHandle(d.instagram)?'@'+siteHandle(d.instagram):'',tel:fz,nicho:d.segmento||'',cidade:d.cidade||'',origem:'site',x:{sid,plano:it,mail:String(d.email||'').trim().toLowerCase(),notas:['Parou no pedido do site em: '+et,d.objetivo&&'Objetivo: '+d.objetivo,d.aparecer&&'Nos vídeos: '+d.aparecer].filter(Boolean).join('\n')}});
    vUpd(L.id,L2=>{L2.tarefas=[{t:'Chamar no WhatsApp: parou no pedido ('+et+') — oferecer ajuda',d:iso(new Date()),ok:0},{t:'Se não responder, tentar de novo amanhã',d:iso(new Date(Date.now()+864e5)),ok:0}];L2.hist=(L2.hist||[]).concat([{ts:Date.now(),etapa:L2.etapa,t:'Parou no pedido do site: '+et}])});
    siteNotif('⚠️ Parou no pedido: '+nm,(it?it+' · ':'')+et+(fz?' · '+fz:''));siteAtv('','parou no meio do pedido do site: '+nm+(it?' ('+it+')':''));return}
+ if(ev=='briefing'){const L=vLeads().find(x=>x.pedido==d.pedido||x.id=='ld_site_'+ped),cc=L&&L.coid?co(L.coid):null,R=d.respostas||{},MK='\n— Formulário de início —\n';
+  if(L)vUpd(L.id,L2=>{L2.notas=String(L2.notas||'').split(MK)[0]+MK+String(d.resumo||Object.keys(R).map(k=>k+': '+R[k]).join('\n'));if(!L2.cidade&&R.cidade)L2.cidade=R.cidade;L2.briefingEm=iso(new Date());L2.hist=(L2.hist||[]).concat([{ts:Date.now(),etapa:L2.etapa,t:'Formulário de início respondido'}])});
+  if(cc&&cc.id){let ch=0;if(!cc.cidade&&R.cidade){cc.cidade=R.cidade;ch=1}if(!cc.kw&&R.objetivo){cc.kw=R.objetivo;ch=1}if(ch)touch('c',cc)}
+  siteNotif('📝 Formulário recebido: '+(d.nome||(cc&&cc.name)||'cliente'),(d.produto||'')+' · pode começar');siteAtv(cc&&cc.id||'','respondeu o formulário de início'+(d.produto?' · '+d.produto:''));return}
  const sd=String(d.sid||'').replace(/[^\w-]/g,'').slice(0,60),L0=sd?vLeads().find(x=>x.sid==sd&&!x.pedido):null,lid=L0?L0.id:'ld_site_'+ped,cid='co_site_'+ped;
  if(ev=='pagamento'){const L=vLeads().find(x=>x.id==lid||x.pedido==d.pedido),cc=L&&L.coid?co(L.coid):null,nm=(cc&&cc.id?cc.name:'')||d.cliente||'cliente',val=siteNum(d.valor);
   if(L){vUpd(L.id,L2=>{if(L2.etapa!='ganho'){L2.etapa='ganho';L2.tarefas=(L2.tarefas||[]).map(t=>/pagamento/i.test(t.t)?{...t,ok:1}:t)}if(val)L2.valor=L2.valor||String(val)},d.mensal?'Mensalidade paga':'Pagamento confirmado')}
