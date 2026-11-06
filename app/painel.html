@@ -1044,7 +1044,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:327*/const PV=327;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:328*/const PV=328;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -2478,7 +2478,11 @@ function siteProc(it){const d=it.dados||{},ev=it.evento,ped=String(d.pedido||it.
   if(cc&&cc.id){let ch=0;if(!cc.cidade&&R.cidade){cc.cidade=R.cidade;ch=1}if(!cc.kw&&R.objetivo){cc.kw=R.objetivo;ch=1}if(ch)touch('c',cc)}
   siteNotif('📝 Formulário recebido: '+(d.nome||(cc&&cc.name)||'cliente'),(d.produto||'')+' · pode começar');siteAtv(cc&&cc.id||'','respondeu o formulário de início'+(d.produto?' · '+d.produto:''));return}
  const sd=String(d.sid||'').replace(/[^\w-]/g,'').slice(0,60),L0=sd?vLeads().find(x=>x.sid==sd&&!x.pedido):null,lid=L0?L0.id:'ld_site_'+ped,cid='co_site_'+ped;
- if(ev=='pagamento'){const L=vLeads().find(x=>x.id==lid||x.pedido==d.pedido),cc=L&&L.coid?co(L.coid):null,nm=(cc&&cc.id?cc.name:'')||d.cliente||'cliente',val=siteNum(d.valor);
+ if(ev=='pagamento'){const L=vLeads().find(x=>x.id==lid||x.pedido==d.pedido);let cc=L&&L.coid?co(L.coid):null;
+  if(!cc&&L&&L.cdata){const k=L.cdata;let ex=live('cos').find(x=>(k.ig&&String(x.ig||coUser(x.id)).toLowerCase()==k.ig.toLowerCase())||(siteDig(k.fone).length>=8&&siteDig(x.fone)==siteDig(k.fone))||(k.mail&&String(x.email||'').toLowerCase()==k.mail));
+   if(!ex){ex={id:cid,name:k.name,color:rc().replace('86%','55%'),photo:'',start:iso(new Date()),renew:k.renewM?iso(new Date(Date.now()+k.renewM*30*864e5)):'',locais:'',fone:k.fone,ig:k.ig,email:k.mail,val:k.mens||'',venc:k.mens?Math.min(28,new Date().getDate()):'',plano:k.plano||'',kw:k.kw||'',cidade:k.cidade||'',ts:0,del:0};S.cos.push(ex);touch('c',ex);siteAtv(ex.id,'empresa criada: pagamento confirmado')}
+   cc=ex;vUpd(L.id,L2=>{L2.coid=ex.id;delete L2.cdata})}
+  const nm=(cc&&cc.id?cc.name:'')||d.cliente||'cliente',val=siteNum(d.valor);
   if(L){vUpd(L.id,L2=>{if(L2.etapa!='ganho'){L2.etapa='ganho';L2.tarefas=(L2.tarefas||[]).map(t=>/pagamento/i.test(t.t)?{...t,ok:1}:t)}if(val)L2.valor=L2.valor||String(val)},d.mensal?'Mensalidade paga':'Pagamento confirmado')}
   if(cc&&cc.id&&val){const ym=iso(new Date()).slice(0,7);if(!S.fin.some(f=>!f.del&&f.co==cc.id&&f.kind=='rec'&&f.ym==ym&&f.desc=='site '+d.pedido)){const r={id:uid(),co:cc.id,kind:'rec',ym,date:iso(new Date()),val,desc:'site '+d.pedido,met:d.forma=='pix'?'Pix':d.forma?'Cartão':'',file:'',ts:0,del:0};S.fin.push(r);touch('f',r)}}
   if(cc&&cc.id){const u=cc.ig||coUser(cc.id);if(u&&!cc.fol0)siteIgIni(cc,u)}
@@ -2487,15 +2491,16 @@ function siteProc(it){const d=it.dados||{},ev=it.evento,ped=String(d.pedido||it.
  const ig=siteHandle(d.instagram),fone=String(d.whatsapp||'').trim(),mail=String(d.email||'').trim().toLowerCase(),contato=d.modo=='contato',val=siteNum(d.valor_num!=null?d.valor_num:d.valor_cobrado),
   plano=(d.plano_nome||(d.plano_id?sitePret(d.plano_id):''))+(d.rede_extra?' + '+String(d.rede_extra).split(',').map(x=>sitePret(x)).filter(Boolean).join(' + '):''),per=d.periodo_nome||(d.periodo_id?sitePret(d.periodo_id):''),serv=d.servico_nome||(d.servico_id?sitePret(d.servico_id):''),nome=String(d.empresa||d.nome||'Novo cliente').trim(),mens=plano?(siteNum(d.valor_mensal)||val):0;
  if((!L0&&G_(lid))||vLeads().some(x=>x.pedido&&x.pedido==d.pedido))return;
- let c=null,nova=0;
+ let c=null,nova=0,cdata=null;
  if(!contato){c=live('cos').find(x=>(ig&&String(x.ig||coUser(x.id)).toLowerCase()==ig.toLowerCase())||(siteDig(fone).length>=8&&siteDig(x.fone)==siteDig(fone))||(mail&&String(x.email||'').toLowerCase()==mail));
-  if(!c){c={id:cid,name:nome,color:rc().replace('86%','55%'),photo:'',start:iso(new Date()),renew:plano?iso(new Date(Date.now()+siteMeses(per)*30*864e5)):'',locais:'',fone,ig,email:mail,val:mens||'',venc:mens?Math.min(28,new Date().getDate()):'',plano:plano||serv||'',kw:[d.segmento,d.objetivo].filter(Boolean).join(' — '),cidade:d.cidade||'',ts:0,del:0};S.cos.push(c);touch('c',c);nova=1}
-  else{let ch=0;if(!c.fone&&fone){c.fone=fone;ch=1}if(!c.ig&&ig){c.ig=ig;ch=1}if(!c.email&&mail){c.email=mail;ch=1}if(ch)touch('c',c)}}
+  /* v328: a empresa só nasce quando o PAGAMENTO é confirmado; aqui só liga a uma empresa que já existe e guarda os dados no lead */
+  if(!c)cdata={name:nome,plano:plano||serv||'',renewM:plano?siteMeses(per):0,mens:mens||'',kw:[d.segmento,d.objetivo].filter(Boolean).join(' — '),cidade:d.cidade||'',ig,fone,mail};
+  if(c){let ch=0;if(!c.fone&&fone){c.fone=fone;ch=1}if(!c.ig&&ig){c.ig=ig;ch=1}if(!c.email&&mail){c.email=mail;ch=1}if(ch)touch('c',c)}}
  const o=(plano?plano+(per?' · '+per:''):serv)||'',obs=[d.objetivo&&'Objetivo: '+d.objetivo,d.aparecer&&'Nos vídeos: '+d.aparecer,d.mensagem&&'Mensagem: '+d.mensagem,d.forma&&'Pagamento: '+d.forma].filter(Boolean).join('\n'),
-  L=L0?(vUpd(L0.id,L2=>{Object.assign(L2,{pedido:d.pedido||'',plano:o,valor:val?String(val):'',notas:[L2.notas,obs].filter(Boolean).join('\n'),mail,...(c?{coid:c.id}:{}),...(contato?{contato:1}:{etapa:'neg'})});L2.tarefas=VCAD.site.map(([dd,t])=>({t,d:iso(new Date(Date.now()+dd*864e5)),ok:0}))}),{id:L0.id}):vNovo({id:lid,nome:d.nome||nome,emp:d.empresa||'',ig:ig?'@'+ig:'',tel:fone,nicho:d.segmento||'',cidade:d.cidade||'',origem:'site',x:{pedido:d.pedido||'',plano:o,valor:val?String(val):'',notas:obs,mail,...(c?{coid:c.id}:{}),...(contato?{contato:1}:{etapa:'neg'})}});
+  L=L0?(vUpd(L0.id,L2=>{Object.assign(L2,{pedido:d.pedido||'',plano:o,valor:val?String(val):'',notas:[L2.notas,obs].filter(Boolean).join('\n'),mail,...(c?{coid:c.id}:{}),...(cdata?{cdata}:{}),...(contato?{contato:1}:{etapa:'neg'})});L2.tarefas=VCAD.site.map(([dd,t])=>({t,d:iso(new Date(Date.now()+dd*864e5)),ok:0}))}),{id:L0.id}):vNovo({id:lid,nome:d.nome||nome,emp:d.empresa||'',ig:ig?'@'+ig:'',tel:fone,nicho:d.segmento||'',cidade:d.cidade||'',origem:'site',x:{pedido:d.pedido||'',plano:o,valor:val?String(val):'',notas:obs,mail,...(c?{coid:c.id}:{}),...(cdata?{cdata}:{}),...(contato?{contato:1}:{etapa:'neg'})}});
  if(!contato)vUpd(L.id,L2=>{L2.hist=(L2.hist||[]).concat([{ts:Date.now(),etapa:'neg',t:'Pedido pelo site: '+(o||'serviço')+(val?' · R$ '+brl(val):'')+' — aguardando pagamento'}])});
  const t=contato?'📩 Mensagem do site: '+(d.nome||nome):'🛒 Pedido novo: '+nome;siteNotif(t,o+(val?' · R$ '+brl(val):'')+(d.erro_pagamento?' · ⚠️ sem link de pagamento':''));
- siteAtv(c&&c.id||'',contato?'recebeu mensagem do site de '+(d.nome||nome):'novo pedido pelo site: '+(o||'serviço')+(nova?' — empresa criada':c?' — cliente já cadastrado':''))}
+ siteAtv(c&&c.id||'',contato?'recebeu mensagem do site de '+(d.nome||nome):'novo pedido pelo site: '+(o||'serviço')+(c?' — cliente já cadastrado':' — aguardando pagamento (a empresa nasce quando pagar)'))}
 async function siteSave(){if(!S.cfg.url||!S.cfg.key)return;const t=(($('#cst')||{}).value||'').trim(),e=$('#cse');if(!t&&!e)return;try{const r=await api({action:'siteCfg',token:t,emails:e?e.value.trim():undefined});SITEQ.tem=r.tem;SITEQ.emails=r.emails||'';if($('#cst'))$('#cst').value=''}catch(x){SITEQ.msg='Não consegui salvar: '+x}}
 async function siteSync(manual){const c=S&&S.cfg;if(!c||!c.url||!c.key){if(manual)SITEQ.msg='Conecte o Apps Script primeiro (URL e chave acima).';return}if(SITEQ.busy)return;SITEQ.busy=1;
  try{const j=await api({action:'siteFila'}),its=j.itens||[],seen=siteSeenL(),ok=[];SITEQ.tem=j.tem;SITEQ.emails=j.emails||'';
