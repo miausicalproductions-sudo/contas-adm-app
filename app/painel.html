@@ -1045,7 +1045,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:333*/const PV=333;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:334*/const PV=334;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -6340,6 +6340,7 @@ REGRAS (para o painel conseguir editar cada peça):
 - Fotos: use <img> (se não tiver foto, deixe um retângulo de cor com data-nome="foto").
 - Sem animações nem filtros pesados.
 - NADA de fundo liso: crie camadas de fundo como elementos separados e editáveis, atrás dos textos: formas decorativas (círculos, blobs, faixas, ondas, cantos arredondados), degradês (linear-gradient) e padrões simples (pontos, listras, grade) com opacidade baixa. Cada uma com data-nome="deco-..." (ex.: data-nome="deco-circulo-1").
+- ILUSTRAÇÕES EM SVG DO NICHO: desenhe 3 a 6 ilustrações/ícones SVG inline (<svg viewBox=...> com <path>, <circle>, <rect>, <polygon>; sem imagem externa, sem filtros nem máscaras) ligados ao ramo da empresa e ao assunto da tela (ex.: contabilidade → calculadora, moedas, gráfico de barras, pasta com documento, cofrinho; pet → patinha, osso, coleira; café → xícara com vapor). Cada SVG com data-nome="svg-..." e position:absolute, espalhados com direção (cantos, perto do título, conduzindo ao botão), alguns grandes e semitransparentes no fundo, outros pequenos e nítidos. Use fill/stroke com as cores da paleta. Não use só retângulos: misture formas orgânicas, linhas curvas, círculos e ícones.
 - TEXTOS: cada bloco de texto (mesmo com 2 ou 3 linhas) é UM elemento só, com <br> entre as linhas, largura fixa e altura suficiente. Nunca ponha dois textos um embaixo do outro com pouco espaço: se uma frase pode quebrar em duas linhas, deixe espaço para as duas.
 
 CORES: principal ${b.c1} · apoio ${b.c2} · destaque ${b.c3} · fundo ${b.bg} · texto ${b.ink}
@@ -6365,6 +6366,7 @@ REGRAS (para o painel conseguir editar cada peça):
 - Fotos: use <img> (se não tiver foto, deixe um retângulo de cor com data-nome="foto").
 - Sem animações nem filtros pesados.
 - NADA de fundo liso: crie camadas de fundo como elementos separados e editáveis, atrás dos textos: formas decorativas (círculos, blobs, faixas, ondas, cantos arredondados), degradês (linear-gradient) e padrões simples (pontos, listras, grade) com opacidade baixa. Cada uma com data-nome="deco-..." (ex.: data-nome="deco-circulo-1").
+- ILUSTRAÇÕES EM SVG DO NICHO: desenhe 3 a 6 ilustrações/ícones SVG inline (<svg viewBox=...> com <path>, <circle>, <rect>, <polygon>; sem imagem externa, sem filtros nem máscaras) ligados ao ramo da empresa e ao assunto da tela (ex.: contabilidade → calculadora, moedas, gráfico de barras, pasta com documento, cofrinho; pet → patinha, osso, coleira; café → xícara com vapor). Cada SVG com data-nome="svg-..." e position:absolute, espalhados com direção (cantos, perto do título, conduzindo ao botão), alguns grandes e semitransparentes no fundo, outros pequenos e nítidos. Use fill/stroke com as cores da paleta. Não use só retângulos: misture formas orgânicas, linhas curvas, círculos e ícones.
 - TEXTOS: cada bloco de texto (mesmo com 2 ou 3 linhas) é UM elemento só, com <br> entre as linhas, largura fixa e altura suficiente. Nunca ponha dois textos um embaixo do outro com pouco espaço: se uma frase pode quebrar em duas linhas, deixe espaço para as duas.
 
 CORES: principal ${b.c1} · apoio ${b.c2} · destaque ${b.c3} · fundo ${b.bg} · texto ${b.ink}
@@ -6414,7 +6416,7 @@ function hteOpen(ctx){ctx=ctx||(STU?{co:STU.p.co,name:STU.c.name,fmt:STU.fmt,cap
  const d=document.createElement('div');d.id='hte';
  d.innerHTML=`<div class=hth><b>🧩 Tela em HTML</b><span class=mu>${esc(ctx.name)}</span><select data-hs=fmt title="Formato">${Object.entries(HTEF).map(([k,v])=>`<option value=${k}${k==HTE.fmt?' selected':''}>${v[0]}</option>`).join('')}</select><span style="flex:1"></span>
  <button class=chip data-act=htepr title="Copia o pedido padrão para colar na IA (Claude, ChatGPT…)">📋 Pedido para a IA</button><button class=chip data-act=htepaste>📥 Colar o HTML</button><button class=chip data-act=htesamp>🧪 Exemplo</button><button class=chip data-act=hteundo>↶ Desfazer</button>
- <input type=text id=htename placeholder="Nome (para salvar)"><select data-hs=saved title="Telas salvas"></select><button class=chip data-act=htesave>💾 Salvar</button><button class=btn data-act=htepng>⬇ Baixar PNG</button><button class=chip data-act=htex>Fechar</button></div>
+ <input type=text id=htename placeholder="Nome (para salvar)"><select data-hs=saved title="Telas salvas"></select><button class=chip data-act=htesave>💾 Salvar</button><button class=btn data-act=htestudio title="Converte as telas em camadas e abre no editor do estúdio (Pincelada, Seta, Camadas…)">🎬 Editar no estúdio</button><button class=chip data-act=htepng>⬇ Baixar PNG</button><button class=chip data-act=htex>Fechar</button></div>
  <div class=htm><div style="flex:1;display:flex;flex-direction:column;min-width:0"><div id=htetabs></div><div id=htest><div id=htew><iframe id=htef sandbox="allow-same-origin" title="tela"></iframe><div id=htesel hidden><i data-hr=1></i></div></div>
  <div id=htepaste><b>Cole aqui o HTML que a IA entregou</b><textarea id=htetx placeholder="<!doctype html> …"></textarea><div class=row style="gap:8px"><button class=btn data-act=hteapply>Abrir no editor</button><button class=chip data-act=htepaste>Cancelar</button><span class=mu>Scripts e links perigosos são removidos. Só o desenho entra.</span></div></div></div></div>
  <div id=htep></div></div>`;
@@ -6437,6 +6439,60 @@ async function hteFiles(fl){try{const L=[];for(const f of [...fl]){if(/\.zip$/i.
 async function hteZip(fs){const sl=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^\w]+/g,'-').replace(/^-+|-+$/g,''),nm=(sl(HTE.ctx&&HTE.ctx.name)||'empresa')+'_'+iso(new Date())+'_telas-html';
  if(typeof IGN=='function'&&IGN()&&/android/i.test(navigator.userAgent)){try{if(await dlGal(fs,nm))return stat('● salvas na galeria')}catch(x){}}
  const b=await zipMake(fs,nm),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=nm+'.zip';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),8000);stat('● baixado: '+nm+'.zip ('+fs.length+' telas)')}
+/* v334: HTML -> camadas do estúdio (JSON de camadas em px) */
+function hteToJson(){const d=hteDoc(),w=d.defaultView,W=HTE.W,H=HTE.H,L=[];let n=0,skip=0;
+ const num=v=>{const x=parseFloat(v);return isFinite(x)?x:0},r1=v=>Math.round(v*10)/10;
+ const colr=c=>{c=String(c||'').trim();return !c||c=='transparent'||/^rgba\(\s*\d+,\s*\d+,\s*\d+,\s*0\s*\)$/.test(c)?null:c};
+ const grad=bg=>{const m=String(bg||'').match(/(linear|radial)-gradient\((.*)\)/);if(!m)return null;const parts=m[2].match(/rgba?\([^)]*\)|#[0-9a-f]{3,8}\b/gi)||[];if(parts.length<2)return null;if(m[1]=='radial')return{type:'radial',colors:parts,cx:.5,cy:.5};let a=180;const am=m[2].match(/(-?[\d.]+)deg/);if(am)a=+am[1];else if(/to right/.test(m[2]))a=90;else if(/to left/.test(m[2]))a=270;else if(/to top/.test(m[2]))a=0;return{type:'linear',angle:a,colors:parts}};
+ const fillOf=cs=>grad(cs.backgroundImage)||colr(cs.backgroundColor);
+ const rotOf=el=>{let a=0;for(let e=el;e&&e.nodeType==1;e=e.parentElement){const t=w.getComputedStyle(e).transform;if(t&&t!='none'){try{const m=new w.DOMMatrix(t);a+=Math.atan2(m.b,m.a)*180/Math.PI}catch(x){}}}return a};
+ const opOf=el=>{let o=1;for(let e=el;e&&e.nodeType==1;e=e.parentElement){const v=num(w.getComputedStyle(e).opacity);o*=v}return o};
+ const vis=el=>{for(let e=el;e&&e.nodeType==1;e=e.parentElement){const c=w.getComputedStyle(e);if(c.display=='none'||c.visibility=='hidden')return false}return true};
+ const zOf=el=>{let z=0;for(let e=el;e&&e.nodeType==1;e=e.parentElement){const v=parseInt(w.getComputedStyle(e).zIndex);if(!isNaN(v)){z=v;break}}return z};
+ const shOf=cs=>{const m=String(cs.boxShadow||'').match(/(rgba?\([^)]*\)|#[0-9a-f]{3,8})\s+(-?[\d.]+)px\s+(-?[\d.]+)px\s+([\d.]+)px/i);return m?{color:m[1],x:+m[2],y:+m[3],blur:+m[4],opacity:1}:null};
+ const nm=(el,k)=>(el.getAttribute&&(el.getAttribute('data-nome')||el.getAttribute('data-name')))||k;
+ const add=(o,z,order)=>{o._z=z;o._o=order;L.push(o)};
+ let ord=0;
+ const bodyCs=w.getComputedStyle(d.body),htmlCs=w.getComputedStyle(d.documentElement);
+ const bg=fillOf(bodyCs)||'#ffffff';
+ const walk=el=>{if(!el||el.nodeType!=1||/^(SCRIPT|STYLE|LINK|META|HEAD|TITLE|BR)$/i.test(el.tagName))return;if(el.id=='hte-base')return;if(!vis(el))return;const cs=w.getComputedStyle(el),tag=el.tagName.toLowerCase(),z=zOf(el),o=++ord;
+  if(tag=='svg'||el instanceof w.SVGSVGElement){svgConv(el,z,o);return}
+  const rc=el.getBoundingClientRect();if(rc.width<1||rc.height<1){[...el.children].forEach(walk);return}
+  const ow=el.offsetWidth||rc.width,oh=el.offsetHeight||rc.height,rot=rotOf(el),cx=rc.left+rc.width/2,cy=rc.top+rc.height/2,op=opOf(el);
+  const base={x:r1(cx-ow/2),y:r1(cy-oh/2),width:r1(ow),height:r1(oh)};if(Math.abs(rot)>.2)base.rotation=r1(rot);if(op<.99)base.opacity=Math.round(op*100)/100;
+  const bgi=String(cs.backgroundImage||''),hasUrl=/url\(/.test(bgi),fl=fillOf(cs),bw=num(cs.borderTopWidth),bc=colr(cs.borderTopColor),sh=shOf(cs);
+  if(tag=='img'){const f={type:'image',id:nm(el,'imagem-'+(++n)),...base,photo:1,fit:cs.objectFit=='contain'?'contain':'cover'};const rd=num(cs.borderTopLeftRadius);if(rd)f.radius=rd;add(f,z,o);skip++}
+  else if(fl||(bw>0&&bc)||sh){const br=cs.borderTopLeftRadius,rp=/%/.test(br)?num(br)/100*Math.min(ow,oh):num(br);let t='rect',extra={};
+   if(rp>=Math.min(ow,oh)/2-1&&Math.abs(ow-oh)<3)t='circle';else if(rp>=Math.min(ow,oh)/2-1&&Math.min(ow,oh)>0&&/%/.test(br))t='ellipse';else if(rp>0)extra.radius=r1(rp);
+   const f={type:t,id:nm(el,'forma-'+(++n)),...base,...extra};if(fl)f.fill=fl;else f.fill='rgba(0,0,0,0)';if(bw>0&&bc)f.stroke={color:bc,width:bw};if(sh)f.shadow=sh;if(cs.mixBlendMode&&cs.mixBlendMode!='normal')f.blend=cs.mixBlendMode;add(f,z,o)}
+  else if(hasUrl)skip++;
+  const direct=[...el.childNodes].filter(c=>c.nodeType==3&&c.textContent.trim());
+  if(direct.length&&!el.children.length||direct.length&&[...el.children].every(c=>/^(br|b|strong|i|em|span|u|mark|small)$/i.test(c.tagName))){
+   let txt='';const run=nd=>{nd.childNodes.forEach(c=>{if(c.nodeType==3)txt+=c.textContent.replace(/\s+/g,' ');else if(c.nodeType==1){if(/^br$/i.test(c.tagName))txt+='\n';else run(c)}})};run(el);txt=txt.replace(/ *\n */g,'\n').trim();
+   if(/uppercase/.test(cs.textTransform))txt=txt.toUpperCase();
+   if(txt){const sz=num(cs.fontSize),lh=cs.lineHeight=='normal'?1.2:num(cs.lineHeight)/sz,pl=num(cs.paddingLeft),pr=num(cs.paddingRight),pt=num(cs.paddingTop),pb=num(cs.paddingBottom),ff=(cs.fontFamily||'').split(',')[0].replace(/["']/g,'').trim(),al=/center/.test(cs.textAlign)?'center':/right|end/.test(cs.textAlign)?'right':'left',ls=cs.letterSpacing=='normal'?0:num(cs.letterSpacing)/sz;
+    const T={type:'text',id:nm(el,'texto-'+(++n)),x:r1(cx-ow/2+pl),y:r1(cy-oh/2+pt),width:r1(ow-pl-pr+Math.max(6,sz*.15)),height:r1(oh-pt-pb),text:txt,size:Math.round(sz),font:ff,color:colr(cs.color)||'#000000',align:al,lineHeight:Math.round(lh*100)/100,verticalAlign:'top',autoShrink:false};
+    if(ls)T.letterSpacing=Math.round(ls*1000)/1000;if(Math.abs(rot)>.2)T.rotation=r1(rot);if(op<.99)T.opacity=Math.round(op*100)/100;const bold=num(cs.fontWeight)>=700||cs.fontWeight=='bold';if(bold)T.style='bold';
+    const ts=String(cs.textShadow||'').match(/(rgba?\([^)]*\)|#[0-9a-f]{3,8})\s+(-?[\d.]+)px\s+(-?[\d.]+)px\s+([\d.]+)px/i);if(ts)T.shadow={color:ts[1],x:+ts[2],y:+ts[3],blur:+ts[4],opacity:1};add(T,z,o+.5)}}
+  else [...el.children].forEach(walk)};
+ const svgConv=(sv,z,o)=>{const col=(v,cs)=>{v=String(v||'');return !v||v=='none'?null:v=='currentcolor'||v=='currentColor'?cs.color:v};let k=0;
+  const shapes=sv.querySelectorAll('path,rect,circle,ellipse,line,polygon,polyline'),sid=nm(sv,'desenho-'+(++n));
+  shapes.forEach(sh=>{if(sh.closest('defs,clipPath,mask,symbol,marker'))return;const cs=w.getComputedStyle(sh);if(cs.display=='none'||cs.visibility=='hidden')return;let fill=col(cs.fill,cs),stroke=col(cs.stroke,cs);if(fill&&/url\(/.test(fill))fill=null;if(stroke&&/url\(/.test(stroke))stroke=null;const fo=num(cs.fillOpacity),so=num(cs.strokeOpacity),op=num(cs.opacity)*opOf(sv);if(!fill&&!stroke)return;
+   let len=0;try{len=sh.getTotalLength()}catch(x){return}if(!(len>0))return;const m=sh.getScreenCTM(),pr=sv.ownerSVGElement?null:null;if(!m)return;const N=Math.max(24,Math.min(220,Math.ceil(len/5))),pts=[];for(let q=0;q<=N;q++){const pt=sh.getPointAtLength(len*q/N),X=m.a*pt.x+m.c*pt.y+m.e,Y=m.b*pt.x+m.d*pt.y+m.f;pts.push([r1(X),r1(Y)])}
+   const closed=/^(rect|circle|ellipse|polygon)$/i.test(sh.tagName)||(sh.tagName=='path'&&/z\s*$/i.test(sh.getAttribute('d')||''));let dd='M'+pts.map(p=>p.join(' ')).join(' L');if(closed)dd+=' Z';
+   const sw=num(cs.strokeWidth)*Math.sqrt(Math.abs(m.a*m.d-m.b*m.c));const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]),x0=Math.min(...xs),y0=Math.min(...ys);
+   const P={type:'path',id:sid+'-'+(++k),d:dd,x:x0,y:y0,width:r1(Math.max(...xs)-x0),height:r1(Math.max(...ys)-y0)};if(fill&&(closed||sh.tagName=='path'))P.fill=fill;else P.fill='none';if(stroke)P.stroke={color:stroke,width:Math.max(1,r1(sw)),cap:cs.strokeLinecap||'round',join:cs.strokeLinejoin||'round'};
+   const oo=op*(fill&&!stroke?fo:stroke&&!fill?so:1);if(oo<.99)P.opacity=Math.round(oo*100)/100;add(P,z,o+k/1000)});};
+ [...d.body.children].forEach(walk);
+ L.sort((a,b)=>a._z-b._z||a._o-b._o);L.forEach(l=>{delete l._z;delete l._o});
+ const hx=t=>t.replace(/rgb\(\s*(\d+),\s*(\d+),\s*(\d+)\s*\)/g,(m,a,b,c)=>'#'+[a,b,c].map(v=>(+v).toString(16).padStart(2,'0')).join(''));
+ return{json:JSON.parse(hx(JSON.stringify({context:'Tela convertida de HTML',canvas:{width:W,height:H,background:bg},layers:L}))),skip}}
+async function hteStudio(){try{if(!STU){alert('Para editar no estúdio, abra primeiro o estúdio de telas do post (botão 🧩 dentro dele).');return}
+  const keep=HTE.cur,n=HTE.T.length,roots=[];let skip=0;for(let i=0;i<n;i++){await hteShow(i);const r=hteToJson();roots.push(r.json);skip+=r.skip}
+  const off=EDX&&document.getElementById('ste')?(+EDX.i||0):0;
+  document.getElementById('hte')?.remove();window.removeEventListener('resize',hteLayout);
+  await stjApply(roots.length==1?{telas:[roots[0]]}:{telas:roots},off);
+  stat('● '+n+' tela(s) abertas no editor do estúdio como camadas'+(skip?' · '+skip+' imagem/textura de fundo viraram espaço de foto ou foram ignoradas':''))}catch(x){alert('Não consegui converter: '+(x&&x.message||x))}}
 async function hteAll(){try{const n=HTE.T.length,keep=HTE.cur,fs=[];for(let i=0;i<n;i++){stat('gerando a tela '+(i+1)+' de '+n+'…');await hteShow(i);const b=await hteBlob();fs.push(new File([b],'tela '+(i+1)+'.png',{type:'image/png'}))}await hteShow(keep);await hteZip(fs)}catch(x){alert('Não consegui gerar todas as telas: '+(x&&x.message||x))}}
 function hteLayout(){const st=document.getElementById('htest'),w=document.getElementById('htew'),f=document.getElementById('htef');if(!st||!w||!f)return;HTE.sc=Math.max(.1,Math.min((st.clientWidth-28)/HTE.W,(st.clientHeight-28)/HTE.H,1));w.style.width=HTE.W*HTE.sc+'px';w.style.height=HTE.H*HTE.sc+'px';f.style.cssText=`width:${HTE.W}px;height:${HTE.H}px;transform:scale(${HTE.sc});transform-origin:0 0`;const d=hteDoc();if(d){const s=d.getElementById('hte-base');if(s)s.textContent=hteBase()}hteBox()}
 function hteAttach(){const d=hteDoc();if(!d)return;d.addEventListener('pointerdown',hteDown,true);d.addEventListener('dblclick',hteDbl,true);d.addEventListener('keydown',hteKey,true);d.addEventListener('click',e=>{e.preventDefault()},true);d.addEventListener('dragstart',e=>e.preventDefault(),true)}
@@ -6512,6 +6568,7 @@ function hteAct(a,b){try{const el=HTE.sel;
  if(a=='hteall')return hteAll();
  if(a=='hteundo')return hteUndo();
  if(a=='htepng')return hteDownload();
+ if(a=='htestudio')return hteStudio();
  if(a=='htesave')return hteSave();
  if(a=='htesel')return hteSelect(HTE.lay[+b.dataset.i]);
  if(!el||!el.isConnected)return;
