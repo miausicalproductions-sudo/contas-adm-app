@@ -1045,7 +1045,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:358*/const PV=358;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:359*/const PV=359;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -5507,7 +5507,7 @@ document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest
  if(k=='cuts'){const o=VE.cut;const pc=o.pace==null?50:o.pace;let n=o.who=='rot'?veCutsRot(o.lv,pc):veCutsPlat(o.lv,pc);if(n){if(VE.sfx.some(e=>e.a))veSfxAuto();VE.sel=null;veSave();veTL();veInspUp();veRender();stat('● '+n+' cortes de zoom aplicados ('+(o.who=='rot'?'do roteirista':'pela plataforma')+'): ajuste na linha do tempo')}return}
  if(k=='fitsc'){if(veFitScenes()){VE.sel=null;veSave();veTL();veInspUp();veRender();stat('● as trocas de tela agora acontecem na palavra em que cada tela começa')}return}
 },true);
-document.addEventListener('change',e=>{const t=e.target;if(!t||!t.dataset||!t.dataset.vo||!t.closest('#ve'))return;const q=t.dataset.vo;VE.cut[q]=q=='pace'?VEZ(0,100,+t.value):q=='strong'?(t.checked?1:0):t.value;veSave();if(q=='who'||q=='pace')veUI()});
+document.addEventListener('change',e=>{const t=e.target;if(!t||!t.dataset||!t.dataset.vo||!t.closest('#ve'))return;const q=t.dataset.vo;VE.cut[q]=q=='pace'?VEZ(0,100,+t.value):q=='strong'||q=='beat'?(t.checked?1:0):t.value;veSave();if(q=='who'||q=='pace')veUI()});
 
 /* ---------- v207: transcrição no navegador (Whisper via transformers.js), para quando não há roteiro ---------- */
 const VEASR={tiny:['Xenova/whisper-tiny','Rápido (~40 MB)'],base:['Xenova/whisper-base','Melhor (~80 MB)']};
@@ -5570,7 +5570,7 @@ function veCutsPlat(lv,pace){if(!veNeedWords())return 0;pace=VEZ(0,100,+pace);co
  const thr=ons.length?(()=>{const s=ons.map(o=>o.s).sort((a,b)=>a-b);return s[Math.min(s.length-1,Math.floor(s.length*(.7-.4*pace/100)))]})():1e9,near=t0=>{let b=null,bd=.15;ons.forEach(o=>{const d=Math.abs(o.t-t0);if(d<bd&&o.s>=thr){bd=d;b=o}});return b};let cur=1;
  VE.sc.forEach(c=>{const ws=W.filter(w=>w.t0>=c.t0-.03&&w.t0<c.t0+c.d-.03);if(!ws.length){ev.push({t:+c.t0.toFixed(2),z:1,k:'seco'});cur=1;return}
   const cuts=[];let last=c.t0,cnt=0;
-  ws.forEach((w,wi)=>{let cut=false,tt=w.t0-.04;if(wi==0){cut=true;tt=c.t0}else{const el=w.t0-last,pv=ws[wi-1],pu=/[.!?…,;:]["”')]*$/.test(pv.w),on=strong?near(w.t0):null;if(el>=minSp&&(on||el>=maxd||cnt>=maxw||(pu&&el>=minSp*.9)))cut=true;if(cut&&on)tt=Math.max(c.t0,on.t-.02)}
+  ws.forEach((w,wi)=>{let cut=false,tt=w.t0-.04;if(wi==0){cut=true;tt=c.t0}else{const el=w.t0-last,pv=ws[wi-1],pu=/[.!?…,;:]["”')]*$/.test(pv.w),on=strong?near(w.t0):null;if(el>=minSp&&(on||el>=maxd||cnt>=maxw||(pu&&el>=minSp*.9)))cut=true;if(cut&&on)tt=Math.max(c.t0,on.t-.02);if(cut&&VE.cut.beat!==0){const ny=veSyl(w.w),dur=Math.max(0,w.t1-w.t0);if(ny>=2&&dur>.18){const tb=w.t0+dur*Math.min(.75,(ny-1)/ny+.05);let bo=null,bd=.1;ons.forEach(o=>{const d=Math.abs(o.t-tb);if(d<bd&&o.t>w.t0+dur*.25&&o.t<w.t1-.03){bd=d;bo=o}});tt=Math.max(c.t0,Math.min(w.t1-.06,bo?bo.t-.02:tb))}}}
    if(!cut){cnt++;return}cuts.push({t:Math.max(c.t0,tt),imp:veCaps(w.w)||(ws[wi+1]&&veCaps(ws[wi+1].w)&&ws[wi+1].t0-w.t1<.2),first:wi==0});last=tt;cnt=1});
   cuts.forEach((q,j)=>{const t=+q.t.toFixed(2),nx=cuts[j+1]?cuts[j+1].t:c.t0+c.d,d=Math.max(.3,+(nx-t).toFixed(2));let e;if(q.first)e={t,z:R(L1),k:'key',d};else if(q.imp)e={t,z:R(L3),k:'seco'};else e={t,z:R(cur>=L2-.001?1:L2),k:'seco'};cur=e.z;ev.push(e)})});
  VE.zm=ev;return ev.length}
@@ -5580,6 +5580,7 @@ function veCutSide(){const o=VE.cut,rot=veHasRot(),P=o.pace==null?50:o.pace,pl=P
  <label>Força do zoom<select data-vo=lv>${[['leve','Leve'],['normal','Normal'],['forte','Forte']].map(q=>`<option value=${q[0]}${o.lv==q[0]?' selected':''}>${q[1]}</option>`).join('')}</select></label></div>
  <label class=vesl>Ritmo da edição: <b>${pl}</b><input type=range min=0 max=100 step=5 data-vo=pace value="${P}"><span class=vesl2><small>menos cortes</small><small>mais cortes</small></span></label>
  ${o.who=='plat'?`<label class=veck><input type=checkbox data-vo=strong ${o.strong===0?'':'checked'}> cortar nas sílabas fortes (T, P, K, B…) que o painel acha no áudio</label>`:''}
+ ${o.who=='plat'?`<label class=veck><input type=checkbox data-vo=beat ${o.beat===0?'':'checked'}> zoom seco na batida: cai na sílaba forte da palavra (ex.: venda → “da”), não no começo</label>`:''}
  <div class=row><button class=btn data-ve=cuts>✨ Aplicar os cortes</button><button class=chip data-ve=fitsc title="Põe a troca de cada tela exatamente na palavra em que ela começa">↔ Trocar as telas nas palavras certas</button></div>
  <small class=mu>Refaz só os zooms (e, se pedir, as trocas de tela). As legendas e o áudio ficam como estão.</small></div>
  <div class=vesec><b>Ajuste manual</b><small class=mu>Arraste a borda direita de uma cena para mudar onde ela troca. Duplo clique na faixa 🔍 cria um zoom. Selecione para ajustar abaixo.</small>
