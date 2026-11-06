@@ -1045,7 +1045,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:329*/const PV=329;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:330*/const PV=330;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -6291,6 +6291,164 @@ function edSaveProj(){const s=STU;if(!s)return;try{stSyncText()}catch(e){}try{te
  if(MD){try{const p=collect();if(p.date){if(MD.isNew){S.posts.push(p);MD.isNew=false}touch('p',p)}}catch(e){console.warn(e)}}
  const t=new Date().toTimeString().slice(0,5);s.svd=t;const b=document.getElementById('stsvd');if(b)b.textContent='💾 salvo às '+t;stat('💾 projeto salvo às '+t+': telas, layout e textos guardados no post')}
 function stSaveArts(){if(EDX)edClose();document.querySelector('#stu [data-act=stsave]')?.click()}
+/* v330: Tela em HTML — a IA entrega um HTML; o painel edita o próprio HTML (texto, cor, tamanho, mover, trocar imagem) e exporta PNG */
+const HTE={W:1080,H:1920,fmt:'st',sel:null,sc:1,hist:[],gid:'',co:'',nm:'',lay:[],drag:null};
+const HTEF={st:['Stories 1080×1920',1080,1920],fd:['Carrossel 1080×1350',1080,1350],sq:['Quadrado 1080×1080',1080,1080]};
+const hteBase=()=>`html,body{margin:0;padding:0}body{width:${HTE.W}px;height:${HTE.H}px;overflow:hidden;position:relative}`;
+const hteHex=c=>{const m=String(c||'').match(/[\d.]+/g);if(!m||m.length<3)return'#000000';if(m.length>3&&+m[3]===0)return'#ffffff';return'#'+m.slice(0,3).map(v=>Math.round(+v).toString(16).padStart(2,'0')).join('')};
+function hteDoc(){const f=document.getElementById('htef');return f&&f.contentDocument&&f.contentDocument.body?f.contentDocument:null}
+function hteClean(h){const d=new DOMParser().parseFromString(String(h||''),'text/html');
+ d.querySelectorAll('script,iframe,object,embed,base,form,meta[http-equiv]').forEach(x=>x.remove());
+ d.querySelectorAll('*').forEach(x=>{[...x.attributes].forEach(a=>{if(/^on/i.test(a.name)||/^\s*javascript:/i.test(a.value))x.removeAttribute(a.name)})});
+ const head=[...d.head.querySelectorAll('style,link[rel=stylesheet]')].filter(x=>x.tagName!='LINK'||/^https:\/\/(fonts\.googleapis\.com|fonts\.gstatic\.com|cdnjs\.cloudflare\.com)\//.test(x.getAttribute('href')||'')).map(x=>x.outerHTML).join('');
+ return{head,body:d.body.innerHTML,bcls:d.body.className||'',bst:d.body.getAttribute('style')||''}}
+function hteCss(){if(document.getElementById('htecss'))return;const s=document.createElement('style');s.id='htecss';s.textContent=`
+#hte{position:fixed;inset:0;z-index:95;background:#1d1b2cf5;display:flex;flex-direction:column;color:#222;font:13px/1.35 "Plus Jakarta Sans",system-ui,sans-serif}
+#hte .hth{display:flex;gap:6px;align-items:center;flex-wrap:wrap;padding:8px 12px;background:#fff;border-bottom:1px solid #e3e0ee}
+#hte .hth b{font-size:14px}#hte .hth input[type=text]{width:150px;padding:5px 8px;border:1px solid #d6d2e6;border-radius:8px;font:inherit}
+#hte .hth select{padding:5px;border:1px solid #d6d2e6;border-radius:8px;font:inherit;max-width:170px}
+#hte .htm{flex:1;display:flex;min-height:0}
+#htest{flex:1;display:grid;place-items:center;overflow:auto;padding:12px;position:relative}
+#htew{position:relative;background:#fff;box-shadow:0 8px 40px #0006;flex:none}
+#htef{border:0;display:block;background:#fff}
+#htesel{position:absolute;border:2px solid #ff3d8b;pointer-events:none;box-sizing:border-box;z-index:3}#htesel[hidden]{display:none}
+#htesel i{position:absolute;right:-8px;bottom:-8px;width:16px;height:16px;border-radius:50%;background:#ff3d8b;border:2px solid #fff;pointer-events:auto;cursor:nwse-resize}
+#htep{width:300px;overflow:auto;background:#fff;padding:10px;border-left:1px solid #e3e0ee;display:flex;flex-direction:column;gap:7px}
+#htep label{display:flex;flex-direction:column;gap:3px;font-size:11px;color:#6b6780}
+#htep input[type=text],#htep input[type=number],#htep select,#htep textarea{padding:5px 7px;border:1px solid #d6d2e6;border-radius:8px;font:13px "Plus Jakarta Sans",system-ui;width:100%;box-sizing:border-box}
+#htep textarea{min-height:64px;resize:vertical}#htep .hr{display:flex;gap:6px;flex-wrap:wrap;align-items:flex-end}#htep .hr label{flex:1;min-width:70px}
+#htep input[type=color]{width:100%;height:30px;padding:0;border:1px solid #d6d2e6;border-radius:8px;background:#fff}
+#htep .htl{display:flex;flex-direction:column;gap:2px;margin-top:6px;border-top:1px solid #eee;padding-top:6px;max-height:260px;overflow:auto}
+#htep .htlb{text-align:left;border:0;background:none;padding:3px 8px;border-radius:6px;font:12px "Plus Jakarta Sans",system-ui;cursor:pointer;color:#333;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#htep .htlb.on{background:#ffe3ef;font-weight:700}
+#hte .chip{cursor:pointer}
+#htepaste{position:absolute;inset:12px;z-index:5;background:#fff;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:8px;box-shadow:0 8px 40px #0006}
+#htepaste[hidden]{display:none}#htepaste textarea{flex:1;font:12px ui-monospace,monospace;border:1px solid #d6d2e6;border-radius:10px;padding:8px;resize:none}
+@media(max-width:760px){#hte .htm{flex-direction:column}#htep{width:auto;max-height:44%;border-left:0;border-top:1px solid #e3e0ee}}`;document.head.appendChild(s)}
+function hteBrand(){const s=STU,cf=(s&&artCfg(s.p.co))||{};const pd=(typeof palDef=='function'?palDef(cf):{})||{};return{c1:cf.c1||pd.c1||'#e8336d',c2:cf.c2||pd.c2||'#2b1b4a',c3:cf.c3||pd.c3||'#ffc83d',bg:cf.bg||pd.bg||'#fff7f0',ink:cf.ink||pd.ink||'#2b1b4a',font:(typeof fontName=='function'?fontName(cf.font):cf.font)||'Bricolage Grotesque'}}
+function htePrompt(){const s=STU,b=hteBrand(),F=HTEF[HTE.fmt],tx=(document.getElementById('sttx')?document.getElementById('sttx').value:(s&&s.p&&s.p.cap))||'';
+ return`Crie UMA tela de ${HTE.fmt=='st'?'Stories':HTE.fmt=='fd'?'carrossel':'post quadrado'} em HTML para a empresa "${(s&&s.c&&s.c.name)||''}".
+
+FORMATO: ${F[1]}×${F[2]} px. Entregue UM arquivo HTML completo (<!doctype html>), com todo o CSS dentro de <style> no <head>. Sem JavaScript.
+
+REGRAS (para o painel conseguir editar cada peça):
+- A tela inteira é o <body>, com ${F[1]}px de largura e ${F[2]}px de altura (overflow:hidden).
+- Cada texto, imagem e forma é um elemento separado (div, h1, p, span, img), com position:absolute (left, top, width) e um data-nome curto (ex.: data-nome="titulo", data-nome="foto").
+- Cada texto fica sozinho no seu elemento, sem outros elementos dentro dele.
+- Fontes só do Google Fonts, via <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=...">.
+- Fotos: use <img> (se não tiver foto, deixe um retângulo de cor com data-nome="foto").
+- Sem animações, filtros nem sombras muito complexas.
+
+CORES: principal ${b.c1} · apoio ${b.c2} · destaque ${b.c3} · fundo ${b.bg} · texto ${b.ink}
+FONTE DOS TÍTULOS: ${b.font}
+
+TEXTO DA TELA:
+${tx.trim()||'(escreva aqui o título e o texto)'}
+
+Estilo: visual moderno e limpo, texto grande e legível no celular, boa hierarquia (título forte, apoio menor). Responda só com o HTML.`}
+function hteSample(){const b=hteBrand(),f=encodeURIComponent(b.font).replace(/%20/g,'+');return`<!doctype html><html><head><meta charset=utf-8><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=${f}:wght@700;800&display=swap"><style>
+body{margin:0;width:${HTE.W}px;height:${HTE.H}px;overflow:hidden;position:relative;background:${b.bg};font-family:'${b.font}',sans-serif}
+.f{position:absolute;left:0;top:0;width:${HTE.W}px;height:${Math.round(HTE.H*.42)}px;background:${b.c1}}
+.t{position:absolute;left:80px;top:${Math.round(HTE.H*.1)}px;width:${HTE.W-160}px;font-size:96px;line-height:1.05;font-weight:800;color:#fff}
+.p{position:absolute;left:80px;top:${Math.round(HTE.H*.5)}px;width:${HTE.W-160}px;font-size:54px;line-height:1.3;color:${b.ink}}
+.b{position:absolute;left:80px;top:${Math.round(HTE.H*.78)}px;padding:30px 54px;border-radius:60px;background:${b.c3};color:${b.c2};font-size:48px;font-weight:800}
+</style></head><body><div class=f data-nome=faixa></div><h1 class=t data-nome=titulo style="margin:0">Título da tela vai aqui</h1><p class=p data-nome=texto style="margin:0">Clique num elemento para editar. Dê dois cliques no texto para escrever direto na tela e arraste para mover.</p><div class=b data-nome=botao>Fale com a gente</div></body></html>`}
+function hteOpen(){if(!STU){alert('Abra primeiro o estúdio de telas de um post.');return}hteCss();document.getElementById('hte')?.remove();
+ HTE.co=STU.p.co;HTE.sel=null;HTE.hist=[];HTE.gid='';HTE.nm='';HTE.fmt=STU.fmt=='st'?'st':'fd';HTE.W=HTEF[HTE.fmt][1];HTE.H=HTEF[HTE.fmt][2];
+ const d=document.createElement('div');d.id='hte';
+ d.innerHTML=`<div class=hth><b>🧩 Tela em HTML</b><span class=mu>${esc(STU.c.name)}</span><select data-hs=fmt title="Formato">${Object.entries(HTEF).map(([k,v])=>`<option value=${k}${k==HTE.fmt?' selected':''}>${v[0]}</option>`).join('')}</select><span style="flex:1"></span>
+ <button class=chip data-act=htepr title="Copia o pedido padrão para colar na IA (Claude, ChatGPT…)">📋 Pedido para a IA</button><button class=chip data-act=htepaste>📥 Colar o HTML</button><button class=chip data-act=htesamp>🧪 Exemplo</button><button class=chip data-act=hteundo>↶ Desfazer</button>
+ <input type=text id=htename placeholder="Nome (para salvar)"><select data-hs=saved title="Telas salvas"></select><button class=chip data-act=htesave>💾 Salvar</button><button class=btn data-act=htepng>⬇ Baixar PNG</button><button class=chip data-act=htex>Fechar</button></div>
+ <div class=htm><div id=htest><div id=htew><iframe id=htef sandbox="allow-same-origin" title="tela"></iframe><div id=htesel hidden><i data-hr=1></i></div></div>
+ <div id=htepaste><b>Cole aqui o HTML que a IA entregou</b><textarea id=htetx placeholder="<!doctype html> …"></textarea><div class=row style="gap:8px"><button class=btn data-act=hteapply>Abrir no editor</button><button class=chip data-act=htepaste>Cancelar</button><span class=mu>Scripts e links perigosos são removidos. Só o desenho entra.</span></div></div></div>
+ <div id=htep></div></div>`;
+ document.body.appendChild(d);hteSavedFill();hteLoad(hteSample());document.getElementById('htepaste').hidden=true;window.addEventListener('resize',hteLayout)}
+function hteSavedFill(){const s=document.querySelector('#hte [data-hs=saved]');if(!s)return;const L=S.grid.filter(g=>g.kind=='thtml'&&!g.del&&g.co==HTE.co);s.innerHTML='<option value="">📂 Salvas ('+L.length+')</option>'+L.map(g=>`<option value="${esc(g.id)}"${g.id==HTE.gid?' selected':''}>${esc(g.name||'sem nome')}</option>`).join('')}
+function hteSrc(c){return`<!doctype html><html><head><meta charset=utf-8>${c.head}<style id=hte-base>${hteBase()}</style></head><body class="${esc(c.bcls)}" style="${esc(c.bst)}">${c.body}</body></html>`}
+function hteLoad(html){const f=document.getElementById('htef');if(!f)return;const m=String(html).match(/name=["']?hte-fmt["']?\s+content=["']?(\w+)/);if(m&&HTEF[m[1]]){HTE.fmt=m[1];HTE.W=HTEF[m[1]][1];HTE.H=HTEF[m[1]][2];const sf=document.querySelector('#hte [data-hs=fmt]');if(sf)sf.value=m[1]}
+ const c=hteClean(html);if(!c.body.trim()){alert('Não achei nenhuma tela nesse HTML.');return}HTE.hist=[];HTE.sel=null;f.onload=()=>{hteAttach();hteLayout();hteInsp()};f.srcdoc=hteSrc(c)}
+function hteLayout(){const st=document.getElementById('htest'),w=document.getElementById('htew'),f=document.getElementById('htef');if(!st||!w||!f)return;HTE.sc=Math.max(.1,Math.min((st.clientWidth-28)/HTE.W,(st.clientHeight-28)/HTE.H,1));w.style.width=HTE.W*HTE.sc+'px';w.style.height=HTE.H*HTE.sc+'px';f.style.cssText=`width:${HTE.W}px;height:${HTE.H}px;transform:scale(${HTE.sc});transform-origin:0 0`;const d=hteDoc();if(d){const s=d.getElementById('hte-base');if(s)s.textContent=hteBase()}hteBox()}
+function hteAttach(){const d=hteDoc();if(!d)return;d.addEventListener('pointerdown',hteDown,true);d.addEventListener('dblclick',hteDbl,true);d.addEventListener('keydown',hteKey,true);d.addEventListener('click',e=>{e.preventDefault()},true);d.addEventListener('dragstart',e=>e.preventDefault(),true)}
+function hteSnap(){const d=hteDoc();if(!d)return;HTE.hist.push(d.body.innerHTML);if(HTE.hist.length>40)HTE.hist.shift()}
+function hteUndo(){const d=hteDoc();if(!d||!HTE.hist.length)return;d.body.innerHTML=HTE.hist.pop();hteSelect(null)}
+function hteSelect(el){HTE.sel=el&&el.isConnected?el:null;hteBox();hteInsp()}
+function hteBox(){const b=document.getElementById('htesel');if(!b)return;const el=HTE.sel;if(!el||!el.isConnected){b.hidden=true;return}const r=el.getBoundingClientRect(),k=HTE.sc;b.hidden=false;b.style.left=r.left*k+'px';b.style.top=r.top*k+'px';b.style.width=r.width*k+'px';b.style.height=r.height*k+'px'}
+function hteTf(el){if(el.dataset.htf==null){const t=el.ownerDocument.defaultView.getComputedStyle(el).transform;el.dataset.htf=t&&t!='none'?t:''}const x=+el.dataset.hx||0,y=+el.dataset.hy||0;el.style.transform=(x||y?`translate(${x}px,${y}px) `:'')+el.dataset.htf}
+function hteDown(e){if(e.button)return;const t=e.target,d=hteDoc();if(!d||t.isContentEditable)return;if(t===d.documentElement||t===d.body){hteSelect(null);return}
+ e.preventDefault();hteSelect(t);try{t.setPointerCapture(e.pointerId)}catch(x){}HTE.drag={el:t,x:e.clientX,y:e.clientY,hx:+t.dataset.hx||0,hy:+t.dataset.hy||0,m:0};d.addEventListener('pointermove',hteMove,true);d.addEventListener('pointerup',hteUp,true)}
+function hteMove(e){const g=HTE.drag;if(!g)return;const dx=e.clientX-g.x,dy=e.clientY-g.y;if(!g.m){if(Math.abs(dx)+Math.abs(dy)<4)return;hteSnap();g.m=1}g.el.dataset.hx=Math.round(g.hx+dx);g.el.dataset.hy=Math.round(g.hy+dy);hteTf(g.el);hteBox()}
+function hteUp(){const d=hteDoc();if(d){d.removeEventListener('pointermove',hteMove,true);d.removeEventListener('pointerup',hteUp,true)}HTE.drag=null;hteInsp()}
+function hteDbl(e){const t=e.target;if(!t||t===t.ownerDocument.body||t.children.length||!String(t.textContent||'').trim())return;hteSnap();t.contentEditable='true';t.focus();t.addEventListener('blur',()=>{t.removeAttribute('contenteditable');hteBox();hteInsp()},{once:true})}
+function hteKey(e){const t=e.target;if(t&&(/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)||t.isContentEditable))return;if(!document.getElementById('hte'))return;const el=HTE.sel;
+ if((e.ctrlKey||e.metaKey)&&e.key=='z'){e.preventDefault();hteUndo();return}if(!el)return;
+ if(e.key=='Delete'||e.key=='Backspace'){e.preventDefault();hteSnap();el.remove();hteSelect(null);return}
+ if(e.key=='Escape'){hteSelect(null);return}
+ const k={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];if(k){e.preventDefault();const n=e.shiftKey?10:1;hteSnap();el.dataset.hx=(+el.dataset.hx||0)+k[0]*n;el.dataset.hy=(+el.dataset.hy||0)+k[1]*n;hteTf(el);hteBox()}}
+function hteInsp(){const p=document.getElementById('htep');if(!p)return;const el=HTE.sel,d=hteDoc();let h='';
+ const lay=d?[...d.body.querySelectorAll('*')].filter(x=>!/^(SCRIPT|STYLE|BR|LINK|META)$/.test(x.tagName)).slice(0,120):[];HTE.lay=lay;
+ const dep=x=>{let n=0;for(let y=x;y&&y!==d.body;y=y.parentElement)n++;return Math.max(0,n-1)};
+ const lb=x=>x.dataset.nome||(x.tagName=='IMG'?'imagem':(x.children.length?x.tagName.toLowerCase():(String(x.textContent||'').trim().slice(0,24)||x.tagName.toLowerCase())));
+ if(el&&el.isConnected){const cs=el.ownerDocument.defaultView.getComputedStyle(el),r=el.getBoundingClientRect(),leaf=!el.children.length&&String(el.textContent||'').trim()!=='',img=el.tagName=='IMG'||/url\(/.test(cs.backgroundImage);
+  h+=`<b>${esc(el.dataset.nome||el.tagName.toLowerCase())}</b>`;
+  if(leaf)h+=`<label>Texto<textarea data-hp=txt>${esc(el.textContent)}</textarea></label>`;
+  h+=`<div class=hr><label>Cor do texto<input type=color data-hp=col value="${hteHex(cs.color)}"></label><label>Fundo<input type=color data-hp=bg value="${hteHex(cs.backgroundColor)}"></label><button class=chip data-act=htebg0 title="Tira a cor de fundo">sem fundo</button></div>`;
+  if(leaf)h+=`<div class=hr><label>Tamanho da letra<input type=number data-hp=fs min=8 max=400 value="${parseInt(cs.fontSize)||0}"></label><label>Peso<select data-hp=fw>${[400,500,600,700,800,900].map(v=>`<option${v==(parseInt(cs.fontWeight)||400)?' selected':''}>${v}</option>`).join('')}</select></label></div>
+   <div class=hr><button class=chip data-act=htealn data-v=left>⬅</button><button class=chip data-act=htealn data-v=center>↔</button><button class=chip data-act=htealn data-v=right>➡</button></div>
+   <label>Fonte<select data-hp=ff><option value="">(a da IA)</option>${(typeof FONTS!='undefined'?FONTS:[]).map(f=>`<option>${esc(f[0])}</option>`).join('')}</select></label>`;
+  h+=`<div class=hr><label>Largura<input type=number data-hp=w value="${Math.round(r.width)}"></label><label>Altura<input type=number data-hp=h value="${Math.round(r.height)}"></label></div>
+   <div class=hr><label>Opacidade<input type=range data-hp=op min=0 max=100 value="${Math.round((+cs.opacity||0)*100)}"></label><label>Cantos<input type=number data-hp=rad min=0 value="${parseInt(cs.borderTopLeftRadius)||0}"></label></div>`;
+  if(img)h+=`<label class=chip style="cursor:pointer;align-self:flex-start">🖼 Trocar a imagem<input type=file accept="image/*" hidden data-hp=img></label>`;
+  h+=`<div class=hr><button class=chip data-act=htedup>Duplicar</button><button class=chip data-act=hteup>Subir</button><button class=chip data-act=htedn>Descer</button><button class=chip data-act=htepar>Selecionar o pai</button><button class=chip data-act=htereset>Voltar à posição</button><button class=chip data-act=htedel style="color:#c0264d">Apagar</button></div>`}
+ else h+='<p class=mu style="margin:0">Clique num elemento da tela para editar. Arraste para mover, dê dois cliques no texto para escrever direto, use as setas para ajustar de 1 em 1 px (Shift = 10) e Ctrl+Z para desfazer.</p>';
+ h+=`<div class=htl><b style="font-size:12px">Camadas</b>${lay.map((x,i)=>`<button class="htlb${x===el?' on':''}" data-act=htesel data-i=${i} style="padding-left:${8+dep(x)*10}px">${esc(lb(x))}</button>`).join('')}</div>`;p.innerHTML=h}
+function hteFont(n){const d=hteDoc();if(!d||!n)return;const u='https://fonts.googleapis.com/css2?family='+encodeURIComponent(n).replace(/%20/g,'+')+':wght@400;500;600;700;800;900&display=swap';if([...d.head.querySelectorAll('link')].some(l=>l.href==u))return;const l=d.createElement('link');l.rel='stylesheet';l.href=u;d.head.appendChild(l)}
+function hteApply(t){const el=HTE.sel;if(!el||!el.isConnected)return;const k=t.dataset.hp,v=t.value;
+ if(k=='txt')el.textContent=v;else if(k=='col')el.style.color=v;else if(k=='bg')el.style.backgroundColor=v;else if(k=='fs')el.style.fontSize=(+v||16)+'px';else if(k=='fw')el.style.fontWeight=v;
+ else if(k=='ff'){if(v){hteFont(v);el.style.fontFamily=`'${v}',sans-serif`}else el.style.fontFamily=''}
+ else if(k=='w')el.style.width=(+v||0)+'px';else if(k=='h')el.style.height=(+v||0)+'px';else if(k=='op')el.style.opacity=(+v)/100;else if(k=='rad')el.style.borderRadius=(+v||0)+'px';
+ else if(k=='img'&&t.files&&t.files[0]){const fr=new FileReader();fr.onload=()=>{hteSnap();if(el.tagName=='IMG')el.src=fr.result;else{el.style.backgroundImage=`url(${fr.result})`;el.style.backgroundSize='cover';el.style.backgroundPosition='center'}hteBox()};fr.readAsDataURL(t.files[0]);return}
+ hteBox()}
+function hteExport(){const d=hteDoc();if(!d)return'';const heads=[...d.head.querySelectorAll('style:not(#hte-base),link[rel=stylesheet]')].map(x=>x.outerHTML).join('');const b=d.body.cloneNode(true);b.querySelectorAll('[contenteditable]').forEach(x=>x.removeAttribute('contenteditable'));
+ return`<!doctype html><html><head><meta charset=utf-8><meta name="hte-fmt" content="${HTE.fmt}">${heads}<style>${hteBase()}</style></head><body class="${esc(b.className)}" style="${esc(b.getAttribute('style')||'')}">${b.innerHTML}</body></html>`}
+async function hteLib(){if(window.html2canvas)return;await new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';s.onload=ok;s.onerror=()=>no(new Error('não consegui carregar a biblioteca de imagem (sem internet?)'));document.head.appendChild(s)})}
+async function hteBlob(){const d=hteDoc();if(!d)throw new Error('nenhuma tela aberta');hteSelect(null);await hteLib();try{await d.fonts.ready}catch(x){}
+ const bg=d.defaultView.getComputedStyle(d.body).backgroundColor,none=/rgba\(0,\s*0,\s*0,\s*0\)|transparent/.test(bg);
+ const cv=await html2canvas(d.body,{width:HTE.W,height:HTE.H,windowWidth:HTE.W,windowHeight:HTE.H,scale:1,useCORS:true,backgroundColor:none?'#ffffff':null,logging:false,x:0,y:0});
+ return await new Promise((ok,no)=>cv.toBlob(b=>b?ok(b):no(new Error('não consegui gerar a imagem')),'image/png'))}
+async function hteDownload(){try{stat('gerando a imagem…');const b=await hteBlob(),sl=v=>String(v||'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^\w]+/g,'-').replace(/^-+|-+$/g,''),nm=(sl(STU&&STU.c&&STU.c.name)||'empresa')+'_'+iso(new Date())+'_'+(sl(document.getElementById('htename')?.value)||'tela-html')+'.png',f=new File([b],nm,{type:'image/png'});
+ if(typeof IGN=='function'&&IGN()&&/android/i.test(navigator.userAgent)){try{if(await dlGal([f],nm.replace(/\.png$/,'')))return stat('● salvo na galeria')}catch(x){}}
+ const u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=nm;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),8000);stat('● baixado: '+nm)}catch(x){alert('Não consegui gerar a imagem: '+(x&&x.message||x)+'\n\nDica: imagens de links de outros sites podem não sair; use "Trocar a imagem" para colocar o arquivo.')}}
+function hteSave(){try{let h=hteExport();if(!h)return;let aviso='';if(h.length>45000){h=h.replace(/data:image\/[a-z+.-]+;base64,[A-Za-z0-9+\/=]+/g,'data:,');aviso=' (as imagens coladas não ficam salvas; coloque de novo ao abrir)'}if(h.length>47000){alert('Essa tela ficou grande demais para salvar. Baixe o PNG.');return}
+ const nm=(document.getElementById('htename').value||'').trim()||'Tela '+iso(new Date());let g=HTE.gid&&S.grid.find(x=>x.id==HTE.gid);snap();if(!g){g={id:'thtml_'+Date.now().toString(36),co:HTE.co,kind:'thtml',name:'',color:'',date:'',ref:'',ts:0,del:0};S.grid.push(g);HTE.gid=g.id}g.name=nm.slice(0,60);g.ref=h;g.del=0;touch('g',g);hteSavedFill();stat('💾 tela salva'+aviso)}catch(x){alert('Não consegui salvar: '+(x&&x.message||x))}}
+function hteAct(a,b){try{const el=HTE.sel;
+ if(a=='htex'){document.getElementById('hte')?.remove();window.removeEventListener('resize',hteLayout);return}
+ if(a=='hted')return hteOpen();
+ if(a=='htepr'){const t=htePrompt();(navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(t):Promise.reject()).then(()=>stat('📋 pedido copiado: cole na IA'),()=>{const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');stat('📋 pedido copiado: cole na IA')}catch(x){alert(t)}ta.remove()});return}
+ if(a=='htepaste'){const p=document.getElementById('htepaste');p.hidden=!p.hidden;if(!p.hidden)document.getElementById('htetx').focus();return}
+ if(a=='hteapply'){const v=document.getElementById('htetx').value;if(!v.trim())return;hteLoad(v);document.getElementById('htepaste').hidden=true;return}
+ if(a=='htesamp')return hteLoad(hteSample());
+ if(a=='hteundo')return hteUndo();
+ if(a=='htepng')return hteDownload();
+ if(a=='htesave')return hteSave();
+ if(a=='htesel')return hteSelect(HTE.lay[+b.dataset.i]);
+ if(!el||!el.isConnected)return;
+ if(a=='htedup'){hteSnap();const c=el.cloneNode(true);c.dataset.hx=(+el.dataset.hx||0)+30;c.dataset.hy=(+el.dataset.hy||0)+30;el.after(c);hteTf(c);return hteSelect(c)}
+ if(a=='htedel'){hteSnap();el.remove();return hteSelect(null)}
+ if(a=='htepar'){const p=el.parentElement;if(p&&p!==el.ownerDocument.body)hteSelect(p);return}
+ if(a=='hteup'||a=='htedn'){hteSnap();const cs=el.ownerDocument.defaultView.getComputedStyle(el);if(cs.position=='static')el.style.position='relative';el.style.zIndex=(parseInt(cs.zIndex)||0)+(a=='hteup'?1:-1);return}
+ if(a=='htereset'){hteSnap();delete el.dataset.hx;delete el.dataset.hy;el.style.transform=el.dataset.htf||'';return hteBox()}
+ if(a=='htealn'){hteSnap();el.style.textAlign=b.dataset.v;return hteBox()}
+ if(a=='htebg0'){hteSnap();el.style.backgroundColor='transparent';el.style.backgroundImage='none';return hteInsp()}
+ }catch(x){console.warn(x);alert('Algo deu errado no editor: '+(x&&x.message||x))}}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act^=hte]');if(!b||(!b.closest('#hte')&&b.dataset.act!='hted'))return;e.stopImmediatePropagation();hteAct(b.dataset.act,b)},true);
+document.addEventListener('input',e=>{const t=e.target;if(t&&t.dataset&&t.dataset.hp&&t.closest('#hte')&&t.dataset.hp!='img')hteApply(t)},true);
+document.addEventListener('change',e=>{const t=e.target;if(!t||!t.closest||!t.closest('#hte'))return;if(t.dataset.hp=='img')hteApply(t);
+ else if(t.dataset.hs=='fmt'){hteSnap();HTE.fmt=t.value;HTE.W=HTEF[t.value][1];HTE.H=HTEF[t.value][2];hteLayout()}
+ else if(t.dataset.hs=='saved'&&t.value){const g=S.grid.find(x=>x.id==t.value);if(g){HTE.gid=g.id;document.getElementById('htename').value=g.name||'';hteLoad(g.ref)}}},true);
+document.addEventListener('focusin',e=>{const t=e.target;if(t&&t.dataset&&t.dataset.hp&&t.closest&&t.closest('#hte')&&t.dataset.hp!='img')hteSnap()},true);
+document.addEventListener('keydown',hteKey,true);
+document.addEventListener('pointerdown',e=>{const i=e.target&&e.target.closest&&e.target.closest('#htesel i');if(!i||!HTE.sel)return;e.preventDefault();e.stopPropagation();const el=HTE.sel,r=el.getBoundingClientRect(),sx=e.clientX,sy=e.clientY,w0=r.width,h0=r.height,leaf=!el.children.length&&String(el.textContent||'').trim()!=='';hteSnap();
+ const mv=ev=>{const dw=(ev.clientX-sx)/HTE.sc,dh=(ev.clientY-sy)/HTE.sc;el.style.width=Math.max(10,Math.round(w0+dw))+'px';if(!leaf||ev.shiftKey)el.style.height=Math.max(10,Math.round(h0+dh))+'px';hteBox()},up=()=>{document.removeEventListener('pointermove',mv,true);document.removeEventListener('pointerup',up,true);hteInsp()};document.addEventListener('pointermove',mv,true);document.addEventListener('pointerup',up,true)},true);
 async function stModelAct(v){const sl=document.querySelector('#stu #stmodel');if(!sl)return;if(![...sl.options].some(o=>o.value==v)){const o=document.createElement('option');o.value=v;o.textContent=v;sl.appendChild(o)}sl.value=v;sl.dispatchEvent(new Event('change',{bubbles:true}));await sleep(60)}
 async function edFile(v){const s=STU;if(!s)return;
  if(v=='save')return edSaveProj();if(v=='arts')return stSaveArts();if(v=='dl'){document.querySelector('#stu [data-act=stdl]')?.click();return}if(v=='close'){edClose();return}
@@ -6550,7 +6708,7 @@ function stShow(){let d=document.getElementById('stu');if(!d){d=document.createE
  <div class=row style="gap:8px;margin-top:6px"><select id=stfont2 title="Fonte do texto de apoio">${[['','Texto: Plus Jakarta (padrão)'],...FONTS2.map(f=>[f,'Texto: '+f])].map(([v,n])=>`<option value="${v}"${(cf.font2||'')==v?' selected':''}>${n}</option>`).join('')}</select><select id=stlst title="Onde vai o logo">${[['','Logo: automático'],['topo','Logo no topo, centralizado'],['avatar','Logo redondo + @']].map(([v,n])=>`<option value="${v}"${(cf.lstyle||'')==v?' selected':''}>${n}</option>`).join('')}</select></div>
  <div class=row style="gap:8px;margin-top:6px;align-items:center"><label class=chip style="cursor:pointer" title="Logo com fundo transparente, usado só nas artes (o fundo branco sai sozinho)">🏷 ${cf.logoArt?'Trocar o logo das artes':'Logo para as artes'}<input type=file accept="image/*" hidden data-act=stlogoart></label>${cf.logoArt?`<img src="${cf.logoArt}" alt="" style="height:30px;max-width:96px;object-fit:contain;background:repeating-conic-gradient(#eee 0 25%,#fff 0 50%) 0 0/10px 10px;border-radius:6px;padding:2px"><button type=button class=chip data-act=stlogoartx title="Tirar o logo das artes">✕</button>`:''}<label class=chip style="cursor:pointer" title="Sem *asteriscos*, a última palavra do título sai na cor de destaque"><input type=checkbox id=stauto2${cf.auto2!==0?' checked':''}> título em 2 cores</label></div><small class=mu>Dica: no texto, *palavra* entre asteriscos sai em outra cor.</small></div></div></details>${sxD('como','6 · ❓ Como funciona','qual IA roda em cada passo')}${comoHtml()}<button type=button class=chip data-act=iamon style="justify-self:start">🤖 Abrir o monitor das IAs</button></div></details></div>
  <div class=sxg id=stg></div></div>
- <div class=sxf><button class=btn data-act=stsave>Salvar as telas no post</button>${(()=>{const q=stNext();return q?`<button class=btn data-act=stsnext title="${esc(fdt(q)+' · '+(q.txt||''))}">Salvar e abrir o próximo ›</button>`:''})()}<button class=chip data-act=stdl>Baixar</button><span class=mu id=stmsg>O layout muda sozinho conforme o tema do dia. Clique em 🔀 para trocar o de uma tela.</span></div></div>`;stRender()}
+ <div class=sxf><button class=btn data-act=stsave>Salvar as telas no post</button>${(()=>{const q=stNext();return q?`<button class=btn data-act=stsnext title="${esc(fdt(q)+' · '+(q.txt||''))}">Salvar e abrir o próximo ›</button>`:''})()}<button class=chip data-act=stdl>Baixar</button><button class=chip data-act=hted title="A IA entrega um HTML e você edita o próprio HTML: texto, cor, posição, imagem">🧩 Tela em HTML</button><span class=mu id=stmsg>O layout muda sozinho conforme o tema do dia. Clique em 🔀 para trocar o de uma tela.</span></div></div>`;stRender()}
 function stRender(){const g=document.getElementById('stg');if(!g||!STU)return;const s=STU,imgs=s.imgs.map(x=>x.img),pl=artPlan(s.p,s.S,imgs);s.lays=pl.L;const H=s.fmt=='st'?1920:1350;
  const photoLays=PHOTOL,full=imgs.length>=s.S.length&&s.S.length>1;if(full)pl.L=pl.L.map((l,i)=>s.S[i].lay||photoLays.includes(l)?l:['capa','faixa','destaque'][i%3]);s.lays=pl.L;let k=0;const man=s.S.some(x=>x.bgi!=null);if(man){pl.L=pl.L.map((l,i)=>s.S[i].bgi==null&&!s.S[i].lay&&['capa','faixa','citacao','onda','saudacao'].includes(l)?(i%2?'cartao':'solido'):l);s.lays=pl.L}s.S.forEach((x,i)=>{x.img=null;if(imgs.length&&photoLays.includes(pl.L[i]))x.img=x.bgi!=null?imgs[x.bgi%imgs.length]:man?null:full?imgs[i]:imgs[k++%imgs.length]});
  s.sel=Math.min(s.sel||0,s.S.length-1);g.innerHTML=`<p class=sxhelp>📋 <b>Do ChatGPT para a tela certa:</b> clique com o botão direito na imagem do ChatGPT → <b>Copiar imagem</b> → volte aqui e aperte <b>Ctrl+V</b>. Ela entra na tela marcada e a marcação passa para a próxima. Também dá para arrastar um arquivo em cima da tela.</p>`+s.S.map((x,i)=>`<div class="sxt${i==s.sel?' sel':''}" data-act=stsel data-i=${i}><b class=sxn>Tela ${i+1}${x.bgi!=null&&s.imgs[x.bgi]?' · foto '+(x.bgi+1):''}</b><canvas width=1080 height=${H} data-i=${i}></canvas>${x.vid?`<small class=mu style="text-align:center">🎬 Sugestão de vídeo: ${esc(x.vid)}</small>`:''}<div class=row style="gap:4px;justify-content:center"><button class=chip data-act=stlay data-i=${i} title="Trocar o layout">🔀 ${ARTL[pl.L[i]]}</button>${imgs.length?`<button class=chip data-act=stpick data-i=${i} title="Escolher a foto desta tela">🖼 Foto</button>`:''}<button class=chip data-act=stedit data-i=${i} title="Editar o texto e o visual desta tela">✏️ Editar</button>${s.S.length>1?`<button class=chip data-act=stdel data-i=${i} title="Excluir esta tela">🗑</button>`:''}</div></div>`).join('');
