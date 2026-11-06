@@ -1045,7 +1045,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:334*/const PV=334;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:335*/const PV=335;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -6461,7 +6461,8 @@ function hteToJson(){const d=hteDoc(),w=d.defaultView,W=HTE.W,H=HTE.H,L=[];let n
   const ow=el.offsetWidth||rc.width,oh=el.offsetHeight||rc.height,rot=rotOf(el),cx=rc.left+rc.width/2,cy=rc.top+rc.height/2,op=opOf(el);
   const base={x:r1(cx-ow/2),y:r1(cy-oh/2),width:r1(ow),height:r1(oh)};if(Math.abs(rot)>.2)base.rotation=r1(rot);if(op<.99)base.opacity=Math.round(op*100)/100;
   const bgi=String(cs.backgroundImage||''),hasUrl=/url\(/.test(bgi),fl=fillOf(cs),bw=num(cs.borderTopWidth),bc=colr(cs.borderTopColor),sh=shOf(cs);
-  if(tag=='img'){const f={type:'image',id:nm(el,'imagem-'+(++n)),...base,photo:1,fit:cs.objectFit=='contain'?'contain':'cover'};const rd=num(cs.borderTopLeftRadius);if(rd)f.radius=rd;add(f,z,o);skip++}
+  if(tag=='img'&&HTE._im&&HTE._im[el.currentSrc||el.src]){add({type:'sticker',ref:HTE._im[el.currentSrc||el.src],id:nm(el,'imagem-'+(++n)),...base},z,o)}
+  else if(tag=='img'){const f={type:'image',id:nm(el,'imagem-'+(++n)),...base,photo:1,fit:cs.objectFit=='contain'?'contain':'cover'};const rd=num(cs.borderTopLeftRadius);if(rd)f.radius=rd;add(f,z,o);skip++}
   else if(fl||(bw>0&&bc)||sh){const br=cs.borderTopLeftRadius,rp=/%/.test(br)?num(br)/100*Math.min(ow,oh):num(br);let t='rect',extra={};
    if(rp>=Math.min(ow,oh)/2-1&&Math.abs(ow-oh)<3)t='circle';else if(rp>=Math.min(ow,oh)/2-1&&Math.min(ow,oh)>0&&/%/.test(br))t='ellipse';else if(rp>0)extra.radius=r1(rp);
    const f={type:t,id:nm(el,'forma-'+(++n)),...base,...extra};if(fl)f.fill=fl;else f.fill='rgba(0,0,0,0)';if(bw>0&&bc)f.stroke={color:bc,width:bw};if(sh)f.shadow=sh;if(cs.mixBlendMode&&cs.mixBlendMode!='normal')f.blend=cs.mixBlendMode;add(f,z,o)}
@@ -6488,11 +6489,11 @@ function hteToJson(){const d=hteDoc(),w=d.defaultView,W=HTE.W,H=HTE.H,L=[];let n
  const hx=t=>t.replace(/rgb\(\s*(\d+),\s*(\d+),\s*(\d+)\s*\)/g,(m,a,b,c)=>'#'+[a,b,c].map(v=>(+v).toString(16).padStart(2,'0')).join(''));
  return{json:JSON.parse(hx(JSON.stringify({context:'Tela convertida de HTML',canvas:{width:W,height:H,background:bg},layers:L}))),skip}}
 async function hteStudio(){try{if(!STU){alert('Para editar no estúdio, abra primeiro o estúdio de telas do post (botão 🧩 dentro dele).');return}
-  const keep=HTE.cur,n=HTE.T.length,roots=[];let skip=0;for(let i=0;i<n;i++){await hteShow(i);const r=hteToJson();roots.push(r.json);skip+=r.skip}
+  const keep=HTE.cur,n=HTE.T.length,roots=[];let skip=0;HTE._im={};for(let i=0;i<n;i++){await hteShow(i);for(const im of [...hteDoc().querySelectorAll('img')]){const u=im.currentSrc||im.src;if(!u||HTE._im[u])continue;try{stat('guardando a foto da tela '+(i+1)+'…');const r0=await elPrep(u,false);if(r0)HTE._im[u]=elSave(HTE.co,{n:'Foto da tela HTML',src:r0.src,hd:r0.hd,iw:r0.w,ih:r0.h,estilo:'foto'})}catch(x){}}const r=hteToJson();roots.push(r.json);skip+=r.skip}
   const off=EDX&&document.getElementById('ste')?(+EDX.i||0):0;
   document.getElementById('hte')?.remove();window.removeEventListener('resize',hteLayout);
   await stjApply(roots.length==1?{telas:[roots[0]]}:{telas:roots},off);
-  stat('● '+n+' tela(s) abertas no editor do estúdio como camadas'+(skip?' · '+skip+' imagem/textura de fundo viraram espaço de foto ou foram ignoradas':''))}catch(x){alert('Não consegui converter: '+(x&&x.message||x))}}
+  stat('● '+n+' tela(s) abertas no editor do estúdio como camadas'+(skip?' · '+skip+' imagem(ns) sem arquivo viraram espaço de foto e texturas de fundo foram ignoradas':''))}catch(x){alert('Não consegui converter: '+(x&&x.message||x))}}
 async function hteAll(){try{const n=HTE.T.length,keep=HTE.cur,fs=[];for(let i=0;i<n;i++){stat('gerando a tela '+(i+1)+' de '+n+'…');await hteShow(i);const b=await hteBlob();fs.push(new File([b],'tela '+(i+1)+'.png',{type:'image/png'}))}await hteShow(keep);await hteZip(fs)}catch(x){alert('Não consegui gerar todas as telas: '+(x&&x.message||x))}}
 function hteLayout(){const st=document.getElementById('htest'),w=document.getElementById('htew'),f=document.getElementById('htef');if(!st||!w||!f)return;HTE.sc=Math.max(.1,Math.min((st.clientWidth-28)/HTE.W,(st.clientHeight-28)/HTE.H,1));w.style.width=HTE.W*HTE.sc+'px';w.style.height=HTE.H*HTE.sc+'px';f.style.cssText=`width:${HTE.W}px;height:${HTE.H}px;transform:scale(${HTE.sc});transform-origin:0 0`;const d=hteDoc();if(d){const s=d.getElementById('hte-base');if(s)s.textContent=hteBase()}hteBox()}
 function hteAttach(){const d=hteDoc();if(!d)return;d.addEventListener('pointerdown',hteDown,true);d.addEventListener('dblclick',hteDbl,true);d.addEventListener('keydown',hteKey,true);d.addEventListener('click',e=>{e.preventDefault()},true);d.addEventListener('dragstart',e=>e.preventDefault(),true)}
