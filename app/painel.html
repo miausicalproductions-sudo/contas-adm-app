@@ -1045,7 +1045,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:332*/const PV=332;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:333*/const PV=333;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -6338,7 +6338,9 @@ REGRAS (para o painel conseguir editar cada peça):
 - Cada texto fica sozinho no seu elemento, sem outros elementos dentro dele.
 - Fontes só do Google Fonts, via <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=...">.
 - Fotos: use <img> (se não tiver foto, deixe um retângulo de cor com data-nome="foto").
-- Sem animações, filtros nem sombras muito complexas.
+- Sem animações nem filtros pesados.
+- NADA de fundo liso: crie camadas de fundo como elementos separados e editáveis, atrás dos textos: formas decorativas (círculos, blobs, faixas, ondas, cantos arredondados), degradês (linear-gradient) e padrões simples (pontos, listras, grade) com opacidade baixa. Cada uma com data-nome="deco-..." (ex.: data-nome="deco-circulo-1").
+- TEXTOS: cada bloco de texto (mesmo com 2 ou 3 linhas) é UM elemento só, com <br> entre as linhas, largura fixa e altura suficiente. Nunca ponha dois textos um embaixo do outro com pouco espaço: se uma frase pode quebrar em duas linhas, deixe espaço para as duas.
 
 CORES: principal ${b.c1} · apoio ${b.c2} · destaque ${b.c3} · fundo ${b.bg} · texto ${b.ink}
 FONTE DOS TÍTULOS: ${b.font}
@@ -6361,7 +6363,9 @@ REGRAS (para o painel conseguir editar cada peça):
 - Nos stories, mantenha os textos entre 250px e 1590px de altura (fora das barras do Instagram).
 - Fontes só do Google Fonts, via <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=...">.
 - Fotos: use <img> (se não tiver foto, deixe um retângulo de cor com data-nome="foto").
-- Sem animações, filtros nem sombras muito complexas.
+- Sem animações nem filtros pesados.
+- NADA de fundo liso: crie camadas de fundo como elementos separados e editáveis, atrás dos textos: formas decorativas (círculos, blobs, faixas, ondas, cantos arredondados), degradês (linear-gradient) e padrões simples (pontos, listras, grade) com opacidade baixa. Cada uma com data-nome="deco-..." (ex.: data-nome="deco-circulo-1").
+- TEXTOS: cada bloco de texto (mesmo com 2 ou 3 linhas) é UM elemento só, com <br> entre as linhas, largura fixa e altura suficiente. Nunca ponha dois textos um embaixo do outro com pouco espaço: se uma frase pode quebrar em duas linhas, deixe espaço para as duas.
 
 CORES: principal ${b.c1} · apoio ${b.c2} · destaque ${b.c3} · fundo ${b.bg} · texto ${b.ink}
 FONTE DOS TÍTULOS: ${b.font}${cf.stnote?'\nESTILO DA MARCA: '+String(cf.stnote).replace(/\n+/g,' ').slice(0,300):''}
@@ -6373,6 +6377,31 @@ Estilo: visual moderno e limpo, texto grande e legível no celular, boa hierarqu
 async function crCopyHtml(Q,i){const c=co(Q.co);let t='';try{hteOpen({co:Q.co,name:c.name,fmt:'st',cap:'',day:{Q,i}});t=htePrompt()}catch(e){stat('⚠ não consegui montar o pedido: '+(e&&e.message||e));return}
  let ok=false;try{await navigator.clipboard.writeText(t);ok=true}catch(e){try{const ta=document.createElement('textarea');ta.value=t;ta.style.cssText='position:fixed;left:-9999px;top:0';document.body.appendChild(ta);ta.focus();ta.select();ok=document.execCommand('copy');ta.remove()}catch(x){}}
  if(ok){bigToast('✓ Copiado! Cole na IA e traga o HTML aqui');stat('● pedido do dia em HTML copiado: cole na IA, depois cole o HTML no editor')}else copyBox('Pedido do dia em HTML',t)}
+function hteTex(k,c,a,z){const col=c=='light'?'#fff':'#000',al=Math.max(.02,Math.min(.9,a||.15)),S=Math.max(8,+z||40);let w=S,h=S,svg='';const o=`xmlns="http://www.w3.org/2000/svg"`;
+ if(k=='dots')svg=`<svg ${o} width="${S}" height="${S}"><circle cx="${S/2}" cy="${S/2}" r="${S*.09}" fill="${col}" fill-opacity="${al}"/></svg>`;
+ else if(k=='stripes')svg=`<svg ${o} width="${S}" height="${S}"><path d="M-${S/4} ${S/4}L${S/4} -${S/4}M0 ${S}L${S} 0M${S*.75} ${S*1.25}L${S*1.25} ${S*.75}" stroke="${col}" stroke-opacity="${al}" stroke-width="${S*.14}"/></svg>`;
+ else if(k=='grid')svg=`<svg ${o} width="${S}" height="${S}"><path d="M${S} 0H0V${S}" fill="none" stroke="${col}" stroke-opacity="${al}" stroke-width="2"/></svg>`;
+ else if(k=='waves'){w=S*2;svg=`<svg ${o} width="${w}" height="${S}"><path d="M0 ${S/2}Q${S/2} 0 ${S} ${S/2}T${w} ${S/2}" fill="none" stroke="${col}" stroke-opacity="${al}" stroke-width="3"/></svg>`}
+ else if(k=='confetti'){w=h=S*3;const cs=['#ff3d8b','#ffc83d','#2bb3ff','#35d07f'];svg=`<svg ${o} width="${w}" height="${h}">${[[.2,.2],[.7,.35],[.4,.75],[.9,.9],[.1,.6]].map((q,i)=>`<rect x="${q[0]*w}" y="${q[1]*h}" width="${S*.22}" height="${S*.1}" rx="2" fill="${cs[i%4]}" fill-opacity="${al*2.2>1?1:al*2.2}" transform="rotate(${i*37} ${q[0]*w} ${q[1]*h})"/>`).join('')}</svg>`}
+ else if(k=='grain'){w=h=300;const v=col=='#fff'?1:0;svg=`<svg ${o} width="300" height="300"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 ${v} 0 0 0 0 ${v} 0 0 0 0 ${v} 0 0 0 ${(al*2).toFixed(2)} 0"/></filter><rect width="100%" height="100%" filter="url(#n)"/></svg>`}
+ return{u:`url("data:image/svg+xml;utf8,${encodeURIComponent(svg)}")`,w,h}}
+const HTEX=[['','nenhuma'],['dots','pontos'],['stripes','listras'],['grid','grade'],['waves','ondas'],['confetti','confete'],['grain','grão (papel)']];
+function hteBg(el){const parts=[],sz=[],rp=[];if(el.dataset.tx){const t=hteTex(el.dataset.tx,el.dataset.txc||'dark',+el.dataset.txa||.15,+el.dataset.txs||40);parts.push(t.u);sz.push(t.w+'px '+t.h+'px');rp.push('repeat')}
+ if(el.dataset.g2){const c1=el.style.backgroundColor||el.ownerDocument.defaultView.getComputedStyle(el).backgroundColor;parts.push(`linear-gradient(${el.dataset.ga||180}deg,${c1&&!/rgba\(0,\s*0,\s*0,\s*0\)/.test(c1)?c1:'#ffffff'},${el.dataset.g2})`);sz.push('100% 100%');rp.push('no-repeat')}
+ el.style.backgroundImage=parts.join(',')||'none';if(parts.length){el.style.backgroundSize=sz.join(',');el.style.backgroundRepeat=rp.join(',')}}
+function hteRoot(){const d=hteDoc();return d?(d.body.querySelector('[data-tela]')||d.body.querySelector('section.tela')||d.body):null}
+function hteAdd(k,src){const d=hteDoc(),r=hteRoot();if(!d||!r)return;hteSnap();const b=hteBrand(),W=r.offsetWidth||HTE.W,H=r.offsetHeight||HTE.H,e=d.createElement(k=='text'?'p':k=='img'?'img':'div');e.style.position='absolute';e.dataset.nome={rect:'forma',circle:'circulo',line:'linha',text:'texto',img:'imagem',tex:'textura'}[k]||'peca';
+ const put=(l,t,w,h)=>{e.style.left=Math.round(l)+'px';e.style.top=Math.round(t)+'px';if(w)e.style.width=Math.round(w)+'px';if(h)e.style.height=Math.round(h)+'px'};
+ if(k=='rect'){put(W/2-250,H/2-150,500,300);e.style.backgroundColor=b.c1;e.style.borderRadius='28px'}
+ else if(k=='circle'){put(W/2-150,H/2-150,300,300);e.style.backgroundColor=b.c3;e.style.borderRadius='50%'}
+ else if(k=='line'){put(W/2-250,H/2,500,8);e.style.backgroundColor=b.c2;e.style.borderRadius='4px'}
+ else if(k=='text'){put(W/2-350,H/2-60,700,0);e.textContent='Novo texto';e.style.margin='0';e.style.fontSize='64px';e.style.fontWeight='700';e.style.lineHeight='1.1';e.style.color=b.ink;e.style.textAlign='center';e.style.fontFamily=`'${b.font}',sans-serif`;hteFont(b.font)}
+ else if(k=='img'){if(!src)return;e.src=src;put(W/2-250,H/2-250,500,0);e.style.height='auto'}
+ else if(k=='tex'){put(0,0,W,H);e.dataset.tx='grain';e.dataset.txc='dark';e.dataset.txa='.12';e.style.pointerEvents='none';hteBg(e)}
+ r.appendChild(e);hteSelect(e)}
+function hteFixText(){const d=hteDoc(),r=hteRoot();if(!d||!r)return;hteSnap();const L=[...r.querySelectorAll('*')].filter(x=>!x.children.length&&String(x.textContent||'').trim()&&!/^(STYLE|SCRIPT|BR)$/.test(x.tagName));L.sort((a,b)=>a.getBoundingClientRect().top-b.getBoundingClientRect().top);let n=0;
+ for(let i=0;i<L.length;i++)for(let j=i+1;j<L.length;j++){const A=L[i].getBoundingClientRect(),B=L[j].getBoundingClientRect(),hov=Math.min(A.right,B.right)-Math.max(A.left,B.left);if(hov<=8)continue;const ov=A.bottom-B.top;if(ov>2&&B.top>=A.top-2){L[j].dataset.hy=(+L[j].dataset.hy||0)+Math.ceil(ov+10);hteTf(L[j]);n++}}
+ hteBox();hteInsp();stat(n?'↕ '+n+' texto(s) afastados para não se sobrepor':'Nenhum texto se sobrepõe')}
 function hteSample(){const b=hteBrand(),f=encodeURIComponent(b.font).replace(/%20/g,'+');return`<!doctype html><html><head><meta charset=utf-8><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=${f}:wght@700;800&display=swap"><style>
 body{margin:0;width:${HTE.W}px;height:${HTE.H}px;overflow:hidden;position:relative;background:${b.bg};font-family:'${b.font}',sans-serif}
 .f{position:absolute;left:0;top:0;width:${HTE.W}px;height:${Math.round(HTE.H*.42)}px;background:${b.c1}}
@@ -6393,8 +6422,8 @@ function hteOpen(ctx){ctx=ctx||(STU?{co:STU.p.co,name:STU.c.name,fmt:STU.fmt,cap
 function hteSavedFill(){const s=document.querySelector('#hte [data-hs=saved]');if(!s)return;const L=S.grid.filter(g=>g.kind=='thtml'&&!g.del&&g.co==HTE.co);s.innerHTML='<option value="">📂 Salvas ('+L.length+')</option>'+L.map(g=>`<option value="${esc(g.id)}"${g.id==HTE.gid?' selected':''}>${esc(g.name||'sem nome')}</option>`).join('')}
 function hteSrc(c){return`<!doctype html><html><head><meta charset=utf-8>${c.head}<style id=hte-base>${hteBase()}</style></head><body class="${esc(c.bcls)}" style="${esc(c.bst)}">${c.body}</body></html>`}
 function hteStash(){const d=hteDoc();if(d&&HTE.T[HTE.cur])HTE.T[HTE.cur].body=d.body.innerHTML}
-function hteShow(i){hteStash();HTE.cur=i;HTE.hist=[];HTE.sel=null;{const tf=HTE.T[i]&&HTE.T[i].fm;if(tf&&HTEF[tf]&&tf!=HTE.fmt){HTE.fmt=tf;HTE.W=HTEF[tf][1];HTE.H=HTEF[tf][2];const sf=document.querySelector('#hte [data-hs=fmt]');if(sf)sf.value=tf}}const f=document.getElementById('htef');if(!f||!HTE.T[i])return Promise.resolve();return new Promise(ok=>{f.onload=()=>{hteAttach();hteLayout();hteInsp();hteTabs();ok()};f.srcdoc=hteSrc(HTE.T[i])})}
-function hteTabs(){const t=document.getElementById('htetabs');if(!t)return;const n=HTE.T.length;t.innerHTML=`<div class=hth style="padding:6px 12px;gap:5px">${HTE.T.map((x,i)=>`<button class="chip${i==HTE.cur?' on':''}" data-act=hteshow data-i=${i}>Tela ${i+1}</button>`).join('')}<label class=chip style="cursor:pointer" title="Vários .html de uma vez, ou um .zip com as telas">📁 Abrir arquivos / ZIP<input type=file multiple accept=".html,.htm,.zip" hidden data-hf=1></label>${n>1?'<button class=chip data-act=hteall title="Gera um PNG de cada tela e baixa tudo junto">⬇ Baixar todas (ZIP)</button>':''}</div>`}
+function hteShow(i){hteStash();HTE.cur=i;HTE.hist=[];HTE.sel=null;{const pp=document.getElementById('htepaste');if(pp)pp.hidden=true}{const tf=HTE.T[i]&&HTE.T[i].fm;if(tf&&HTEF[tf]&&tf!=HTE.fmt){HTE.fmt=tf;HTE.W=HTEF[tf][1];HTE.H=HTEF[tf][2];const sf=document.querySelector('#hte [data-hs=fmt]');if(sf)sf.value=tf}}const f=document.getElementById('htef');if(!f||!HTE.T[i])return Promise.resolve();return new Promise(ok=>{f.onload=()=>{hteAttach();hteTabs();hteLayout();hteInsp();ok()};f.srcdoc=hteSrc(HTE.T[i])})}
+function hteTabs(){const t=document.getElementById('htetabs');if(!t)return;const n=HTE.T.length;t.innerHTML=`<div class=hth style="padding:6px 12px;gap:5px">${HTE.T.map((x,i)=>`<button class="chip${i==HTE.cur?' on':''}" data-act=hteshow data-i=${i}>Tela ${i+1}</button>`).join('')}<label class=chip style="cursor:pointer" title="Vários .html de uma vez, ou um .zip com as telas">📁 Abrir arquivos / ZIP<input type=file multiple accept=".html,.htm,.zip" hidden data-hf=1></label>${n>1?'<button class=chip data-act=hteall title="Gera um PNG de cada tela e baixa tudo junto">⬇ Baixar todas (ZIP)</button>':''}</div>${n?`<div class=hth style="padding:4px 12px 6px;gap:5px;border-top:0"><span class=mu>Adicionar:</span><button class=chip data-act=hteadd data-k=rect>▭ Retângulo</button><button class=chip data-act=hteadd data-k=circle>● Círculo</button><button class=chip data-act=hteadd data-k=line>▬ Linha</button><button class=chip data-act=hteadd data-k=text>T Texto</button><label class=chip style="cursor:pointer">🖼 Imagem<input type=file accept="image/*" hidden data-hf2=1></label><button class=chip data-act=hteadd data-k=tex>▦ Textura na tela</button><button class=chip data-act=htefix title="Se um texto quebrou em duas linhas e bateu no de baixo, afasta os textos">↕ Corrigir sobreposição de textos</button></div>`:''}`}
 function hteLoad(html,more){const r=hteParse(html);if(!r.T.length){alert('Não achei nenhuma tela nesse HTML.');return Promise.resolve()}
  if(r.fmt&&!more){HTE.fmt=r.fmt;HTE.W=HTEF[r.fmt][1];HTE.H=HTEF[r.fmt][2];const sf=document.querySelector('#hte [data-hs=fmt]');if(sf)sf.value=r.fmt}
  if(more&&HTE.T.length){hteStash();const k=HTE.T.length;HTE.T=HTE.T.concat(r.T);return hteShow(k)}HTE.T=r.T;HTE.cur=-1;return hteShow(0)}
@@ -6437,6 +6466,12 @@ function hteInsp(){const p=document.getElementById('htep');if(!p)return;const el
   if(leaf)h+=`<div class=hr><label>Tamanho da letra<input type=number data-hp=fs min=8 max=400 value="${parseInt(cs.fontSize)||0}"></label><label>Peso<select data-hp=fw>${[400,500,600,700,800,900].map(v=>`<option${v==(parseInt(cs.fontWeight)||400)?' selected':''}>${v}</option>`).join('')}</select></label></div>
    <div class=hr><button class=chip data-act=htealn data-v=left>⬅</button><button class=chip data-act=htealn data-v=center>↔</button><button class=chip data-act=htealn data-v=right>➡</button></div>
    <label>Fonte<select data-hp=ff><option value="">(a da IA)</option>${(typeof FONTS!='undefined'?FONTS:[]).map(f=>`<option>${esc(f[0])}</option>`).join('')}</select></label>`;
+  {const tx=el.dataset.tx||'';h+=`<details class=hdt open><summary style="cursor:pointer;font-size:12px;font-weight:700">Fundo e acabamento</summary>
+   <div class=hr><label>Degradê até<input type=color data-hp=g2 value="${el.dataset.g2||'#ffffff'}"></label><label>Ângulo<input type=number data-hp=ga value="${el.dataset.ga||180}"></label><button class=chip data-act=hteg0>sem degradê</button></div>
+   <div class=hr><label>Textura<select data-hp=tx>${HTEX.map(([v,n])=>`<option value="${v}"${v==tx?' selected':''}>${n}</option>`).join('')}</select></label><label>Cor<select data-hp=txc><option value=dark${(el.dataset.txc||'dark')=='dark'?' selected':''}>escura</option><option value=light${el.dataset.txc=='light'?' selected':''}>clara</option></select></label></div>
+   <div class=hr><label>Força<input type=range data-hp=txa min=3 max=60 value="${Math.round((+el.dataset.txa||.15)*100)}"></label><label>Tamanho<input type=number data-hp=txs min=8 value="${el.dataset.txs||40}"></label></div>
+   <div class=hr><label>Borda<input type=color data-hp=bc value="${hteHex(cs.borderTopColor)}"></label><label>Espessura<input type=number data-hp=bw min=0 value="${parseInt(cs.borderTopWidth)||0}"></label></div>
+   <label>Sombra<select data-hp=sh>${[['none','nenhuma'],['0 6px 18px rgba(0,0,0,.18)','suave'],['0 14px 40px rgba(0,0,0,.35)','forte']].map(([v,n])=>`<option value="${v}"${(el.style.boxShadow||'none')==v||(!el.style.boxShadow&&v=='none')?' selected':''}>${n}</option>`).join('')}</select></label></details>`}
   h+=`<div class=hr><label>Largura<input type=number data-hp=w value="${Math.round(r.width)}"></label><label>Altura<input type=number data-hp=h value="${Math.round(r.height)}"></label></div>
    <div class=hr><label>Opacidade<input type=range data-hp=op min=0 max=100 value="${Math.round((+cs.opacity||0)*100)}"></label><label>Cantos<input type=number data-hp=rad min=0 value="${parseInt(cs.borderTopLeftRadius)||0}"></label></div>`;
   if(img)h+=`<label class=chip style="cursor:pointer;align-self:flex-start">🖼 Trocar a imagem<input type=file accept="image/*" hidden data-hp=img></label>`;
@@ -6448,6 +6483,8 @@ function hteApply(t){const el=HTE.sel;if(!el||!el.isConnected)return;const k=t.d
  if(k=='txt')el.textContent=v;else if(k=='col')el.style.color=v;else if(k=='bg')el.style.backgroundColor=v;else if(k=='fs')el.style.fontSize=(+v||16)+'px';else if(k=='fw')el.style.fontWeight=v;
  else if(k=='ff'){if(v){hteFont(v);el.style.fontFamily=`'${v}',sans-serif`}else el.style.fontFamily=''}
  else if(k=='w')el.style.width=(+v||0)+'px';else if(k=='h')el.style.height=(+v||0)+'px';else if(k=='op')el.style.opacity=(+v)/100;else if(k=='rad')el.style.borderRadius=(+v||0)+'px';
+ else if(k=='g2'){el.dataset.g2=v;hteBg(el)}else if(k=='ga'){el.dataset.ga=v;hteBg(el)}else if(k=='tx'){if(v)el.dataset.tx=v;else delete el.dataset.tx;hteBg(el)}else if(k=='txc'){el.dataset.txc=v;hteBg(el)}else if(k=='txa'){el.dataset.txa=(+v)/100;hteBg(el)}else if(k=='txs'){el.dataset.txs=v;hteBg(el)}
+ else if(k=='bc'){el.style.borderStyle='solid';el.style.borderColor=v;if(!parseInt(el.ownerDocument.defaultView.getComputedStyle(el).borderTopWidth))el.style.borderWidth='4px'}else if(k=='bw'){el.style.borderStyle='solid';el.style.borderWidth=(+v||0)+'px'}else if(k=='sh')el.style.boxShadow=v=='none'?'':v;
  else if(k=='img'&&t.files&&t.files[0]){const fr=new FileReader();fr.onload=()=>{hteSnap();if(el.tagName=='IMG')el.src=fr.result;else{el.style.backgroundImage=`url(${fr.result})`;el.style.backgroundSize='cover';el.style.backgroundPosition='center'}hteBox()};fr.readAsDataURL(t.files[0]);return}
  hteBox()}
 function hteExport(){hteStash();if(!HTE.T.length)return'';const hs=[...new Set(HTE.T.map(t=>t.head))].join(''),t0=HTE.T[0];return`<!doctype html><html><head><meta charset=utf-8><meta name="hte-fmt" content="${HTE.fmt}">${hs}<style>${hteBase()}</style></head><body class="${esc(t0.bcls)}" style="${esc(t0.bst)}">${HTE.T.map(t=>t.body).join('\n')}</body></html>`}
@@ -6469,6 +6506,9 @@ function hteAct(a,b){try{const el=HTE.sel;
  if(a=='hteapply'){const v=document.getElementById('htetx').value;if(!v.trim())return;hteLoad(v);document.getElementById('htepaste').hidden=true;return}
  if(a=='htesamp')return hteLoad(hteSample());
  if(a=='hteshow')return hteShow(+b.dataset.i);
+ if(a=='hteadd')return hteAdd(b.dataset.k);
+ if(a=='htefix')return hteFixText();
+ if(a=='hteg0'){const e=HTE.sel;if(e){hteSnap();delete e.dataset.g2;hteBg(e);hteInsp()}return}
  if(a=='hteall')return hteAll();
  if(a=='hteundo')return hteUndo();
  if(a=='htepng')return hteDownload();
@@ -6485,7 +6525,7 @@ function hteAct(a,b){try{const el=HTE.sel;
  }catch(x){console.warn(x);alert('Algo deu errado no editor: '+(x&&x.message||x))}}
 document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-act^=hte]');if(!b||(!b.closest('#hte')&&b.dataset.act!='hted'))return;e.stopImmediatePropagation();hteAct(b.dataset.act,b)},true);
 document.addEventListener('input',e=>{const t=e.target;if(t&&t.dataset&&t.dataset.hp&&t.closest('#hte')&&t.dataset.hp!='img')hteApply(t)},true);
-document.addEventListener('change',e=>{const t=e.target;if(!t||!t.closest||!t.closest('#hte'))return;if(t.dataset.hf){const fl=[...t.files];t.value='';hteFiles(fl);return}if(t.dataset.hp=='img')hteApply(t);
+document.addEventListener('change',e=>{const t=e.target;if(!t||!t.closest||!t.closest('#hte'))return;if(t.dataset.hf){const fl=[...t.files];t.value='';hteFiles(fl);return}if(t.dataset.hf2){const f=t.files&&t.files[0];t.value='';if(f){const fr=new FileReader();fr.onload=()=>hteAdd('img',fr.result);fr.readAsDataURL(f)}return}if(t.dataset.hp=='img')hteApply(t);
  else if(t.dataset.hs=='fmt'){hteSnap();HTE.fmt=t.value;HTE.W=HTEF[t.value][1];HTE.H=HTEF[t.value][2];hteLayout()}
  else if(t.dataset.hs=='saved'&&t.value){const g=S.grid.find(x=>x.id==t.value);if(g){HTE.gid=g.id;document.getElementById('htename').value=g.name||'';hteLoad(g.ref)}}},true);
 document.addEventListener('focusin',e=>{const t=e.target;if(t&&t.dataset&&t.dataset.hp&&t.closest&&t.closest('#hte')&&t.dataset.hp!='img')hteSnap()},true);
