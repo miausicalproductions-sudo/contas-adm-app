@@ -5023,12 +5023,14 @@ function veChoreo(x,TX){const C=[...((x.mod&&x.mod.camadas)||[]),...(x.extra||[]
 function veSyncTexts(){const st=VE.s,W=VE.words||[];if(!st||!W.length||!VE.sc.length)return 0;let n=0;
  VE.sc.forEach(c=>{const x=st.S[c.i];if(!x)return;const t0=c.t0,t1=c.t0+c.d,sw=W.filter(w=>w.t0>=t0-.05&&w.t0<t1);if(!sw.length)return;
   const TX=L=>String(L.txt!=null?L.txt:L.texto!=null?L.texto:nrm(L.tipo||'')=='titulo'?(x.t||''):L.linha?((x.b||[])[+L.linha-1]||''):'').replace(/\*/g,'').trim(),C=[...((x.mod&&x.mod.camadas)||[]),...(x.extra||[])].filter(L=>L&&!L.oculto&&['titulo','texto'].includes(nrm(L.tipo||''))&&TX(L));let used=0;
-  C.sort((p,q)=>(+p.y||0)-(+q.y||0));C.forEach((L,qi)=>{const tx=TX(L),tk=tx.split(/\s+/).map(veNz).filter(Boolean);if(!tk.length)return;let at=-1;
+  C.sort((p,q)=>(+p.y||0)-(+q.y||0));const isCh=L=>+L.y<7||+L.y>93,NM=Math.max(1,C.filter(L=>!isCh(L)).length);let mi=0;C.forEach((L,qi)=>{const tx=TX(L),tk=tx.split(/\s+/).map(veNz).filter(Boolean);if(!tk.length)return;let at=-1;const mq=isCh(L)?0:mi++;
    for(let k=used;k<sw.length&&at<0;k++)if(tk.slice(0,2).every((q,j)=>sw[k+j]&&veNz(sw[k+j].w)==q))at=k;
    for(let k=used;k<sw.length&&at<0;k++)if(veNz(sw[k].w)==tk[0])at=k;
-   if(at<0)at=Math.min(sw.length-1,Math.max(used,Math.floor(qi/Math.max(1,C.length)*sw.length)));
+   if(at<0)at=Math.min(sw.length-1,Math.max(used,Math.floor(mq/NM*sw.length)));
    const last=Math.min(sw.length-1,at+tk.length-1),dly=Math.max(0,sw[at].t0-t0-.08),dur=Math.min(2.2,Math.max(.5,sw[last].t1-sw[at].t0));
-   const tit=nrm(L.tipo||'')=='titulo';if(!L.anim||nrm(L.anim)=='kenburns')L.anim=tit?'subir':'palavras';L.animDelay=+dly.toFixed(2);L.animDur=+dur.toFixed(2);used=Math.min(sw.length-1,at+1);n++});try{veLink(x,C);if(x.ov&&x.ov.html)veChoreo(x,C)}catch(e){console.warn('veLink',e)}});
+   const tit=nrm(L.tipo||'')=='titulo';if(!L.anim||nrm(L.anim)=='kenburns')L.anim=tit?'subir':'palavras';const chr=+L.y<7||+L.y>93,dly2=chr?0:dly;L.animDelay=+dly2.toFixed(2);L.animDur=chr?.4:+dur.toFixed(2);used=Math.min(sw.length-1,at+1);n++});try{veLink(x,C);if(x.ov&&x.ov.html)veChoreo(x,C)}catch(e){console.warn('veLink',e)}
+  /* v367: tudo precisa estar na tela com tempo de ler: se algo entra depois de ~55% da cena, comprime todos os tempos da cena na mesma proporção (mantém a ordem) */
+  try{const A=[...((x.mod&&x.mod.camadas)||[]),...(x.extra||[])].filter(L=>L&&L.anim&&L._lk!==2&&+L.animDelay>0),mx=Math.max(0,...A.map(L=>+L.animDelay)),lim=Math.max(.5,c.d*.55);if(mx>lim){const f=lim/mx;A.forEach(L=>{L.animDelay=+(L.animDelay*f).toFixed(2)})}}catch(e){}});
  return n}
 /* ---------- áudio ---------- */
 function vePeaks(){const A=VE.au;if(!A){VE.pk=null;return}const c=A.ch[0],n=Math.ceil(A.dur*50),pk=new Float32Array(n),st=Math.floor(A.sr/50);for(let i=0;i<n;i++){let m=0;const a=i*st,b=Math.min(c.length,a+st);for(let j=a;j<b;j+=4){const v=Math.abs(c[j]);if(v>m)m=v}pk[i]=m}VE.pk=pk}
