@@ -1045,7 +1045,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:373*/const PV=373;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:374*/const PV=374;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -5062,12 +5062,12 @@ let VEPRP=null,VEPRQ=0;
 /* v364: um preparo por vez (pedidos que chegam durante ele viram uma segunda rodada, barata graças ao cache) */
 function veBusyUI(on){try{const b=document.querySelector('#ve [data-ve=play]');if(b){b.disabled=!!on;b.title=on?'Preparando as telas…':'';if(on&&!VE.pl)b.textContent='⏳'}}catch(e){}}
 async function vePrep(){if(VEPRP){VEPRQ=1;return VEPRP}VEPRP=(async()=>{try{veBusyUI(1);do{VEPRQ=0;VE._prep=1;try{await vePrep0()}finally{VE._prep=0}}while(VEPRQ)}finally{VEPRP=null;veBusyUI(0);if(!VE.busy)veProg(false);const b=document.querySelector('#ve [data-ve=play]');if(b&&!VE.pl)b.textContent='▶';if(VE._playQ){VE._playQ=0;try{vePlay()}catch(e){}}}})();return VEPRP}
-async function vePrep0(){const s=VE.s,PP=[];try{veFloatChars(s)}catch(e){}const N=s.S.length;for(let i=0;i<N;i++){if(!VE.busy)veProg(Math.round(i/(N+1)*100),'⏳ preparando as telas… '+(i+1)+' de '+N+' (o play libera no fim)');await new Promise(r=>setTimeout(r,0));await gifWarm(s,i);const P=vePartsC(s,i);P.zm=null;PP.push(P)}if(!VE.busy)veProg(Math.round(N/(N+1)*100),'⏳ finalizando os desenhos…');await new Promise(r=>setTimeout(r,0));try{await penWarm(PP)}catch(e){}VE.PP=PP}
+async function vePrep0(){const s=VE.s,PP=[];try{veFloatChars(s)}catch(e){}const N=s.S.length;for(let i=0;i<N;i++){if(!VE.busy)veProg(Math.round(i/(N+1)*100),'⏳ preparando as telas… '+(i+1)+' de '+N+' (o play libera no fim)');await new Promise(r=>setTimeout(r,0));const P=await vePartsC(s,i);P.zm=null;PP.push(P)}if(!VE.busy)veProg(Math.round(N/(N+1)*100),'⏳ finalizando os desenhos…');await new Promise(r=>setTimeout(r,0));try{await penWarm(PP)}catch(e){}VE.PP=PP}
 /* v364: reaproveita as peças já desenhadas da tela quando só mudou animação (o preparo caía a cada sincronização/legenda) */
 const VPC=new Map();
-function vePartsC(s,i){const x=s.S[i];let key=null;try{const AN=/^(anim[A-Za-z]*|loop|ganim|_lk|_force)$/,fo=[...document.fonts].filter(f=>f.status=='loaded').length;key=[s.p.id,i,s.lays[i]||x.lay,fo,JSON.stringify(vidOpt(s,i)),JSON.stringify(x,(k,v)=>AN.test(k)||k=='ve'?undefined:v),JSON.stringify((s.imgs||[]).map(z=>z.id)),JSON.stringify(s.cfg||0),JSON.stringify(s.bgs||0)].join('|')}catch(e){key=null}
+async function vePartsC(s,i){const x=s.S[i];let key=null;try{const AN=/^(anim[A-Za-z]*|loop|ganim|_lk|_force)$/,fo=[...document.fonts].filter(f=>f.status=='loaded').length;key=[s.p.id,i,s.lays[i]||x.lay,fo,JSON.stringify(vidOpt(s,i)),JSON.stringify(x,(k,v)=>AN.test(k)||k=='ve'?undefined:v),JSON.stringify((s.imgs||[]).map(z=>z.id)),JSON.stringify(s.cfg||0),JSON.stringify(s.bgs||0)].join('|')}catch(e){key=null}
  const old=key&&VPC.get(s.p.id+'#'+i);if(old&&old.key==key){const A=x.mod&&x.mod.camadas,E=x.extra||[];const parts=old.P.parts.map(p=>({...p,L:(p.ext?E:A||[])[p.li]||p.L}));return{...old.P,parts,_gb:undefined,zm:old.P.zm}}
- const P=vidParts(s,i);if(key)VPC.set(s.p.id+'#'+i,{key,P});return P}
+ await gifWarm(s,i);const P=vidParts(s,i);if(key)VPC.set(s.p.id+'#'+i,{key,P});return P}
 function veZoom(T){let z=1,fx=.5,fy=.5;for(const e of VE.zm){if(T<e.t)break;const ex=e.fx==null?.5:e.fx,ey=e.fy==null?.5:e.fy;if(e.k=='key'){const d=Math.max(.1,+e.d||1),q=Math.min(1,(T-e.t)/d),w=1-Math.pow(1-q,2);z+=(e.z-z)*w;fx+=(ex-fx)*w;fy+=(ey-fy)*w}else{z=e.z;fx=ex;fy=ey}}return{z,fx,fy}}
 function veScene(T){let k=0;while(k<VE.sc.length-1&&T>=VE.sc[k].t0+VE.sc[k].d)k++;return k}
 /* v299: o zoom continua em tudo (dinamismo), mas nunca corta o texto: se o texto não couber, o foco do zoom se desloca e, em último caso, o zoom diminui */
