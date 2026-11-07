@@ -1045,7 +1045,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:383*/const PV=383;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:384*/const PV=384;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -5291,6 +5291,8 @@ const vxId={s:1,r:0,tx:0,ty:0},
  vxCl=(v,a,b)=>Math.max(a,Math.min(b,v));
 /* reduz uma série (um valor por quadro) a poucos keyframes: só guarda onde a reta entre dois pontos deixa de bater */
 function vxKf(a,eps){if(a.length<=2)return a;const o=[a[0]];let s=0;for(let i=2;i<a.length;i++){let ok=true;const A=a[s],B=a[i];for(let j=s+1;j<i&&ok;j++){const t=(a[j].f-A.f)/(B.f-A.f);for(let q=0;q<A.v.length;q++)if(Math.abs(A.v[q]+(B.v[q]-A.v[q])*t-a[j].v[q])>eps[q]){ok=false;break}}if(!ok){o.push(a[i-1]);s=i-1}}o.push(a[a.length-1]);return o}
+const vxSlug=t=>String(t||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,24);
+function vxNm(L,co){if(L.lnome)return String(L.lnome).slice(0,40);const t=nrm(L.tipo||'');if(t=='figurinha')return(((typeof elFind=='function'&&elFind(L.id,co))||{}).n)||'Figurinha';if((t=='texto'||t=='titulo')&&L.txt!=null)return(t=='titulo'?'Título: ':'Texto: ')+(String(L.txt).replace(/\*/g,'').replace(/\s+/g,' ').trim().slice(0,28)||'(vazio)');return{foto:'Foto',forma:'Forma',emoji:'Emoji',svg:'Desenho',linha:'Linha',titulo:'Título (texto da cena)',texto:'Texto (da cena)',textura:'Textura',fita:'Fita'}[t]||(t?t[0].toUpperCase()+t.slice(1):'Elemento')}
 function vxWav(R){const n=R.length,ch=2,sr=R.sampleRate,b=new ArrayBuffer(44+n*ch*2),v=new DataView(b),w=(o,t)=>{for(let i=0;i<t.length;i++)v.setUint8(o+i,t.charCodeAt(i))};w(0,'RIFF');v.setUint32(4,36+n*ch*2,true);w(8,'WAVE');w(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,ch,true);v.setUint32(24,sr,true);v.setUint32(28,sr*ch*2,true);v.setUint16(32,ch*2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,n*ch*2,true);
  const L=R.getChannelData(0),Rr=R.numberOfChannels>1?R.getChannelData(1):L;let o=44;for(let i=0;i<n;i++){v.setInt16(o,vxCl(L[i],-1,1)*32767,true);v.setInt16(o+2,vxCl(Rr[i],-1,1)*32767,true);o+=4}return new Uint8Array(b)}
 const vxBlK=new Map();
@@ -5316,11 +5318,11 @@ async function veXmlBuild(s,O){O=O||{};await veEnsure(s);veLay();veStop&&veStop(
  const sprBlur=(p,spr)=>{const r=+p.L.desfoque>0?Math.min(80,+p.L.desfoque):0;if(!r)return spr;const v=vxBlur(spr.c,r);return{c:v.c,x:spr.x-v.pad,y:spr.y-v.pad}};
  const nS=SC.length;let tot=0;for(let k=0;k<nS;k++)tot+=1+PP[SC[k].i].parts.length;let dn=0;
  for(let k=0;k<nS;k++){const c=SC[k],P=PP[c.i],fa=FR(c.t0),fb=FR(c.t0+c.d),tEnd=c.t0+c.d-1e-4;
-  const bgE=png(P.bg,'cena'+(k+1)+'_fundo');clip('M0',fa,fb,bgE,'Cena '+(k+1)+' fundo',T=>bgAt(k,Math.min(T,tEnd),false));
-  P.parts.forEach((p,j)=>{const nm='cena'+(k+1)+'_'+(j+1)+'_'+String(nrm(p.L.tipo||'el')).replace(/[^a-z0-9]/g,'').slice(0,10);let segs=null;
+  const bgE=png(P.bg,'c'+(k+1)+'_0_fundo');clip('M0',fa,fb,bgE,'Cena '+(k+1)+' · Fundo',T=>bgAt(k,Math.min(T,tEnd),false));
+  P.parts.forEach((p,j)=>{const ln=vxNm(p.L,s.p&&s.p.co),nm='c'+(k+1)+'_'+(j+1)+'_'+(vxSlug(ln)||'el'),lb='Cena '+(k+1)+' · '+ln;let segs=null;
    if(p.gif){segs=[];let step=1/60;while(c.d/step>1200)step*=2;let last=undefined;for(let t=0;t<c.d;t+=step){let q=null;try{q=p.gif(c.loc0+t)}catch(e){}if(q!==last){segs.push({q,t:c.t0+t});last=q}}if(segs.length>400){notes.push('Cena '+(k+1)+': GIF com quadros demais, usei parte deles.');const m=Math.ceil(segs.length/400);segs=segs.filter((_,i)=>i%m==0)}}
-   if(segs&&segs.length>1){segs.forEach((sg,i)=>{const ta=i?sg.t:c.t0,tb=segs[i+1]?segs[i+1].t:c.t0+c.d,fa2=FR(ta),fb2=segs[i+1]?FR(tb):fb;if(fb2<=fa2)return;const spr=sprBlur(p,sg.q?{c:sg.q.c,x:sg.q.x,y:sg.q.y}:{c:p.c,x:p.x,y:p.y}),e=png(spr.c,nm,{x:spr.x,y:spr.y});clip('M'+(j+1),fa2,fb2,e,nm,T=>partAt(k,p,Math.min(T,tEnd),false,FS))})}
-   else{const q0=segs&&segs[0]&&segs[0].q,spr=sprBlur(p,q0?{c:q0.c,x:q0.x,y:q0.y}:{c:p.c,x:p.x,y:p.y}),e=png(spr.c,nm,{x:spr.x,y:spr.y});clip('M'+(j+1),fa,fb,e,nm,T=>partAt(k,p,Math.min(T,tEnd),false,FS));}
+   if(segs&&segs.length>1){segs.forEach((sg,i)=>{const ta=i?sg.t:c.t0,tb=segs[i+1]?segs[i+1].t:c.t0+c.d,fa2=FR(ta),fb2=segs[i+1]?FR(tb):fb;if(fb2<=fa2)return;const spr=sprBlur(p,sg.q?{c:sg.q.c,x:sg.q.x,y:sg.q.y}:{c:p.c,x:p.x,y:p.y}),e=png(spr.c,nm,{x:spr.x,y:spr.y});clip('M'+(j+1),fa2,fb2,e,lb,T=>partAt(k,p,Math.min(T,tEnd),false,FS))})}
+   else{const q0=segs&&segs[0]&&segs[0].q,spr=sprBlur(p,q0?{c:q0.c,x:q0.x,y:q0.y}:{c:p.c,x:p.x,y:p.y}),e=png(spr.c,nm,{x:spr.x,y:spr.y});clip('M'+(j+1),fa,fb,e,lb,T=>partAt(k,p,Math.min(T,tEnd),false,FS));}
    dn++});dn++;pg(dn/tot*.5)}
  /* ---- trocas de cena: os quadros da troca (fade, deslizar, zoom, cortina) vão prontos, 1 imagem por quadro, por cima das duas cenas ---- */
  {const tmp=VE.tmp||[mkc(W,H),mkc(W,H),mkc(W,H)],cv=mkc(W,H),g=cv.getContext('2d');let nt=0;for(let k=1;k<nS;k++){const c=SC[k],pv=SC[k-1];if(!(pv.i!=c.i&&c.tr!='corte'))continue;for(let f=FR(c.t0);f<FR(c.t0+SEQTR);f++){const T=Math.max(c.t0+.001,Math.min(D-.001,f/fps));if(VE.vb||(VE.ov&&VE.ov.length))await veSeekFrame(T);veFrame(g,T,tmp);const c2=mkc(W,H);c2.getContext('2d').drawImage(cv,0,0);const e=png(c2,'troca'+k);e.jpg=1;clip('U0',f,f+1,e,'Troca '+k,()=>({pos:[W/2,H/2],sc:100,rot:0,op:100,cr:[0,0,0,0]}));nt++}}if(nt)notes.push(nt+' quadros de troca de cena já vêm prontos (imagem única por quadro).')}
@@ -5356,6 +5358,7 @@ async function veXmlBuild(s,O){O=O||{};await veEnsure(s);veLay();veStop&&veStop(
  const txt=['LINHA DO TEMPO EXPORTADA — Studios Miau','',
  'Como abrir no Premiere Pro: Arquivo > Importar > escolha "linha-do-tempo.xml" (use a opção de arquivo do Final Cut Pro 7 / XML). No DaVinci Resolve: Arquivo > Importar > Linha do tempo > XML.',
  'Se o Premiere disser "mídia off-line", escolha "Localizar" e aponte para esta pasta (as imagens e o audio.wav ficam juntos com o XML).',
+ 'Cada peça tem o nome do elemento no editor (ex.: "Cena 3 · Título: venda fechada"). As faixas ficam de baixo para cima na mesma ordem das camadas: fundo, elementos, trocas de cena, imagens soltas e legenda no topo.',
  'Se as posições ficarem de cabeça para baixo (elementos no lugar espelhado), importe o "linha-do-tempo-B.xml" no lugar.','',
  'O que vem: '+nS+' cena(s), '+nClips+' peça(s). Cada elemento da tela é um PNG já com os efeitos (sombra, desfoque, contorno) e vem com os keyframes de posição, tamanho, giro e opacidade, inclusive os zooms, flutuar e as trocas de cena. A legenda vem palavra por palavra. O áudio (voz, música e sons) vem num WAV só.','',
  'O que muda: os textos viram imagem (dá para mover e animar, mas não digitar); animações de escrever/revelar viram um corte (Crop) animado; as trocas de cena (fade, deslizar, zoom, cortina) vêm como imagens prontas, quadro a quadro, por cima das duas cenas; modos de mescla não vão.',...notes.map(x=>'- '+x)].join('\n');
