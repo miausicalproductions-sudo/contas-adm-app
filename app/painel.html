@@ -651,7 +651,7 @@ body.crbusy #md,body.crbusy #stu{visibility:hidden!important}
 .imf button:not(.btn):not(.dng){color:var(--ink)}
 
 /* ===== v16: segurança, kit dos Stories, grade com IA ===== */
-#lock{position:fixed;inset:0;z-index:200;background:radial-gradient(circle at 30% 20%,color-mix(in srgb,var(--brand) 30%,#1d1b2c),#1d1b2c);display:grid;place-items:center}
+#lock{position:fixed;inset:0;z-index:2147483000;background:radial-gradient(circle at 30% 20%,color-mix(in srgb,var(--brand) 30%,#1d1b2c),#1d1b2c);display:grid;place-items:center}
 .lkb{background:#fff;border-radius:22px;padding:28px 30px;display:grid;justify-items:center;gap:8px;width:min(340px,90vw);box-shadow:0 30px 80px #0006}
 .lkl{width:84px;height:84px;border-radius:22px;object-fit:cover;box-shadow:0 8px 24px #0004}.lki .ik svg{width:30px;height:30px;color:var(--brand)}.lkb p{margin:0}.lkb input{font-size:26px;letter-spacing:10px;text-align:center;width:100%;border-radius:12px}#lkmsg{color:#C62F4A;min-height:16px}
 .kitr{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px;padding-top:8px;border-top:1px dashed var(--ln)}.kitr .chip{display:inline-flex;align-items:center;gap:6px}
@@ -1045,7 +1045,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:365*/const PV=365;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:366*/const PV=366;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -1344,6 +1344,7 @@ function lockShow(){if(!LK.h||LK.on)return;LK.on=true;const d=document.createEle
 async function lockTry(){const v=$('#lkin').value;if(v.length<4)return;if(await pinHash(v)===LK.h){LK.on=false;LK.last=Date.now();$('#lock')?.remove()}else if(v.length>=8||v.length>=(localStorage.pinl||4)){$('#lkmsg').textContent='PIN errado.';$('#lkin').value=''}}
 ['pointerdown','keydown','wheel'].forEach(t=>document.addEventListener(t,e=>{if(LK.on&&!e.target.closest('#lock')){e.stopImmediatePropagation();e.preventDefault()}else LK.last=Date.now()},true));
 document.addEventListener('input',e=>{if(e.target.id=='lkin')lockTry()},true);
+document.addEventListener('mousemove',()=>{if(!LK.on)LK.last=Date.now()},{passive:true,capture:true});
 setInterval(()=>{if(LK.h&&!LK.on&&Date.now()-LK.last>LK.m*6e4)lockShow()},20000);
 setTimeout(lockShow,0);
 /* ---------- Grade de Stories planejada com IA ---------- */
