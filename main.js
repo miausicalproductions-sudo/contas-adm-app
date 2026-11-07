@@ -257,6 +257,24 @@ function fontNome(p) {
   } catch (e) { return ''; } finally { if (fd !== null) try { fs.closeSync(fd); } catch (e) {} }
 }
 let FONTCACHE = null;
+/* projeto do CapCut: grava a pasta pronta direto na pasta de projetos (sem zip, sem extrair) */
+ipcMain.handle('salvar-pasta', async (e, dir, arquivos) => {
+  try {
+    dir = path.resolve(String(dir || ''));
+    if (!path.isAbsolute(dir) || !/capcut|lveditor/i.test(dir)) return { ok: 0, erro: 'o endereço precisa ser o da pasta de projetos do CapCut' };
+    if (fs.existsSync(dir)) return { ok: 0, erro: 'essa pasta já existe, gere de novo' };
+    if (!Array.isArray(arquivos) || !arquivos.length) return { ok: 0, erro: 'nada para gravar' };
+    for (const a of arquivos) {
+      const rel = path.normalize(String((a && a.name) || ''));
+      if (!rel || rel.startsWith('..') || path.isAbsolute(rel)) throw new Error('nome de arquivo inválido');
+      const dest = path.join(dir, rel);
+      if (!dest.startsWith(dir + path.sep)) throw new Error('nome de arquivo inválido');
+      fs.mkdirSync(path.dirname(dest), { recursive: true });
+      fs.writeFileSync(dest, Buffer.from(a.data));
+    }
+    return { ok: 1, n: arquivos.length };
+  } catch (err) { return { ok: 0, erro: String((err && err.message) || err) }; }
+});
 ipcMain.handle('fontes-lista', async () => {
   if (FONTCACHE) return FONTCACHE; const out = [], seen = new Set();
   for (const d of FONTDIRS()) { let L = []; try { L = fs.readdirSync(d); } catch (e) { continue; } for (const f of L) { if (!/\.(ttf|otf)$/i.test(f)) continue; const p = path.join(d, f), n = fontNome(p) || f.replace(/\.(ttf|otf)$/i, ''); if (!n || seen.has(n)) continue; seen.add(n); out.push({ n, p }); } }

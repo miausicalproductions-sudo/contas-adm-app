@@ -9,6 +9,7 @@ contextBridge.exposeInMainWorld('desktop', {
   tmFit: h => ipcRenderer.send('tm-fit', h),
   checkUpdate: () => ipcRenderer.invoke('check-update'),
   iaInstalar: papel => ipcRenderer.invoke('ia-instalar', papel),
+  salvarPasta: (dir, arquivos) => ipcRenderer.invoke('salvar-pasta', dir, arquivos),
   fontes: () => ipcRenderer.invoke('fontes-lista'),
   fonteLer: p => ipcRenderer.invoke('fonte-ler', p),
   platform: process.platform
