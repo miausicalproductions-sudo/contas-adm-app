@@ -1045,7 +1045,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:392*/const PV=392;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:394*/const PV=394;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -2856,7 +2856,36 @@ function sugType(L){if(!L.length)return{t:'feed',why:''};
  return{t:'feed',why:'É uma foto: escolha se vai para o Feed ou para os Stories.'}}
 async function osDrop(files,day,band){if(!sel)return pickCo(null,()=>osDrop(files,day,band),'Post de qual empresa?');const L=[];
  for(const f of files){const vid=/^video\//.test(f.type);let r=0;try{if(vid)r=await new Promise(ok=>{const v=document.createElement('video');v.preload='metadata';v.onloadedmetadata=()=>ok(v.videoWidth/v.videoHeight||0);v.onerror=()=>ok(0);v.src=URL.createObjectURL(f)});else if(/^image\//.test(f.type)){const b=await createImageBitmap(f);r=b.width/b.height}}catch(e){}L.push({vid,r})}
+ if(files.length>1&&files.every(f=>/^(image|video)\//.test(f.type))){const k=await miauCard('Você soltou '+files.length+' arquivos','Como quer criar os posts?',[['seq','🧭 1 post para cada arquivo: escolher a ordem e passar por cada um',1],['one','📦 Um post só com os '+files.length+' arquivos (como antes)'],['no','Cancelar']]);if(k=='no'||!k)return;if(k=='seq')return osSeqStart(files,L,day,band)}
  const sg=sugType(L),n=blank({type:sg.t},day);if(band!=null&&band!=='')n.time=slot(day,sel,BT(day,sel,n.type,band),1,n.type);if(files.length==1)n.txt=cleanName(files[0].name);openMd(n,true,{sug:sg.t,why:sg.why});upFiles(files)}
+/* ===== v394: soltar várias fotos na grade → 1 post por arquivo, na ordem escolhida, passando por cada post ===== */
+let OSQ=null;
+function osSeqPick(files,L){return new Promise(ok=>{
+ const A=files.map((f,i)=>({f,vid:L[i].vid,r:L[i].r,u:URL.createObjectURL(f)})),d=document.createElement('div'),bt='padding:11px 14px;border-radius:10px;font:inherit;font-weight:700;cursor:pointer;',sm='width:38px;height:38px;border:1px solid #ccc;border-radius:8px;background:#fff;font:inherit;cursor:pointer;flex:none';
+ d.style.cssText='position:fixed;inset:0;z-index:99997;background:#000c;display:flex;align-items:center;justify-content:center;padding:12px';
+ d.innerHTML='<div style="background:#fff;color:#111;border-radius:14px;padding:14px;width:min(520px,98vw);max-height:96vh;display:grid;gap:10px;font:14px/1.4 system-ui"><b style="font-size:17px">Quem vai ser postado primeiro?</b><span style="color:#555">Cada arquivo vira <b>1 post</b>. O de cima sai primeiro e os horários seguem essa ordem. Depois você passa por cada post e muda o que quiser.</span><div id=osl style="display:grid;gap:6px;overflow:auto;max-height:50vh"></div><label style="display:flex;gap:8px;align-items:center;font-weight:700">Formato<select id=osf style="flex:1;padding:8px;font:inherit;font-weight:400"><option value="">Automático (pelo arquivo)</option><option value=stories>Stories</option><option value=feed>Feed</option><option value=reels>Reels</option></select></label><div style="display:flex;gap:8px"><button data-o=x style="'+bt+'border:1px solid #bbb;background:#fff">Cancelar</button><button data-o=go style="'+bt+'flex:1;border:0;background:#1f9d55;color:#fff"></button></div></div>';
+ document.body.appendChild(d);
+ const end=r=>{document.removeEventListener('keydown',kd,true);A.forEach(a=>URL.revokeObjectURL(a.u));d.remove();ok(r)},kd=e=>{if(e.key=='Escape'){e.stopPropagation();end(null)}};
+ const draw=()=>{d.querySelector('#osl').innerHTML=A.map((a,i)=>'<div style="display:flex;gap:8px;align-items:center;padding:4px;border:1px solid #e3e3e3;border-radius:10px"><b style="width:22px;text-align:center;flex:none">'+(i+1)+'</b><div style="width:40px;height:56px;border-radius:6px;overflow:hidden;background:#eee;flex:none">'+(a.vid?'<video src="'+a.u+'" muted preload=metadata style="width:100%;height:100%;object-fit:cover"></video>':'<img src="'+a.u+'" alt="" style="width:100%;height:100%;object-fit:cover">')+'</div><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(a.f.name)+'</span><button data-o=up data-i='+i+' style="'+sm+'"'+(i?'':' disabled')+'>▲</button><button data-o=dn data-i='+i+' style="'+sm+'"'+(i<A.length-1?'':' disabled')+'>▼</button><button data-o=rm data-i='+i+' style="'+sm+'" title="Tirar da lista">✕</button></div>').join('');const g=d.querySelector('[data-o=go]');g.textContent='Criar '+A.length+(A.length==1?' post':' posts')+' ›';g.disabled=!A.length};
+ document.addEventListener('keydown',kd,true);
+ d.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('[data-o]');if(!b||b.disabled)return;const k=b.dataset.o,i=+b.dataset.i;
+  if(k=='x')return end(null);if(k=='go')return end({A,ty:d.querySelector('#osf').value});
+  if(k=='up'&&i>0)[A[i-1],A[i]]=[A[i],A[i-1]];else if(k=='dn'&&i<A.length-1)[A[i+1],A[i]]=[A[i],A[i+1]];else if(k=='rm'){URL.revokeObjectURL(A[i].u);A.splice(i,1)}draw()});
+ draw()})}
+async function osSeqStart(files,L,day,band){const r=await osSeqPick(files,L);if(!r||!r.A.length)return;OSQ={q:r.A,i:0,n:r.A.length,day,band,ty:r.ty,co:sel,prev:'',cur:null};osSeqNext()}
+function osBar(){let b=document.getElementById('osb');if(!OSQ){if(b)b.remove();return}
+ if(!b){b=document.createElement('div');b.id='osb';b.style.cssText='position:fixed;left:50%;top:8px;transform:translateX(-50%);z-index:99990;background:#1f2937;color:#fff;border-radius:12px;padding:8px 12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center;font:700 13px system-ui;box-shadow:0 6px 24px #0007;max-width:96vw';document.body.appendChild(b);
+  b.onclick=e=>{const k=e.target.closest&&e.target.closest('[data-os]'),Q=OSQ;if(!k||!Q)return;if(k.dataset.os=='stop'){OSQ=null;osBar();stat('● fila parada: os posts que você já salvou ficam na grade');return}
+   if(MD)closeMd();Q.i++;osSeqNext()}}
+ const Q=OSQ,bs='border:0;border-radius:8px;padding:6px 10px;font:inherit;cursor:pointer;background:#fff;color:#111';
+ b.innerHTML='<span>🧭 Post '+(Q.i+1)+' de '+Q.n+(Q.q[Q.i+1]?' · depois: '+esc(cleanName(Q.q[Q.i+1].f.name)).slice(0,24):' · é o último')+'</span><button data-os=skip style="'+bs+'" title="Fecha este post sem salvar e vai para o próximo">Pular este</button><button data-os=stop style="'+bs+'" title="Para a fila (o post aberto continua como está)">Parar</button>'}
+function osSeqNext(){const Q=OSQ;if(!Q)return;
+ if(Q.i>=Q.n){OSQ=null;osBar();render();stat('● '+Q.n+' posts passados ✓');return}
+ const it=Q.q[Q.i],sg=sugType([{vid:it.vid,r:it.r}]),ty=Q.ty||sg.t,n=blank({type:ty,co:Q.co},Q.day);
+ if(Q.i==0){if(Q.band!=null&&Q.band!=='')n.time=slot(Q.day,Q.co,BT(Q.day,Q.co,ty,Q.band),1,ty)}
+ else{const a=String(Q.prev||'').split(':').map(Number);if(!isNaN(a[0])){const m=Math.min(a[0]*60+(a[1]||0)+60,23*60+30);n.time=slot(Q.day,Q.co,pad(m/60|0)+':'+pad(m%60),0,ty)}}
+ n.txt=cleanName(it.f.name);Q.cur=n;openMd(n,true,{sug:Q.ty?'':sg.t,why:Q.ty?'':sg.why});upFiles([it.f]);osBar()}
+{const _sv=saveMd;saveMd=function(ev){const Q=OSQ,p=MD&&MD.p,r=_sv.apply(this,arguments);if(Q&&OSQ===Q&&p&&p===Q.cur&&!MD){Q.prev=p.time;Q.i++;setTimeout(osSeqNext,200)}return r}}
 /* campos que dependem do formato: Stories têm telas e figurinha; os outros têm legenda e texto alternativo */
 function mdType(){const st=$('#my')&&$('#my').value=='stories';{const gu=$('#mguia'),v=($('#my')||{}).value;if(gu){gu.hidden=!['stories','carrossel','reels'].includes(v);const b3=gu.querySelector('[data-act=stopen]');if(b3)b3.hidden=v=='reels'}}document.querySelectorAll('#md .tpx').forEach(e=>e.hidden=(e.dataset.for=='st')!=st);const cv=$('#mcov');if(cv)cv.hidden=($('#my')||{}).value!='reels'}
 function capCount(){const t=$('#mcap'),n=$('#mcapn');if(!t||!n)return;const v=t.value,ty=($('#my')||{}).value;
@@ -5969,7 +5998,7 @@ async function stDistribute(){const s=STU,cur=s.p.id,G={};s.S.forEach((x,i)=>{co
    touch('p',p);bgUp(p,fs,{arts:1})}catch(er){stat('⚠ não consegui salvar as telas de “'+(p.txt||'post')+'”: '+(er.message||er))}}
  const keep=G[cur]||[];if(keep.length){s.S=keep.map(i=>s.S[i]);s.lays=keep.map(i=>(s.lays||[])[i]);s.sel=0;try{stShow()}catch(x){}return'stay'}
  document.getElementById('stu')?.remove();STU=null;if(MD)closeMd();render();stat('● '+others.length+' Stories prontos · o envio continua em segundo plano');return'gone'}
-/* ===== v386: Pronto → distribuir as telas pelos Stories do dia, passo a passo. Tudo local; o envio ao Drive roda em segundo plano ===== */
+/* ===== v393: Pronto → distribuir as telas pelos Stories do dia, passo a passo. Tudo local; o envio ao Drive roda em segundo plano ===== */
 const BGQ={n:0,p:Promise.resolve()};
 function bgUp(p,fs,opt){BGQ.n++;BGQ.p=BGQ.p.then(()=>upPost(p,fs,opt)).catch(er=>stat('⚠ não consegui enviar as telas de “'+(p.txt||'post')+'”: '+(er.message||er))).then(()=>{BGQ.n--;stat(BGQ.n?'☁ enviando em segundo plano… faltam '+BGQ.n+' post(s)':'● todas as telas foram salvas ✓')})}
 addEventListener('beforeunload',e=>{if(BGQ.n){e.preventDefault();e.returnValue=''}});
