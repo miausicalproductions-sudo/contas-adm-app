@@ -1045,7 +1045,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:397*/const PV=397;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:398*/const PV=398;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -5999,8 +5999,9 @@ async function stDistribute(){const s=STU,cur=s.p.id,G={};s.S.forEach((x,i)=>{co
  const keep=G[cur]||[];if(keep.length){s.S=keep.map(i=>s.S[i]);s.lays=keep.map(i=>(s.lays||[])[i]);s.sel=0;try{stShow()}catch(x){}return'stay'}
  document.getElementById('stu')?.remove();STU=null;if(MD)closeMd();render();stat('● '+others.length+' Stories prontos · o envio continua em segundo plano');return'gone'}
 /* ===== v393: Pronto → distribuir as telas pelos Stories do dia, passo a passo. Tudo local; o envio ao Drive roda em segundo plano ===== */
-const BGQ={n:0,p:Promise.resolve()};
-function bgUp(p,fs,opt){BGQ.n++;BGQ.p=BGQ.p.then(()=>upPost(p,fs,opt)).catch(er=>stat('⚠ não consegui enviar as telas de “'+(p.txt||'post')+'”: '+(er.message||er))).then(()=>{BGQ.n--;stat(BGQ.n?'☁ enviando em segundo plano… faltam '+BGQ.n+' post(s)':'● todas as telas foram salvas ✓')})}
+const BGQ={n:0,p:Promise.resolve(),bad:[]};
+function bgUp(p,fs,opt){BGQ.n++;const lb='“'+(p.txt||'post')+'” ('+(p.time||'?')+')',okp=()=>{const ids=artIds(p.id),fl=String(p.files||'').split(',');return ids.length>=fs.length&&ids.every(i=>fl.includes(i))};
+ BGQ.p=BGQ.p.then(async()=>{for(let t=0;t<2;t++){try{await upPost(p,fs,opt);if(!opt||!opt.arts||okp())return}catch(er){}if(t<1)await sleep(1500)}BGQ.bad.push(lb)}).catch(()=>{BGQ.bad.push(lb)}).then(()=>{BGQ.n--;if(!MD&&!STU&&!EDX){try{render()}catch(x){}}stat(BGQ.n?'☁ enviando em segundo plano… faltam '+BGQ.n+' post(s)':BGQ.bad.length?'⚠ não consegui enviar as telas de: '+BGQ.bad.join(', ')+'. Abra esse post e salve as telas de novo.':'● todas as telas foram salvas ✓');if(!BGQ.n)BGQ.bad=[]})}
 addEventListener('beforeunload',e=>{if(BGQ.n){e.preventDefault();e.returnValue=''}});
 function stWizOk(){const s=STU;if(!s||s._crp||s._ret)return[];const sib=stSiblings();return sib.length>1&&sib.some(p=>p.id==s.p.id)?sib:[]}
 async function stWizard(){
