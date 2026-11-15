@@ -1046,7 +1046,7 @@ body:has(#ste) #tmw{z-index:95}
 </style>
 </head><body>
 <nav id="nv"></nav><div id="nvhot"></div><button id="nvbtn" title="Abrir o menu" aria-label="Abrir o menu"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><main id="m"></main><div id="tabm" role="navigation" aria-label="Menu"></div><div id="md"></div>
-<script>/*PANELV:410*/const PV=410;   /* versão do painel: suba os dois números juntos */
+<script>/*PANELV:411*/const PV=411;   /* versão do painel: suba os dois números juntos */
 
 const $=s=>document.querySelector(s),TYPES={reels:'Reels',stories:'Stories',feed:'Feed',carrossel:'Carrossel'},TI={reels:'🎬',stories:'⭕',feed:'🖼️',carrossel:'🎠'},TT={reels:'18:00',stories:'09:00',feed:'12:00',carrossel:'12:00'};
 const TAGS=['Geral','Gancho','Engajamento','Dica','Bastidores','Promoção','Educativo','Depoimento','Produto','Humor','Data comemorativa','Notícia'],ST={rascunho:'Rascunho',arte:'Fazer arte/vídeo',pronto:'Pronto para postar',agendado:'Agendado',postado:'Postado'},PEND=['arte','pronto','agendado'],NXT={rascunho:'arte',arte:'pronto',pronto:'agendado',agendado:'postado',postado:'arte'},SBD={rascunho:'RASCUNHO',arte:'FAZER ARTE',pronto:'PRONTO',agendado:'AGENDADO',postado:'POSTADO'},DIA=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -2971,7 +2971,7 @@ function openMd(p,isNew,opt){opt=opt||{};setTimeout(()=>rsWarm(p.co));MD={p,isNe
   <label class="blk tpx" data-for=nst><span class=lb>Texto alternativo <small class=mu>(acessibilidade)</small></span><input id=malt value="${esc(p.alt||'')}" placeholder="Descreva a imagem em uma frase"></label>
   <div class="tpx stkbox" data-for=st>${thBox(p)}<div class=row><label class=fl2>Figurinha<select id=mfig>${Object.keys(FIG).map(k=>`<option value="${k}"${k==(p.fig||'')?' selected':''}>${FIG[k]}</option>`).join('')}</select></label><span class="chip warn" id=mman${p.fig?'':' hidden'} title="Stories com figurinha não vão para a publicação automática">MANUAL</span></div><label class=blk><span class=lb>Texto da figurinha</span><input id=mfigtx value="${esc(p.figtx||'')}" placeholder="Seu pet te segue pela casa? Sim / Não"></label><small class=mu>Arraste a figurinha na prévia para planejar onde ela vai ficar. A posição vai junto no pedido de arte para a IA.</small></div>
   <div id=mrfb${p.type=='reels'?'':' hidden'}><div class=row style="align-items:end;gap:8px"><label class=fl2 style="flex:1;min-width:200px"><span>Protagonismo do Reels</span><select id=mrfoco><option value="">—</option><option value=atracao${p.rfoco=='atracao'?' selected':''}>Atração (personagem, humor ou gancho)</option><option value=autoridade${p.rfoco=='autoridade'?' selected':''}>Autoridade (empresa, estrutura ou técnica)</option></select></label><label class=fl2 style="flex:1;min-width:200px"><span>Status do formato</span><select id=mrval><option value="">—</option><option value=validado${p.rval=='validado'?' selected':''}>Formato validado (o que mais deu views)</option><option value=teste${p.rval=='teste'?' selected':''}>Teste de novo formato</option></select></label></div><small class=mu>Na semana: 3 formatos validados (1 ou 2 com a empresa como principal) para 1 de teste.</small></div>
-  ${aprBox(p)}${igPostBox(p)}
+  ${aprBox(p)}${igPostBox(p)}${botaoSeparar(p)?`<div class=row><button type=button class="chip warn" data-act=mdsepcel title="Desfaz a ligação errada com o story postado no celular">📱 Separar do celular</button></div>`:''}
   <details class=mdx${p.how||p.info||hh?' open':''}><summary>Mais detalhes <small>como será, roteiro, horas, pasta</small></summary><input id=mhw placeholder="Como será? (descrição rápida)" value="${esc(p.how||'')}"><input id=mhr placeholder="Horas gastas neste post (ex.: 45min ou 1h30) — entram no banco de horas" value="${hh?fh(hh.min):''}"><textarea id=mi placeholder="Roteiro, detalhes e observações (não vai para o Instagram)" style="min-height:60px">${esc(p.info||'')}</textarea><label>Arquivo que já está no Drive (cole o link)<input id=mdl placeholder="https://drive.google.com/file/d/…" style="width:100%"></label><label>Pasta: Semana <input type=number min=1 id=mw style="width:70px" value="${p.week||weekOf(p.date)}"></label>${p.link?`<a href="${p.link}" target=_blank rel=noopener>Abrir a pasta no Drive</a>`:''}<label class=chip hidden><input type=checkbox id=mmc${p.mc?' checked':''}> Metricool</label></details>
  </div><div class=cmp2><span class=lb>Prévia no Instagram</span><div id=mpv></div><p id=pvn class=mu></p><label class="chip" style="cursor:pointer"><input type=checkbox id=msafe${SAFEA?' checked':''}> Mostrar as áreas que o Instagram cobre</label></div></div>
  <div class=cmft><button class=btn data-act=msave>Salvar <small style="opacity:.6">Ctrl+Enter</small></button><button class=chip data-act=pai title="Roteiro, ganchos, legenda, revisão, hashtags…">${IK.ai} Pedir à IA ▾</button>${isNew?'':'<button class=chip data-act=pdup title="Cria uma cópia para você ajustar">'+IK.copy+' Duplicar</button>'}<span class=sp></span><button data-act=mcancel>Cancelar</button>${isNew?'':'<button class=dng data-act=mdel>Excluir</button>'}</div></div></div>`;
@@ -3414,7 +3414,8 @@ document.addEventListener('click',async e=>{const g=e.target.closest('[data-go]'
  if(act=='edtxo'&&EDX){EDX.txo=!EDX.txo;edShow();return}
  if(act=='stproj'&&STU){edSaveProj();return}
  if(act=='edgo2'&&EDX){EDX.i=+a.dataset.v;EDX.hist=[];EDX.sel='t';edShow();return}
- if(act=='stwiz'&&STU){if(STU.S.length<2){stat('⚠ monte pelo menos 2 telas para distribuir');return}if(!stWizOk().length){alert('Para distribuir, o dia precisa ter 2 ou mais Stories na grade.');return}try{if(EDX)edClose()}catch(x){}if(await stWizard()=='go')document.querySelector('#stu [data-act=stsave]')?.click();return}
+ if(act=='mdsepcel'&&MD){const p=MD.p;if(!botaoSeparar(p))return;if(!confirm('Este item foi ligado por engano a um story postado no celular. O story vira um item 📱 próprio e este volta a ser a tela planejada. Continuar?'))return;stat('separando do celular…');try{const r=await api({action:'separarCelular',id:p.id});stat(r&&r.ok?'● separado: o story do celular virou um item próprio':'⚠ '+(r&&(r.msg||r.erro)||'não consegui separar'));closeMd();await pull()}catch(x){stat('⚠ não consegui separar: '+(x&&x.message||x))}return}
+ if(act=='stwiz'&&STU){if(STU._dia){await diaSalvar();return}/* v411: no editor do dia, Distribuir = salvar (cada tela vai para o seu item), sem o assistente antigo */if(STU.S.length<2){stat('⚠ monte pelo menos 2 telas para distribuir');return}if(!stWizOk().length){stat('⚠ Para distribuir, o dia precisa ter 2 ou mais Stories na grade.');return}try{if(EDX)edClose()}catch(x){}if(await stWizard()=='go')document.querySelector('#stu [data-act=stsave]')?.click();return}
  if(act=='edfim'&&EDX){if(STU&&!STU._ret){const q=await stProntoAsk();if(q=='back')return;if(q=='go'){edClose();document.querySelector('#stu [data-act=stsave]')?.click();return}}if(STU&&STU._ret){const qid=STU._ret,dq=(STU._dayq||[]).slice(),dn=STU._dayn||0,crp=STU._crp;
   if(crp&&!STU.S.some(x=>x._json)){if(!confirm('Nenhuma arte (JSON ou imagem) foi colocada neste dia.\nSair sem salvar nada? (os posts continuam na grade, sem arte)'))return;edClose();document.getElementById('stu')?.remove();STU=null;if(MD)closeMd();view='week';cv='cron';render();stat('● nada foi salvo · de volta ao cronograma');return}
   if(crp){const ch=await edAsk(STU.S.filter(x=>x._json).length);if(ch=='back')return;if(ch=='discard'){edClose();document.getElementById('stu')?.remove();STU=null;if(MD)closeMd();view='week';cv='cron';render();stat('● telas descartadas · nada foi salvo · de volta ao cronograma');return}}
@@ -6171,8 +6172,8 @@ async function stDistribute(){const s=STU,cur=s.p.id,G={};s.S.forEach((x,i)=>{co
 const BGQ={n:0,p:Promise.resolve(),bad:[]};
 function bgUp(p,fs,opt){BGQ.n++;const lb='“'+(p.txt||'post')+'” ('+(p.time||'?')+')',okp=()=>{const ids=artIds(p.id),fl=String(p.files||'').split(',');return ids.length>=fs.length&&ids.every(i=>fl.includes(i))};
  BGQ.p=BGQ.p.then(async()=>{for(let t=0;t<2;t++){try{await upPost(p,fs,opt);if(!opt||!opt.arts||okp())return}catch(er){}if(t<1)await sleep(1500)}BGQ.bad.push(lb)}).catch(()=>{BGQ.bad.push(lb)}).then(()=>{BGQ.n--;if(!MD&&!STU&&!EDX){try{render()}catch(x){}}stat(BGQ.n?'☁ enviando em segundo plano… faltam '+BGQ.n+' post(s)':BGQ.bad.length?'⚠ não consegui enviar as telas de: '+BGQ.bad.join(', ')+'. Abra esse post e salve as telas de novo.':'● todas as telas foram salvas ✓');if(!BGQ.n)BGQ.bad=[]})}
-addEventListener('beforeunload',e=>{if(BGQ.n){e.preventDefault();e.returnValue=''}});
-function stWizOk(){const s=STU;if(!s||s._crp||s._ret)return[];const sib=stSiblings();return sib.length>1&&sib.some(p=>p.id==s.p.id)?sib:[]}
+addEventListener('beforeunload',e=>{if(BGQ.n||(window.ENV&&ENV.size)){e.preventDefault();e.returnValue=''}});
+function stWizOk(){const s=STU;if(s&&s._dia){/* v411: no editor do dia os itens do dia vêm de _dia.ids (cada tela é um item) */const L=(s._dia.ids||[]).map(id=>Po(id)).filter(Boolean);return L.length>1?L:[]}if(!s||s._crp||s._ret)return[];const sib=stSiblings();return sib.length>1&&sib.some(p=>p.id==s.p.id)?sib:[]}
 async function stWizard(){
  const s=STU,sib=stWizOk();if(!sib.length||s.S.length<2)return'back';
  const cur=s.p.id,N=s.S.length,tm=p=>esc('Story das '+(p.time||'?')+(p.txt?' · '+String(p.txt).slice(0,26):'')),sel=s.S.map((x,i)=>sib[i]?sib[i].id:cur);
@@ -9349,10 +9350,10 @@ function fileOf(d,j){const s0=d.stories[j],o=postOf(d,s0);if(!o)return'';const L
  const T=d.stories,ok=s=>s&&s.fid&&L.includes(s.fid),free=L.filter(x=>!T.some(s=>ok(s)&&s.fid===x));let n=0;for(let k=0;k<j;k++)if(!ok(T[k]))n++;return free[n]||''}
 /* pilha de telas de uma célula de Story: uma miniatura por item, com horário e estado */
 function crStack(p,d,s,i,j,a){if(!s||s.tipo=='reels'||s.tipo=='carrossel')return'';const L=postsOf(d,s).filter(q=>itemDaCel(s,q));if(!L.length)return'';
- const n=L.length,its=L.map((q,k)=>{const fid=pvIds(q)[0],x=fid?pvSrc(fid):null,th=x?(x.vid&&x.local?`<video src="${esc(x.src)}" muted playsinline></video>`:`<img alt="" src="${esc(x.src)}" onerror="this.style.visibility='hidden'">`)+(x.vid?'<i class=crpl>▶</i>':''):'<em>＋ arte</em>',es=estadoItem(q,SBD);
+ const n=L.length,its=L.map((q,k)=>{const ev=ENV.get(q.id),fid=pvIds(q)[0],x=ev&&ev.url?{src:ev.url}:fid?pvSrc(fid):null,th=x?(x.vid&&x.local?`<video src="${esc(x.src)}" muted playsinline></video>`:`<img alt="" src="${esc(x.src)}" onerror="this.style.visibility='hidden'">`)+(x.vid?'<i class=crpl>▶</i>':''):'<em>＋ arte</em>',es=estadoItem(q,SBD);
   const fixo=q.ig=='ok'||q.ig=='publicando'||q.st=='postado',aut=q.ig=='fila'||q.ig=='ok'||q.ig=='publicando';
   /* v407: horário e Automática/Manual direto na miniatura (fora do .crit, para o clique da miniatura continuar abrindo o item) */
-  return`<div class=crwr><div class=crit data-cr=openit data-crpid="${esc(q.id)}" title="Tela ${k+1} de ${n} · clique para abrir"><span class=crith>${th}</span><span class=crim><b>Tela ${k+1} · ${esc(q.time||'—')}</b><small class="crist ${esc(es.toLowerCase())}">${esc(es)}</small></span></div><div class=crctl><input type=time class=crtm data-crpid="${esc(q.id)}" value="${esc(q.time||'')}"${fixo?' disabled':''} title="Horário desta tela (grava só ela)"><select class=crau data-crpid="${esc(q.id)}"${fixo?' disabled':''} title="Automática: o painel publica sozinho (precisa de arquivo, horário e sem figurinha). Manual: você baixa e posta"><option value=man${aut?'':' selected'}>Manual</option><option value=auto${aut?' selected':''}>Automática</option></select></div></div>`}).join('');
+  return`<div class=crwr><div class=crit data-cr=openit data-crpid="${esc(q.id)}" title="Tela ${k+1} de ${n} · clique para abrir"><span class=crith>${th}</span><span class=crim><b>Tela ${k+1} · ${esc(q.time||'—')}</b><small class="crist ${esc(es.toLowerCase())}">${esc(es)}</small>${ev?(ev.s=='erro'?`<small class="crenv erro" data-cr=envre data-crpid="${esc(q.id)}" title="O arquivo desta tela continua guardado no painel. Clique para enviar de novo">⚠ não enviou · tentar de novo</small>`:'<small class="crenv">⏳ enviando…</small>'):''}</span></div><div class=crctl><input type=time class=crtm data-crpid="${esc(q.id)}" value="${esc(q.time||'')}"${fixo?' disabled':''} title="Horário desta tela (grava só ela)"><select class=crau data-crpid="${esc(q.id)}"${fixo?' disabled':''} title="Automática: o painel publica sozinho (precisa de arquivo, horário e sem figurinha). Manual: você baixa e posta"><option value=man${aut?'':' selected'}>Manual</option><option value=auto${aut?' selected':''}>Automática</option></select></div></div>`}).join('');
  return`<div class=crstk${n>3?' crmany':''}>${its}</div><button class=crmini data-cr=addtela ${a} title="Cria outra tela neste Story (mesmo dia, horário livre)">＋ tela</button>`}
 /* nova tela na mesma célula: item novo com o mesmo grp, ord = último + 1 */
 function crNovaTela(Q,i,j){const D=Q.dias[i],s=D.stories[j];if(!s||s.tipo=='reels'||s.tipo=='carrossel')return null;if(!s.uid)s.uid=uid();
@@ -9399,6 +9400,7 @@ async function diaCarrega(me,L){
 async function diaAbrir(Q,i,j0,op){
  if(BGQ.n>0||(CLR.size>0&&!REC)){stat('⚠ Espere os envios terminarem');return false}
  const D=Q.dias[i],L=diaTelas(D,S.posts);if(!L.length)return false;
+ if(envErroDe(L.map(x=>x.p.id))){stat('⚠ Há telas deste dia que não enviaram: clique em “tentar de novo” na miniatura antes de abrir o dia');return false}
  try{if(MD)closeMd();document.body.classList.add('crbusy');openMd(Po(L[0].p.id),false);await sleep(150);await stOpen({none:1});await sleep(250)}finally{document.body.classList.remove('crbusy')}
  if(!STU)return false;
  STU._ret=Q.id;STU._dayq=[];STU._dayn=L.length;STU._crp={id:Q.id,i};if(op&&op.tx)STU._dtxId=op.tx;
@@ -9423,7 +9425,7 @@ async function diaImgs(fs,tg){const s=STU;if(!s||!s._dia)return fs;const abre=ED
  const al=tg&&tg.length?tg:diaAlvos(s.S.map((_,k)=>diaVaziaS(s,k)),abre,fs.length);
  if(!al.length){stat('⚠ Não há tela vazia para receber as imagens');return[]}
  let n=0;const left=fs.slice(al.length);if(left.length)stat('⚠ Sobraram '+left.length+' imagem(ns): não há mais telas vazias');   /* sobra só avisa (não vira camada na tela aberta) */
- for(let q=0;q<al.length;q++){const f=fs[q],k=al[q];let im;try{im=await loadImg(URL.createObjectURL(f))}catch(e){alert('Não consegui abrir '+(f.name||'a imagem')+'.');continue}
+ for(let q=0;q<al.length;q++){const f=fs[q],k=al[q];let im;try{im=await loadImg(URL.createObjectURL(f))}catch(e){stat('⚠ Não consegui abrir '+(f.name||'a imagem'));continue}
   if(!n&&EDX)edSnap();s.imgs.push({id:'local'+uid(),img:im});const x=s.S[k],zt=s._dtxId&&s._dtxId[s._dia.ids[k]];
   const sl=EDX&&x&&x._json?diaSlot(s,k):null;if(sl){EDX.i=k;EDX.sel=null;edPhotoTo(sl,s.imgs.length-1);x._novoArt=1;n++;continue}   /* v409: JSON com espaço de foto vazio: a foto entra no espaço */
   const x2={...x,lay:'pronta',bgi:s.imgs.length-1,img:im,_json:1,_novoArt:1};delete x2.mod;delete x2._semArq;if(zt){x2.t='';x2.b=[];x2.extra=crTxtLayers(zt)}else x2.extra=[];
@@ -9437,7 +9439,7 @@ async function diaAuto(fs0,hitFrame){const s=STU,fs=[...fs0].filter(f=>f&&/^imag
  else if(ns.every(n=>n!=null&&n>=1&&n<=N)&&new Set(ns).size==ns.length)pairs=fs.map((f,k)=>[ns[k]-1,f]).sort((a,b)=>a[0]-b[0]);
  else{const o=[...fs].sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''),'pt',{numeric:true}));pairs=o.slice(0,comSlot.length).map((f,k)=>[comSlot[k],f])}
  const dir=[],feitas=new Set(),back=EDX.i;let n=0;
- for(const [i,f] of pairs){if(diaSlot(s,i)){let im;try{im=await loadImg(URL.createObjectURL(f))}catch(e){alert('Não consegui abrir '+(f.name||'a imagem')+'.');feitas.add(f);continue}
+ for(const [i,f] of pairs){if(diaSlot(s,i)){let im;try{im=await loadImg(URL.createObjectURL(f))}catch(e){stat('⚠ Não consegui abrir '+(f.name||'a imagem'));feitas.add(f);continue}
    s.imgs.push({id:'local'+uid(),img:im});EDX.i=i;EDX.sel=null;edPhotoTo(diaSlot(s,i),s.imgs.length-1);if(s.S[i])s.S[i]._json=1;feitas.add(f);n++}
   else if(diaVaziaS(s,i)){dir.push([i,f])}}
  if(dir.length){const r=await diaImgs(dir.map(d=>d[1]),dir.map(d=>d[0]));dir.forEach(d=>{if(!r.includes(d[1]))feitas.add(d[1])});n+=dir.length}
@@ -9459,11 +9461,31 @@ function gridRefPor(id,p,ref,kind){let g=S.grid.find(z=>z.id==id);if(!g){if(!ref
    Depois recalcula ig/st do item (Automática é da POSIÇÃO). Devolve os ids dos itens mexidos: o chamador manda todos no MESMO push com clr:1 e NÃO joga arquivo na lixeira (os arquivos só mudam de dono) */
 function diaAplicaTrocas(T){const sn={};T.forEach(t=>[t.para,t.de].forEach(id=>{if(sn[id])return;const p=Po(id);sn[id]={f:Object.fromEntries(DIA_CAMPOS.map(c=>[c,p[c]])),tela:gridRefDe('tela_'+id),arts:gridRefDe('arts_'+id),auto:p.ig=='fila'}}));
  const aff=[];T.forEach(t=>{const p=Po(t.para),o=sn[t.de];DIA_CAMPOS.forEach(c=>{p[c]=o.f[c]});diaRecalcIg(p,sn[t.para].auto,sn[t.para].f.files);touch('p',p);gridRefPor('tela_'+t.para,p,o.tela,'telas');gridRefPor('arts_'+t.para,p,o.arts,'arts');if(!aff.includes(p.id))aff.push(p.id)});return aff}
+/* v411: telas do dia enviando em segundo plano. id do item -> {s:'env'|'erro', url:miniatura local, f:arquivo desenhado (fica na memória até enviar), job} */
+const ENV=new Map();
+const envN=()=>{let n=0;ENV.forEach(v=>{if(v.s=='env')n++});return n};
+const envErroDe=ids=>(ids||[]).some(i=>{const v=ENV.get(i);return !!v&&v.s=='erro'});
+const botaoSeparar=p=>!!p&&p.st=='postado'&&!!p.igid&&p.ig!='ok';   /* v411: botão "Separar do celular" */
+function envFim(id){const v=ENV.get(id);if(v&&v.url){try{URL.revokeObjectURL(v.url)}catch(e){}}ENV.delete(id)}
+function envStat(){const n=envN(),e=[...ENV.values()].filter(v=>v.s=='erro').length;stat(n?'☁ '+n+' tela'+(n>1?'s':'')+' enviando…':e?'⚠ '+e+' tela'+(e>1?'s':'')+' não enviou: clique em “tentar de novo” na miniatura (nada foi perdido)':'● todas as telas foram salvas ✓')}
+function envDraw(){try{if(!MD&&!STU&&!EDX)render()}catch(x){}}
+/* roda o envio de um salvar do dia sem prender a tela: 1) troca de posição em bloco (push com clr) 2) arquivo de cada tela, uma de cada vez (fila BGQ). Falha: o item fica com ⚠ e o arquivo continua na memória */
+async function envRoda(job){BGQ.n++;let ok=true;
+ try{
+  if(job.aff.length&&!job.trocaOk){ok=false;try{ok=await pushClr(job.aff)}catch(e){}
+   if(ok)job.trocaOk=1;else{job.ids.forEach(id=>{const v=ENV.get(id);if(v)v.s='erro'});if(REC)stat('⚠ Outro aparelho alterou estas telas: atualize e tente de novo')}}
+  if(ok){job.aff.forEach(id=>{const v=ENV.get(id);if(v&&!v.f)envFim(id)});
+   const pr=job.ups.filter(u=>ENV.has(u.p.id)&&ENV.get(u.p.id).s=='env').map(u=>bgUpTroca(u.p,u.f).then(r=>{if(r)envFim(u.p.id);else{const v=ENV.get(u.p.id);if(v)v.s='erro'}}));
+   await Promise.all(pr)}
+ }finally{BGQ.n--;if(!BGQ.n)BGQ.bad=[];envDraw();if(!(REC&&!ok))envStat()}}
+function envRetry(id){const v=ENV.get(id);if(!v||v.s!='erro'||!v.job)return;if(BGQ.n>0){stat('⚠ Espere os envios terminarem');return}
+ v.job.ids.forEach(i=>{const w=ENV.get(i);if(w&&w.s=='erro')w.s='env'});envDraw();envStat();envRoda(v.job)}
 /* envia o arquivo da tela para o item, trocando o que ele já tinha (troca:1 = 1 arquivo por item, sem criar item). Devolve uma promessa: true se o servidor confirmou */
 function bgUpTroca(p,f){BGQ.n++;const lb='“'+(p.txt||'tela')+'” ('+(p.time||'?')+')';
- const pr=BGQ.p.then(async()=>{for(let t=0;t<2;t++){if(PENDCLR.has(p.id)){/* v410: o arquivo novo já está no Drive: só refaz o envio do clr, sem subir de novo */try{if(await pushClr([p.id])){PENDCLR.delete(p.id);if(pvIds(p).length==1)artIdsSet(p,pvIds(p));return true}}catch(er){}if(t<1)await sleep(1500);continue}const ant=pvIds(p).join(',');try{await upPost(p,[f],{troca:1});if(pvIds(p).join(',')!=ant){if(pvIds(p).length==1)artIdsSet(p,pvIds(p));return true}}catch(er){}if(t<1)await sleep(1500)}BGQ.bad.push(lb);return false}).catch(()=>{BGQ.bad.push(lb);return false}).then(ok=>{BGQ.n--;if(!MD&&!STU&&!EDX){try{render()}catch(x){}}stat(BGQ.n?'☁ enviando em segundo plano… faltam '+BGQ.n+' tela(s)':BGQ.bad.length?'⚠ não consegui enviar as telas de: '+BGQ.bad.join(', ')+'. Abra o dia no editor e salve de novo.':'● todas as telas foram salvas ✓');if(!BGQ.n)BGQ.bad=[];return ok});BGQ.p=pr;return pr}
+ const pr=BGQ.p.then(async()=>{for(let t=0;t<2;t++){if(PENDCLR.has(p.id)){/* v410: o arquivo novo já está no Drive: só refaz o envio do clr, sem subir de novo */try{if(await pushClr([p.id])){PENDCLR.delete(p.id);if(pvIds(p).length==1)artIdsSet(p,pvIds(p));return true}}catch(er){}if(t<1)await sleep(1500);continue}const ant=pvIds(p).join(',');try{await upPost(p,[f],{troca:1});if(pvIds(p).join(',')!=ant){if(pvIds(p).length==1)artIdsSet(p,pvIds(p));return true}}catch(er){}if(t<1)await sleep(1500)}BGQ.bad.push(lb);return false}).catch(()=>{BGQ.bad.push(lb);return false}).then(ok=>{BGQ.n--;if(!MD&&!STU&&!EDX){try{render()}catch(x){}}if(ENV.size)envStat();else stat(BGQ.n?'☁ '+BGQ.n+' tela'+(BGQ.n>1?'s':'')+' enviando…':BGQ.bad.length?'⚠ não consegui enviar as telas de: '+BGQ.bad.join(', ')+'. Abra o dia no editor e salve de novo.':'● todas as telas foram salvas ✓');if(!BGQ.n&&!ENV.size)BGQ.bad=[];return ok});BGQ.p=pr;return pr}
 async function diaSalvar(){const s=STU;if(!s||!s._dia||s._salvando)return;
  if(BGQ.n>0||(CLR.size>0&&!REC)){stat('⚠ Espere os envios terminarem');return}
+ if(envErroDe(s._dia.ids)){stat('⚠ Há telas deste dia que não enviaram: clique em “tentar de novo” na miniatura antes de salvar de novo');return}
  s._salvando=1;const k0=EDX&&EDX.i!=null?EDX.i:0;
  try{
  const ids=s._dia.ids,Q=plan(s._dia.q),D=Q&&Q.dias[s._dia.i];
@@ -9474,10 +9496,10 @@ async function diaSalvar(){const s=STU;if(!s||!s._dia||s._salvando)return;
  try{if(EDX)edClose()}catch(e){}
  const dest=k=>{const m=ex.indexOf(k);return m>=0?ids[m]:''};
  /* 1) trocas de posição: todos os itens mexidos vão no MESMO push com clr:1; nenhum arquivo vai para a lixeira */
+ let aff0=[];
  if(T.length){const aff=diaAplicaTrocas(T);
   s.S.forEach((x,k)=>{if(dest(k)){x._org=dest(k);x._pid=x._org}});   /* as trocas já estão feitas neste aparelho: não repetir se o envio falhar */
-  stat('💾 gravando a nova ordem…');
-  if(!(await pushClr(aff))){stat(REC?'⚠ Outro aparelho alterou estas telas: atualize e tente de novo':'⚠ a nova ordem ainda não chegou ao servidor: confira a conexão e clique em Salvar de novo');try{edOpen(k0)}catch(e){}return}}
+  aff.forEach(id=>CLR.add(id));aff0=aff}   /* v411: o push com clr roda em segundo plano (envRoda); a marca clr já vale para qualquer envio no meio do caminho */
  /* 2) telas novas (sem item): entram na célula do vizinho (no meio do dia) ou na que tiver espaço/última; horário entre os vizinhos e ord na posição certa */
  const novos={},uidDe={};
  if(nv.length&&D){const base=diaTelas(D,S.posts),cels=D.stories.map((st,j)=>({uid:st&&st.uid,j,ok:st&&st.tipo!='reels'&&st.tipo!='carrossel'})).filter(c=>c.ok&&c.uid).map(c=>({uid:c.uid,n:base.filter(b=>b.j==c.j).length}));
@@ -9498,19 +9520,21 @@ async function diaSalvar(){const s=STU;if(!s||!s._dia||s._salvando)return;
   if(diaAntigo(p)){pula(k,'é um story antigo (vários arquivos ou sem tela própria): não será redesenhada · separe os stories antigos em telas (Config)');return false}
   if(x._semArq&&!x._novoArt){pula(k,'tem um vídeo/arquivo que o editor não abre: não será redesenhada');return false}return true});
  const cel=Q&&D?diaTelas(D,S.posts):[];
- let nOk=0;const falhou=[];
- if(sujas.length){stat('💾 desenhando '+sujas.length+' tela(s)…');const fs0=await stFiles(sujas),pr=[];
+ let nOk=0;const ups=[];
+ if(sujas.length){stat('💾 desenhando '+sujas.length+' tela(s)…');const fs0=await stFiles(sujas);
   for(let q=0;q<sujas.length;q++){const k=sujas[q],x=s.S[k],p=Po(pidDe(k));if(!p)continue;
    const ce=cel.find(c=>c.p.id==p.id),stc=ce&&D.stories[ce.j];if(stc&&stc.uid&&p.grp!=stc.uid){p.grp=stc.uid;p.ord=p.ord||ordNova(S.posts,stc.uid)}
    const im=x.bgi!=null&&s.imgs[x.bgi],big=(kk,v)=>typeof v=='string'&&v.length>3000&&/^data:/.test(v)?undefined:v;
    if(x._capRest!==undefined&&x._cj)p.cap=x._capRest;
    gridRefPor('tela_'+p.id,p,JSON.stringify({cap:p.cap||'',mdl:s.mdl||'',S:[{ov:x.ov,lay:x.lay||(s.lays||[])[k]||'',mod:x.mod,extra:x.extra,pet:x.pet,src:im?im.id:''}],cli:''},big),'telas');
-   touch('p',p);const f=fs0[q],ext=(f.name.match(/\.\w+$/)||['.jpg'])[0];pr.push(bgUpTroca(p,new File([f],'tela'+ext,{type:f.type})).then(ok=>{if(ok)nOk++;else falhou.push(k)}))}
-  await Promise.all(pr)}
- s.S.forEach((x,k)=>{if(pidDe(k)){x._org=pidDe(k);x._pid=x._org}if(falhou.includes(k))return;x._sig=diaSig(s,x);delete x._cj;delete x._json;delete x._novoArt});
- if(falhou.length){falhou.sort((a,b)=>a-b);stat('⚠ não salvou a tela '+(falhou[0]+1)+(falhou.length>1?' (e mais '+(falhou.length-1)+')':'')+': tente de novo');try{edOpen(falhou[0])}catch(e){}return}
+   touch('p',p);const f=fs0[q],ext=(f.name.match(/\.\w+$/)||['.jpg'])[0];ups.push({p,f:new File([f],'tela'+ext,{type:f.type})});nOk++}}
+ s.S.forEach((x,k)=>{if(pidDe(k)){x._org=pidDe(k);x._pid=x._org}x._sig=diaSig(s,x);delete x._cj;delete x._json;delete x._novoArt});
+ /* v411: resposta imediata: marca as telas como "enviando" com a miniatura local, fecha o editor e manda ao Drive em segundo plano */
+ const job={aff:aff0.slice(),ups,ids:[...new Set([...aff0,...ups.map(u=>u.p.id)])],trocaOk:0};
+ job.ids.forEach(id=>{const u=ups.find(z=>z.p.id==id);ENV.set(id,{s:'env',url:u?URL.createObjectURL(u.f):'',f:u?u.f:null,job})});
  document.getElementById('stu')?.remove();STU=null;if(MD)closeMd();view='week';cv='cron';render();
- stat('● '+(nOk?nOk+' tela(s) enviadas para os seus itens':'nada novo para enviar')+(T.length?' · '+T.length+' tela(s) trocaram de lugar':'')+(nv.length?' · '+nv.length+' tela(s) nova(s) viraram item':'')+' · de volta ao cronograma'+(avisos.length?' · ⚠ '+avisos.join('; '):''))
+ if(job.ids.length)envRoda(job);
+ stat('● '+(nOk?nOk+' tela(s) indo para os seus itens em segundo plano':'nada novo para enviar')+(T.length?' · '+T.length+' tela(s) trocaram de lugar':'')+(nv.length?' · '+nv.length+' tela(s) nova(s) viraram item':'')+' · de volta ao cronograma'+(avisos.length?' · ⚠ '+avisos.join('; '):''))
  }catch(er){console.warn(er);stat('⚠ não consegui salvar o dia: '+(er&&er.message||er))}finally{if(STU===s)s._salvando=0}}
 /* ---- arrastar miniaturas, botões e atalhos do editor do dia ---- */
 (function(){let D0=null;const alvo=e=>e.target.closest&&e.target.closest('#ste [data-act=edgo2][draggable=true]');
@@ -9519,11 +9543,11 @@ async function diaSalvar(){const s=STU;if(!s||!s._dia||s._salvando)return;
  document.addEventListener('drop',e=>{if(D0==null)return;const b=alvo(e);document.querySelectorAll('#ste .diaov').forEach(x=>x.classList.remove('diaov'));const de=D0;D0=null;if(!b)return;e.preventDefault();e.stopImmediatePropagation();diaMover(de,+b.dataset.v)},true);
  document.addEventListener('dragend',()=>{D0=null;document.querySelectorAll('#ste .diaov').forEach(x=>x.classList.remove('diaov'))},true);
  document.addEventListener('click',e=>{if(!STU||!STU._dia)return;const a=e.target.closest&&e.target.closest('[data-act],[data-ms=del]');if(!a)return;const k=a.dataset.act;
-  if(k=='edfim'||k=='stsave'||k=='stsnext'||k=='diasalvar'||(k=='edfile'&&a.dataset.v=='arts')){e.preventDefault();e.stopImmediatePropagation();diaSalvar();return}
+  if(k=='edfim'||k=='stsave'||k=='stsnext'||k=='stwiz'||k=='diasalvar'||(k=='edfile'&&a.dataset.v=='arts')){e.preventDefault();e.stopImmediatePropagation();diaSalvar();return}
   if(k=='diamv'){e.preventDefault();e.stopImmediatePropagation();const i=EDX?EDX.i:0;diaMover(i,i+(+a.dataset.v))}
-  if(k=='eddel'||a.dataset.ms=='del'){e.preventDefault();e.stopImmediatePropagation();alert('No editor do dia não dá para apagar telas: cada tela é um item da grade. Para tirar uma, apague o item na grade.')}},true)})();
+  if(k=='eddel'||a.dataset.ms=='del'){e.preventDefault();e.stopImmediatePropagation();stat('⚠ No editor do dia não dá para apagar telas: cada tela é um item da grade. Para tirar uma, apague o item na grade.')}},true)})();
 /* este bloco fica dentro do módulo do cronograma: expõe o que o resto do painel chama */
-Object.assign(window,{diaImgOn,diaImgs,diaAuto,diaJson,diaAbrir,diaMover,diaSalvar,diaTrocas,diaTelas});
+Object.assign(window,{diaImgOn,diaImgs,diaAuto,diaJson,diaAbrir,diaMover,diaSalvar,diaTrocas,diaTelas,ENV,envRetry,envN,botaoSeparar});
 if(typeof stSaveArts=='function'){const _ssa=stSaveArts;stSaveArts=function(){if(STU&&STU._dia)return diaSalvar();return _ssa.apply(this,arguments)}}
 /* horário e Automática/Manual nas miniaturas da grade: grava só aquele item */
 /* v409: horário da grade só grava quando o campo perde o foco ou no Enter (o navegador dispara 'change' a cada dígito) */
@@ -9698,6 +9722,7 @@ if(k=='mkweek'&&P){const hj=today();let n=0,pas=0;P.dias.forEach((d,x)=>{d.stori
  if(k=='cpday'){crCopyDay(Q,i);return}
  if(k=='carpr'){const s0=D.stories[j];if(!s0)return;if((artCfg(Q.co)||{}).visual==null){stat('🎨 Primeira vez desta empresa: escolha o estilo visual (fica salvo) e clique de novo');visMd(Q.co,0);return}if(D.data<today()&&!confirm('Esse dia já passou. Criar na grade mesmo assim?'))return;if(!postOf(D,s0)){crMakeS(Q,i,j);setTimeout(()=>crRegS(Q.id,i,j),400)}crCopyDay(Q,i,false,j);render();const o=postOf(D,s0);if(!o)return;
   (async()=>{try{await sleep(150);if(MD)closeMd();document.body.classList.add('crbusy');openMd(Po(o.id),false);await sleep(150);await stOpen({none:1});await sleep(250);document.body.classList.remove('crbusy');if(!STU)return;STU._ret=Q.id;STU._dayq=[];STU._dayn=1;STU._crp={id:Q.id,i};edOpen(0);stat('🧩 pedido do carrossel copiado · cole na IA e arraste aqui o .json que ela entregar')}catch(e){console.warn(e)}})();return}
+ if(k=='envre'){envRetry(a.dataset.crpid);return}
  if(k=='openit'){const q=Po(a.dataset.crpid);if(q&&!q.del){if(MD)closeMd();openMd(q,false)}return}
  if(k=='addtela'){if(D.data<today()&&!confirm('Esse dia já passou. Criar a tela mesmo assim?'))return;const n=crNovaTela(Q,i,j);if(n)setTimeout(()=>{const q=Po(n.id);if(q&&!MD)openMd(q,false)},60);return}
  if(k=='dldia'){const ps=[],lab={};D.stories.forEach((x,jj)=>{postsOf(D,x).filter(q=>q.type=='stories').forEach((q,kk)=>{if(ps.includes(q))return;ps.push(q);lab[q.id]='Story '+(jj+1)+' - tela '+(kk+1)+' - '+String(q.time||'sem hora').replace(':','-')})});igGalPosts(ps,lab);return}
@@ -9846,7 +9871,7 @@ const css=document.createElement('style');css.textContent=`
 .crmb label{display:grid;gap:4px;font-size:13px;font-weight:600}.crmb input,.crmb select,.crmb textarea{border:1px solid #d9d7e3;border-radius:10px;padding:8px 10px;font:14px inherit;width:100%;box-sizing:border-box}.crmb textarea{font-family:ui-monospace,Consolas,monospace;font-size:12px}
 .crg2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.crbt{display:flex;gap:8px;flex-wrap:wrap}.crbt button{border:1px solid #d9d7e3;background:#fff;border-radius:10px;padding:9px 14px;font:700 13px inherit;cursor:pointer}.crbt .crb1{background:#1e1b2e;color:#fff;border-color:transparent}.crer{color:#c62f4a;font-size:13px;min-height:4px}
 @media(max-width:760px){.crov{grid-template-columns:1fr}.crovg{grid-template-columns:repeat(4,1fr)}.crg2{grid-template-columns:1fr}}
-.crstk{display:grid;gap:4px}.crstk.crmany{max-height:196px;overflow-y:auto;padding-right:2px}.crit{display:flex;gap:6px;align-items:center;background:#ffffffb0;border:1px solid #0000001f;border-radius:8px;padding:3px;cursor:pointer;min-height:58px}.crit:hover{border-color:#7048E8}.crith{position:relative;flex:none;width:34px;height:52px;border-radius:5px;overflow:hidden;background:#0000000d;display:grid;place-items:center}.crith img,.crith video{width:100%;height:100%;object-fit:cover}.crith em{font-size:9px;font-style:normal;text-align:center;opacity:.7}.crim{display:grid;gap:2px;font-size:11.5px;min-width:0}.crist{font-size:9.5px;font-weight:800;letter-spacing:.3px;padding:1px 5px;border-radius:6px;background:#e9ecef;color:#495057;width:max-content}.crist.postado{background:#d3f9d8;color:#2b8a3e}.crist.agendado{background:#fff3bf;color:#9a6a00}.crist.erro{background:#ffe3e3;color:#c92a2a}.crsel{font-size:10.5px;font-weight:700;color:#9a6a00;background:#fff3bf;border-radius:6px;padding:3px 6px}.crmd{position:relative;display:block;width:100%;height:118px;border-radius:9px;overflow:hidden;background:#0000000d;cursor:zoom-in;border:0;padding:0;color:inherit}.crmd img,.crmd video{width:100%;height:100%;object-fit:cover;display:block}.crsvg img{object-fit:contain;background:#fff}
+.crenv{display:block;font-weight:700;color:#7048E8}.crenv.erro{color:#c0392b;cursor:pointer;text-decoration:underline}.crstk{display:grid;gap:4px}.crstk.crmany{max-height:196px;overflow-y:auto;padding-right:2px}.crit{display:flex;gap:6px;align-items:center;background:#ffffffb0;border:1px solid #0000001f;border-radius:8px;padding:3px;cursor:pointer;min-height:58px}.crit:hover{border-color:#7048E8}.crith{position:relative;flex:none;width:34px;height:52px;border-radius:5px;overflow:hidden;background:#0000000d;display:grid;place-items:center}.crith img,.crith video{width:100%;height:100%;object-fit:cover}.crith em{font-size:9px;font-style:normal;text-align:center;opacity:.7}.crim{display:grid;gap:2px;font-size:11.5px;min-width:0}.crist{font-size:9.5px;font-weight:800;letter-spacing:.3px;padding:1px 5px;border-radius:6px;background:#e9ecef;color:#495057;width:max-content}.crist.postado{background:#d3f9d8;color:#2b8a3e}.crist.agendado{background:#fff3bf;color:#9a6a00}.crist.erro{background:#ffe3e3;color:#c92a2a}.crsel{font-size:10.5px;font-weight:700;color:#9a6a00;background:#fff3bf;border-radius:6px;padding:3px 6px}.crmd{position:relative;display:block;width:100%;height:118px;border-radius:9px;overflow:hidden;background:#0000000d;cursor:zoom-in;border:0;padding:0;color:inherit}.crmd img,.crmd video{width:100%;height:100%;object-fit:cover;display:block}.crsvg img{object-fit:contain;background:#fff}
 .crph{height:58px;cursor:pointer;border:1.5px dashed var(--kln);background:#ffffff80;font:600 12px inherit;opacity:.75}.crph:hover{opacity:1;background:#fff}
 .crmb3{position:absolute;right:4px;bottom:4px;border:0;background:#fffe;color:#1e1b2e;border-radius:8px;padding:2px 7px;font-size:12px;cursor:pointer;opacity:0;transition:.15s}.crmd:hover .crmb3,.crmd:focus-within .crmb3{opacity:1}@media(hover:none){.crmb3{opacity:.92}}
 .crtag{justify-self:start;border-radius:99px;font:800 10px inherit;padding:2px 9px;letter-spacing:.03em}
