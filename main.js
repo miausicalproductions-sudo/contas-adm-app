@@ -258,6 +258,90 @@ function fontNome(p) {
 }
 let FONTCACHE = null;
 /* projeto do CapCut: grava a pasta pronta direto na pasta de projetos (sem zip, sem extrair) */
+/*ARTES-INI*/
+// v1.5.0: salvar no PC as artes (PNG e PSD) ao distribuir as telas. Funções puras (sem Electron) para poder testar.
+const ART_MAX_ARQ = 200 * 1024 * 1024, ART_MAX_N = 200, ART_EXT = /\.(png|psd|jpg|jpeg)$/i, ART_RESERVADO = /^(con|prn|aux|nul|com[0-9]|lpt[0-9])$/i;
+// limpa um nome de pasta ou arquivo: tira / \ : * ? " < > | e caracteres de controle, nunca deixa ".." e nunca devolve vazio
+function nomeSeguro(t, padrao) {
+  let s = String(t == null ? '' : t).normalize('NFC').replace(/[\\\/:*?"<>|\u0000-\u001f]+/g, ' ').replace(/\.{2,}/g, '.').replace(/\s+/g, ' ').trim().replace(/^[. ]+|[. ]+$/g, '');
+  if (s.length > 80) s = s.slice(0, 80).replace(/[. ]+$/g, '');
+  if (!s) s = padrao || 'Sem nome';
+  if (ART_RESERVADO.test(s.replace(/\..*$/, ''))) s = '_' + s;
+  return s;
+}
+// nome de arquivo: só png/psd/jpg; devolve '' se a extensão não for permitida
+function nomeArquivoArte(t) {
+  const m = String(t == null ? '' : t).match(/\.(png|psd|jpg|jpeg)\s*$/i); if (!m) return '';
+  const ext = m[0].trim().toLowerCase(), raiz = String(t).slice(0, String(t).length - m[0].length);
+  return nomeSeguro(raiz, 'Tela').replace(/[. ]+$/g, '') + ext;
+}
+// pasta de destino: <base>/<Empresa>/<AAAA-MM-DD>; sempre dentro da base (senão devolve '')
+function destinoArte(base, rel) {
+  const partes = String(rel == null ? '' : rel).split(/[\\\/]+/).filter(x => x.trim() !== '');
+  if (!partes.length || partes.length > 3) return '';
+  if (!base || !path.isAbsolute(String(base))) return '';
+  const b = path.resolve(String(base)); if (b === path.parse(b).root) return '';
+  const dir = path.resolve(b, ...partes.map((x, i) => nomeSeguro(x, i ? 'Sem data' : 'Sem empresa')));
+  return dir.startsWith(b + path.sep) ? dir : '';
+}
+// escolhe um nome que ainda não existe: "Tela 1.png", "Tela 1 (2).png", "Tela 1 (3).png"…  (usados = nomes já tomados neste envio, sem diferenciar maiúsculas)
+function nomeLivre(dir, nome, existe, usados) {
+  const ext = (nome.match(/\.\w+$/) || [''])[0], raiz = nome.slice(0, nome.length - ext.length);
+  for (let k = 1; k < 1000; k++) {
+    const n = k === 1 ? nome : raiz + ' (' + k + ')' + ext;
+    if (!(usados && usados.has(n.toLowerCase())) && !existe(path.join(dir, n))) return n;
+  }
+  throw new Error('muitos arquivos com o mesmo nome');
+}
+/*ARTES-FIM*/
+const baseArtes = () => { const p = prefs().pastaArtes; return (typeof p === 'string' && path.isAbsolute(p)) ? path.resolve(p) : path.join(app.getPath('documents'), 'Contas ADM Artes'); };
+ipcMain.handle('pasta-artes', async () => ({ dir: baseArtes() }));
+ipcMain.handle('escolher-pasta-artes', async () => {
+  try {
+    const r = await dialog.showOpenDialog(win || undefined, { title: 'Pasta onde salvar as artes', defaultPath: baseArtes(), properties: ['openDirectory', 'createDirectory'] });
+    if (r.canceled || !r.filePaths || !r.filePaths[0]) return { ok: 0, cancelado: 1 };
+    const d = path.resolve(r.filePaths[0]); if (d === path.parse(d).root) return { ok: 0, erro: 'escolha uma pasta, não o disco inteiro' };
+    savePrefs({ pastaArtes: d }); return { ok: 1, dir: d };
+  } catch (err) { return { ok: 0, erro: String((err && err.message) || err) }; }
+});
+ipcMain.handle('abrir-pasta-artes', async (e, rel) => {
+  try {
+    const base = baseArtes(); fs.mkdirSync(base, { recursive: true });
+    let dir = rel ? destinoArte(base, rel) : base; if (!dir || !fs.existsSync(dir)) dir = base;
+    // só abre PASTA de verdade, dentro da pasta das artes (nunca arquivo, nunca atalho para fora)
+    try { const rb = fs.realpathSync(base), rd = fs.realpathSync(dir); if (!fs.statSync(rd).isDirectory() || !(rd === rb || (rd + path.sep).startsWith(rb + path.sep))) dir = rb; else dir = rd; } catch (e2) { dir = base; }
+    if (!fs.statSync(dir).isDirectory()) return { ok: 0, erro: 'não é uma pasta' };
+    const er = await shell.openPath(dir); return er ? { ok: 0, erro: er } : { ok: 1, dir };
+  } catch (err) { return { ok: 0, erro: String((err && err.message) || err) }; }
+});
+ipcMain.handle('salvar-artes', async (e, rel, arquivos) => {
+  try {
+    if (!Array.isArray(arquivos) || !arquivos.length) return { ok: 0, erro: 'nada para gravar' };
+    if (arquivos.length > ART_MAX_N) return { ok: 0, erro: 'arquivos demais de uma vez (máximo ' + ART_MAX_N + ')' };
+    const base = path.resolve(baseArtes()), dir = destinoArte(base, rel);
+    if (!dir) return { ok: 0, erro: 'pasta de destino inválida' };
+    const lista = arquivos.map(a => {   // confere tudo antes de gravar qualquer coisa
+      const nome = nomeArquivoArte(a && a.name); if (!nome) throw new Error('nome de arquivo inválido (só png, psd ou jpg)');
+      const d = a.data, buf = Buffer.isBuffer(d) ? d : (d instanceof Uint8Array || d instanceof ArrayBuffer) ? Buffer.from(d) : null;
+      if (!buf) throw new Error('arquivo sem conteúdo: ' + nome);
+      if (buf.length > ART_MAX_ARQ) throw new Error('arquivo grande demais (máximo 200 MB): ' + nome);
+      return { nome, buf };
+    });
+    fs.mkdirSync(base, { recursive: true });
+    { const rb = fs.realpathSync(base); let cur = base; for (const parte of path.relative(base, dir).split(path.sep)) { cur = path.join(cur, parte); if (fs.existsSync(cur)) { const rc = fs.realpathSync(cur); if (!(rc + path.sep).startsWith(rb + path.sep) || !fs.statSync(rc).isDirectory()) return { ok: 0, erro: 'pasta de destino fora da pasta das artes' }; } else fs.mkdirSync(cur); } }
+    let real = ''; try { real = fs.realpathSync(dir); const rb = fs.realpathSync(base); if (!(real + path.sep).startsWith(rb + path.sep)) return { ok: 0, erro: 'pasta de destino fora da pasta das artes' }; } catch (e2) { return { ok: 0, erro: 'não consegui abrir a pasta de destino' }; }
+    const usados = new Set(); let n = 0;
+    for (const a of lista) {
+      for (let tent = 0; tent < 50; tent++) {   // flag 'wx': se alguém criar o mesmo nome no meio do caminho, tenta o próximo número
+        const nome = nomeLivre(dir, a.nome, f => fs.existsSync(f), usados), dest = path.join(dir, nome);
+        if (!dest.startsWith(dir + path.sep)) throw new Error('nome de arquivo inválido');
+        try { fs.writeFileSync(dest, a.buf, { flag: 'wx' }); usados.add(nome.toLowerCase()); n++; break; }
+        catch (e3) { if (e3 && e3.code === 'EEXIST') { usados.add(nome.toLowerCase()); continue; } throw e3; }
+      }
+    }
+    return { ok: 1, dir, n };
+  } catch (err) { return { ok: 0, erro: String((err && err.message) || err) }; }
+});
 ipcMain.handle('salvar-pasta', async (e, dir, arquivos) => {
   try {
     dir = path.resolve(String(dir || ''));

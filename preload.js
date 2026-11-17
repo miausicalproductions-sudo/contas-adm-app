@@ -10,6 +10,10 @@ contextBridge.exposeInMainWorld('desktop', {
   checkUpdate: () => ipcRenderer.invoke('check-update'),
   iaInstalar: papel => ipcRenderer.invoke('ia-instalar', papel),
   salvarPasta: (dir, arquivos) => ipcRenderer.invoke('salvar-pasta', dir, arquivos),
+  salvarArtes: (rel, arquivos) => ipcRenderer.invoke('salvar-artes', rel, arquivos),
+  pastaArtes: () => ipcRenderer.invoke('pasta-artes'),
+  escolherPastaArtes: () => ipcRenderer.invoke('escolher-pasta-artes'),
+  abrirArtes: rel => ipcRenderer.invoke('abrir-pasta-artes', rel),
   fontes: () => ipcRenderer.invoke('fontes-lista'),
   fonteLer: p => ipcRenderer.invoke('fonte-ler', p),
   platform: process.platform
